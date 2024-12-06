@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+}
+
+.test {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+}
+
+.test2 {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  flex: 1;
+  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+}
