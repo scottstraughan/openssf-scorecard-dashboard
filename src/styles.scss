@@ -4,6 +4,8 @@ html, body {
   height: 100%;
 
   --default-transition: .2s all;
+  --default-border-radius: 8px;
+  --default-box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
 }
 
 body {
@@ -14,4 +16,17 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+a {
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.panel {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+  overflow: hidden;
+  padding: 2rem;
 }

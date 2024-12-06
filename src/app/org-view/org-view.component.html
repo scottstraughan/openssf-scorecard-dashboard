@@ -1,7 +1,14 @@
-<div class="test">
+<div class="panel overview">
   asdasd
 </div>
 
-<div class="test2">
-  asdasda
+<div class="panel repositories">
+  <div class="header">
+    <osf-button icon="grid_view">Hello</osf-button>
+  </div>
+  <div class="list">
+    @for (repository of repositories; track repository.name) {
+      <osf-repository [repository]="repository"></osf-repository>
+    }
+  </div>
 </div>
