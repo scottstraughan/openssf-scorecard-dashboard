@@ -4,18 +4,27 @@
   height: 100%;
 }
 
-.test {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 300px;
-  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+.panel.overview {
+  width: 340px;
 }
 
-.test2 {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
+.panel.repositories {
+  padding: 0;
   flex: 1;
-  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+
+  .header {
+    background-color: rgba(0, 0, 0, .05);
+    padding: 1rem;
+  }
+
+  .list {
+    padding: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    osf-repository {
+      flex: 1 0 25%
+    }
+  }
 }

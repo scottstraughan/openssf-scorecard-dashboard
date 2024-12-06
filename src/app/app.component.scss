@@ -8,9 +8,15 @@ nav {
   display: flex;
   flex-direction: column;
   text-align: center;
+  padding: 1.5rem 0;
 
   .logo {
-    padding: 2rem 0;
+    padding: 1rem 0;
+
+    img {
+      width: 100%;
+      max-width: 70px;
+    }
   }
 
   .orgs {
@@ -19,6 +25,7 @@ nav {
     align-items: center;
     flex-direction: column;
     gap: 1rem;
+    padding-top: 3rem;
 
     > div {
       width: 70px;
@@ -49,9 +56,13 @@ nav {
     }
 
     .add {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, .2);
+        border: rgba(0, 0, 0, .3) 1px solid;
+      }
 
       span {
         font-size: 30px;
@@ -61,7 +72,15 @@ nav {
   }
 
   .settings {
-    padding: 1rem;
+
+    .url {
+      background-color: rgba(0, 0, 0, .05);
+      border-radius: 6px;
+      padding: .5rem;
+      font-size: .8rem;
+      color: rgba(0, 0, 0, .5);
+      cursor: pointer;
+    }
   }
 }
 
