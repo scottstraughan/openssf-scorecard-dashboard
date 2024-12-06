@@ -33,9 +33,10 @@ nav {
       border-radius: 100%;
       overflow: hidden;
       padding: .3rem;
-      opacity: .7;
+      opacity: .5;
       transition: var(--default-transition);
       cursor: pointer;
+      filter: grayscale(1);
 
       > div {
         background-color: rgba(0, 0, 0, .2);
@@ -46,8 +47,9 @@ nav {
       }
 
       &.selected {
-        border: purple 2px solid;
+        border: #32008c 2px solid;
         opacity: 1;
+        filter: grayscale(0);
       }
 
       &:hover {
