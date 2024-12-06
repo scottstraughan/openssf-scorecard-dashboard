@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { OrganizationModel } from './shared/models/organization.model';
 import { NgClass } from '@angular/common';
 
@@ -11,7 +11,9 @@ import { NgClass } from '@angular/common';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'openssf-dashboard';
+  constructor(
+    protected router: Router
+  ) { }
 
   organizations: OrganizationModel[] = [
     {
@@ -19,25 +21,22 @@ export class AppComponent {
       icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4'
     },
     {
-      name: 'codeplaysoftware1',
-      icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4'
+      name: 'jetbrains',
+      icon: 'https://avatars.githubusercontent.com/u/878437?s=48&v=4'
     },
     {
-      name: 'codeplaysoftware2',
-      icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4'
+      name: 'uxlfoundation',
+      icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4'
     }
   ];
 
   selectedOrganization: OrganizationModel | undefined = this.organizations[0];
 
-
   onOrganizationSelected(organization: OrganizationModel) {
-    this.selectedOrganization = organization;
+    this.router.navigateByUrl('/view/' + organization.name)
   }
 
   onAddOrg() {
     alert();
   }
-
-  protected readonly Object = Object;
 }

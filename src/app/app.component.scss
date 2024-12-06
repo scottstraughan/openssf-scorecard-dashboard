@@ -36,20 +36,18 @@ nav {
       opacity: .5;
       transition: var(--default-transition);
       cursor: pointer;
-      filter: grayscale(1);
 
       > div {
         background-color: rgba(0, 0, 0, .2);
         height: 100%;
         width: 100%;
         border-radius: 100%;
-        background-size: cover;
+        background-size: cover
       }
 
       &.selected {
         border: #32008c 2px solid;
         opacity: 1;
-        filter: grayscale(0);
       }
 
       &:hover {
