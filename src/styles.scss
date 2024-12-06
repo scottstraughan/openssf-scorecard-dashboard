@@ -2,10 +2,17 @@
 
 html, body {
   height: 100%;
+  color: #111;
 
   --default-transition: .2s all;
   --default-border-radius: 8px;
+  --default-border-radius-large: 12px;
   --default-box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+
+  --color-shocking: #c10000;
+  --color-poor: #e35600;
+  --color-good: #f4c500;
+  --color-excellent: #43a300;
 }
 
 body {
@@ -23,10 +30,15 @@ a {
   color: inherit;
 }
 
+input {
+  font: inherit;
+  color: inherit;
+}
+
 .panel {
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .1);
+  border-radius: var(--default-border-radius-large);
+  box-shadow: var(--default-box-shadow);
   overflow: hidden;
   padding: 2rem;
 }
