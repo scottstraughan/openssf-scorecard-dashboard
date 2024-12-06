@@ -7,12 +7,70 @@
 .panel.overview {
   width: 340px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 2rem 0;
 
-  osf-ring {
-    width: 200px;
-    height: 200px;
+  .header {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+
+    osf-ring {
+      width: 180px;
+      height: 180px;
+    }
+  }
+
+  .details {
+    flex: 1;
+    padding: 2rem 1rem;
+
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    p {
+      opacity: .5;
+    }
+
+    .stats {
+      margin-top: 2rem;
+
+      > div {
+        display: flex;
+        padding: .5rem 0;
+
+        &:not(:last-of-type) {
+          border-bottom: rgba(0, 0, 0, .15) 1px solid;
+        }
+
+        > div {
+          display: flex;
+          align-items: center;
+        }
+
+        > div:nth-of-type(1) {
+          flex: 1;
+        }
+
+        .number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: #ccc 1px solid;
+          border-radius: 100%;
+          padding: .5rem;
+          font-size: .9rem;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
   }
 }
 
