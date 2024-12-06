@@ -1,10 +1,15 @@
 <div class="panel overview">
-  asdasd
+  <osf-ring [score]="8" [thickness]="'10px'" fontSize="4rem"></osf-ring>
 </div>
 
 <div class="panel repositories">
   <div class="header">
-    <osf-button icon="grid_view">Hello</osf-button>
+    <div>
+      <osf-search [(value)]="searchString"></osf-search>
+    </div>
+    <div>
+      <osf-button icon="grid_view">Hello</osf-button>
+    </div>
   </div>
   <div class="list">
     @for (repository of repositories; track repository.name) {
