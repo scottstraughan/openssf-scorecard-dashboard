@@ -1,39 +1,30 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { OrganizationModel } from './shared/models/organization.model';
 import { NgClass } from '@angular/common';
+import { OrganizationService } from './shared/services/organization.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NgClass],
+  imports: [RouterOutlet, NgClass, RouterLinkActive, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  constructor(
-    protected router: Router
-  ) { }
-
-  organizations: OrganizationModel[] = [
-    {
-      name: 'codeplaysoftware',
-      icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4'
-    },
-    {
-      name: 'jetbrains',
-      icon: 'https://avatars.githubusercontent.com/u/878437?s=48&v=4'
-    },
-    {
-      name: 'uxlfoundation',
-      icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4'
-    }
-  ];
-
+  organizations: OrganizationModel[] = [];
   selectedOrganization: OrganizationModel | undefined = this.organizations[0];
 
-  onOrganizationSelected(organization: OrganizationModel) {
-    this.router.navigateByUrl('/view/' + organization.name)
+  constructor(
+    protected router: Router,
+    protected organizationService: OrganizationService,
+  ) {
+    this.organizations = this.organizationService.getOrganizations();
+    this.setSelectedOrganization(this.organizations[0]);
+  }
+
+  setSelectedOrganization(organization: OrganizationModel) {
+    this.selectedOrganization = organization;
   }
 
   onAddOrg() {
