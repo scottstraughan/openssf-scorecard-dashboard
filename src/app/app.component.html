@@ -4,7 +4,7 @@
   </div>
 
   <div class="orgs">
-    @for (organization of organizations; track organization.name) {
+    @for (organization of organizations(); track organization.name) {
       <a [routerLink]="'view/' + organization.name" class="item" routerLinkActive="selected">
         <div [style.background-image]="'url(' + organization.icon + ')'"></div>
       </a>

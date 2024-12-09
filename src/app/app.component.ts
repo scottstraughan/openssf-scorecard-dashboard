@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, signal, Signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { OrganizationModel } from './shared/models/organization.model';
 import { NgClass } from '@angular/common';
 import { OrganizationService } from './shared/services/organization.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -12,15 +13,14 @@ import { OrganizationService } from './shared/services/organization.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  organizations: OrganizationModel[] = [];
-  selectedOrganization: OrganizationModel | undefined = this.organizations[0];
+  organizations: Signal<OrganizationModel[]> = signal([]);
+  selectedOrganization: OrganizationModel | undefined;
 
   constructor(
-    protected router: Router,
     protected organizationService: OrganizationService,
   ) {
-    this.organizations = this.organizationService.getOrganizations();
-    this.setSelectedOrganization(this.organizations[0]);
+    this.organizations = toSignal(this.organizationService.getOrganizations(), { initialValue: [] });
+    this.setSelectedOrganization(this.organizations()[0]);
   }
 
   setSelectedOrganization(organization: OrganizationModel) {

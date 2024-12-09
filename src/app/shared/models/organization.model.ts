@@ -8,4 +8,5 @@ export interface OrganizationModel {
   totalRepositories: number
   repositoriesWithScorecards: number
   totalStars: number
+  url: string
 }
