@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { OrganizationModel } from '../models/organization.model';
-import { RepositoryType } from '../models/repository.model';
+import { RepositoryModel, RepositoryType } from '../models/repository.model';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
@@ -9,6 +9,8 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
   providedIn: 'root'
 })
 export class OrganizationService {
+  static readonly RESULTS_PER_REQUEST = 100;
+
   constructor(
     private httpClient: HttpClient,
     @Inject(LOCAL_STORAGE) private storageService: StorageService
@@ -75,42 +77,36 @@ export class OrganizationService {
             repositoriesWithScorecards: 0,
             followers: organizationResult['followers'],
             url: organizationResult['html_url'],
-            repositories: []
           }
         }),
-        tap((organization) => this.storageService.set(apiUrl, organization))
+        tap((organization) =>
+          this.storageService.set(apiUrl, organization))
       );
   }
 
   getOrganizationRepositories(
     organizationModel: OrganizationModel,
     page: number = 1,
-  ): Observable<OrganizationModel> {
-    const resultsPagePage = 100;
-
+    repositories: RepositoryModel[] = []
+  ): Observable<RepositoryModel[]> {
     const apiUrl = OrganizationService.getGitHubApiUrl(
-      organizationModel.login, RepositoryType.ORGANIZATION);
+      organizationModel.login, RepositoryType.ORGANIZATION) + '/repos';
 
-    const fullUrl = `${apiUrl}/repos?per_page=${resultsPagePage}&page=${page}`;
-
-    if (this.storageService.has(fullUrl)) {
+    if (this.storageService.has(apiUrl)) {
       console.log('Loading repositories from cache...');
-      return of(this.storageService.get(fullUrl));
+      return of(this.storageService.get(apiUrl));
     }
 
     let exhausted = false;
 
-    return this.httpClient.get(fullUrl, { responseType: 'json' })
+    return this.httpClient.get(`${apiUrl}?per_page=${OrganizationService.RESULTS_PER_REQUEST}&page=${page}`,
+      { responseType: 'json' })
       .pipe(
         map((repositoriesResult: any) => {
           console.log('Loading repositories from GitHub API...');
 
-          if (!organizationModel.repositories) {
-            organizationModel.repositories = [];
-          }
-
           for (const repository of repositoriesResult) {
-            organizationModel.repositories.push({
+            repositories.push({
               name: repository['name'],
               url: repository['url'],
               lastUpdated: new Date(repository['updated_at']),
@@ -119,16 +115,16 @@ export class OrganizationService {
             });
           }
 
-          exhausted = repositoriesResult.length < resultsPagePage;
-          return organizationModel;
+          exhausted = repositoriesResult.length < OrganizationService.RESULTS_PER_REQUEST;
+          return repositories;
         }),
-        switchMap((organizationModel) => {
+        switchMap((repositories) => {
           if (exhausted) {
-            this.storageService.set(fullUrl, organizationModel);
-            return of(organizationModel);
+            this.storageService.set(apiUrl, repositories);
+            return of(repositories);
           }
 
-          return this.getOrganizationRepositories(organizationModel, page + 1);
+          return this.getOrganizationRepositories(organizationModel, page + 1, repositories);
         }),
       );
   }
