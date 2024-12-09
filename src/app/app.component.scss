@@ -33,7 +33,7 @@ nav {
       border-radius: 100%;
       overflow: hidden;
       padding: .3rem;
-      opacity: .5;
+      opacity: .8;
       transition: var(--default-transition);
       cursor: pointer;
 
@@ -46,7 +46,7 @@ nav {
       }
 
       &.selected {
-        border: #32008c 2px solid;
+        border: var(--hint-color) 2px solid;
         opacity: 1;
       }
 

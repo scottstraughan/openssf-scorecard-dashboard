@@ -12,44 +12,48 @@ export class OrganizationService {
   constructor(
     private httpClient: HttpClient,
     @Inject(LOCAL_STORAGE) private storageService: StorageService
-  ) {
-  }
+  ) { }
 
   getOrganizations(): Observable<OrganizationModel[]> {
     return of([
       {
-        name: 'codeplaysoftware',
+        login: 'codeplaysoftware',
         icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4',
         totalRepositories: 121,
         repositoriesWithScorecards: 24,
         followers: 300,
         averageScore: 8.3,
         url: 'https://github.com',
+        description: '', name: ''
       },
       {
-        name: 'jetbrains',
+        login: 'jetbrains',
         icon: 'https://avatars.githubusercontent.com/u/878437?s=48&v=4',
         totalRepositories: 42,
         repositoriesWithScorecards: 12,
         followers: 23,
         averageScore: 5,
         url: 'https://github.com',
+        description: '', name: ''
       },
       {
-        name: 'uxlfoundation',
+        login: 'uxlfoundation',
         icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4',
         totalRepositories: 5,
         repositoriesWithScorecards: 2,
         followers: 123,
         averageScore: 3.2,
-        url: 'https://github.com',
+        url: 'https://github.com',description: '', name: ''
+
       }
     ]);
   }
 
-  getOrganizationByTag(organizationName: string): Observable<OrganizationModel> {
+  getOrganizationByTag(
+    organizationLogin: string
+  ): Observable<OrganizationModel> {
     const apiUrl = OrganizationService.getGitHubApiUrl(
-      organizationName, RepositoryType.ORGANIZATION);
+      organizationLogin, RepositoryType.ORGANIZATION);
 
     if (this.storageService.has(apiUrl)) {
       console.log('Loading organization details from cache...');
@@ -62,8 +66,10 @@ export class OrganizationService {
           console.log('Loading organization details from GitHub API...');
 
           return {
-            name: organizationName,
+            login: organizationResult['login'],
+            name: organizationResult['name'],
             icon: organizationResult['avatar_url'],
+            description: organizationResult['description'],
             averageScore: 8.3,
             totalRepositories: organizationResult['public_repos'],
             repositoriesWithScorecards: 0,
@@ -83,7 +89,7 @@ export class OrganizationService {
     const resultsPagePage = 100;
 
     const apiUrl = OrganizationService.getGitHubApiUrl(
-      organizationModel.name, RepositoryType.ORGANIZATION);
+      organizationModel.login, RepositoryType.ORGANIZATION);
 
     const fullUrl = `${apiUrl}/repos?per_page=${resultsPagePage}&page=${page}`;
 
@@ -107,6 +113,9 @@ export class OrganizationService {
             organizationModel.repositories.push({
               name: repository['name'],
               url: repository['url'],
+              lastUpdated: new Date(repository['updated_at']),
+              stars: repository['stargazers_count'],
+              description: repository['description'],
             });
           }
 

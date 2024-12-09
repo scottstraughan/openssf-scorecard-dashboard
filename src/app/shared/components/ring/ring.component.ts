@@ -1,4 +1,12 @@
-import { Component, effect, HostBinding, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  HostBinding,
+  input,
+  SkipSelf
+} from '@angular/core';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NgClass } from '@angular/common';
 
@@ -10,9 +18,10 @@ import { NgClass } from '@angular/common';
     NgCircleProgressModule,
     NgClass
   ],
-  styleUrl: './ring.component.scss'
+  styleUrl: './ring.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RingComponent  {
+export class RingComponent {
   readonly score = input.required<number>();
   readonly thickness = input<string>('5px');
   readonly fontSize = input<string>('1.5rem');
@@ -29,11 +38,15 @@ export class RingComponent  {
   /**
    * Constructor.
    */
-  constructor() {
+  constructor(
+    @SkipSelf() protected cdRef: ChangeDetectorRef
+  ) {
     effect(() => {
       this.percentage = Math.round(this.score() * 10) + '%';
       this.thicknessBinding = this.thickness();
       this.fontSizeBinding = this.fontSize();
+
+      this.cdRef.detectChanges();
     });
   }
 
