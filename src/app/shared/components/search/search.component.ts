@@ -12,4 +12,5 @@ import { FormsModule } from '@angular/forms';
 })
 export class SearchComponent {
   value = model<string>('');
+  placeholder = model<string>('');
 }

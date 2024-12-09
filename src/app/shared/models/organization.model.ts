@@ -1,3 +1,5 @@
+import { RepositoryModel } from './repository.model';
+
 /**
  * Organization model.
  */
@@ -7,6 +9,7 @@ export interface OrganizationModel {
   averageScore: number
   totalRepositories: number
   repositoriesWithScorecards: number
-  totalStars: number
+  followers: number
   url: string
+  repositories?: RepositoryModel[]
 }

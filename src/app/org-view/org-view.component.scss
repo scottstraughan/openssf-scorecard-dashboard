@@ -5,7 +5,7 @@
 }
 
 .panel.overview {
-  width: 340px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -95,6 +95,8 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    overflow: auto;
+    height: 100%;
 
     osf-repository {
       flex: 1 0 25%;

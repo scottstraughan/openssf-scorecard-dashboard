@@ -1,12 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { OrganizationModel } from '../models/organization.model';
-import { RepositoryModel } from '../models/repository.model';
-import { map, Observable, of } from 'rxjs';
+import { RepositoryType } from '../models/repository.model';
+import { map, Observable, of, switchMap, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrganizationService {
+  constructor(
+    private httpClient: HttpClient,
+    @Inject(LOCAL_STORAGE) private storageService: StorageService
+  ) {
+  }
+
   getOrganizations(): Observable<OrganizationModel[]> {
     return of([
       {
@@ -14,7 +22,7 @@ export class OrganizationService {
         icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4',
         totalRepositories: 121,
         repositoriesWithScorecards: 24,
-        totalStars: 300,
+        followers: 300,
         averageScore: 8.3,
         url: 'https://github.com',
       },
@@ -23,7 +31,7 @@ export class OrganizationService {
         icon: 'https://avatars.githubusercontent.com/u/878437?s=48&v=4',
         totalRepositories: 42,
         repositoriesWithScorecards: 12,
-        totalStars: 23,
+        followers: 23,
         averageScore: 5,
         url: 'https://github.com',
       },
@@ -32,54 +40,103 @@ export class OrganizationService {
         icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4',
         totalRepositories: 5,
         repositoriesWithScorecards: 2,
-        totalStars: 123,
+        followers: 123,
         averageScore: 3.2,
         url: 'https://github.com',
       }
     ]);
   }
 
-  getOrganizationByTag(tag: string): Observable<OrganizationModel | undefined> {
-    return this.getOrganizations()
-      .pipe(
-        map((organizations) => {
-          for (const org of organizations) {
-            if (org.name == tag) {
-              return org
-            }
-          }
+  getOrganizationByTag(organizationName: string): Observable<OrganizationModel> {
+    const apiUrl = OrganizationService.getGitHubApiUrl(
+      organizationName, RepositoryType.ORGANIZATION);
 
-          return undefined;
-        })
+    if (this.storageService.has(apiUrl)) {
+      console.log('Loading organization details from cache...');
+      return of(this.storageService.get(apiUrl));
+    }
+
+    return this.httpClient.get(`${apiUrl}`, { responseType: 'json' })
+      .pipe(
+        map((organizationResult: any) => {
+          console.log('Loading organization details from GitHub API...');
+
+          return {
+            name: organizationName,
+            icon: organizationResult['avatar_url'],
+            averageScore: 8.3,
+            totalRepositories: organizationResult['public_repos'],
+            repositoriesWithScorecards: 0,
+            followers: organizationResult['followers'],
+            url: organizationResult['html_url'],
+            repositories: []
+          }
+        }),
+        tap((organization) => this.storageService.set(apiUrl, organization))
       );
   }
 
-  getRepos(): Observable<RepositoryModel[]> {
-    return of([
-      {
-        name: 'repo1',
-        url: 'https://githhub.com'
-      },
-      {
-        name: 'repo2',
-        url: 'https://githhub.com'
-      },
-      {
-        name: 'repo3',
-        url: 'https://githhub.com'
-      },
-      {
-        name: 'repo4',
-        url: 'https://githhub.com'
-      },
-      {
-        name: 'repo5',
-        url: 'https://githhub.com'
-      },
-      {
-        name: 'repo6',
-        url: 'https://githhub.com'
-      }
-    ]);
+  getOrganizationRepositories(
+    organizationModel: OrganizationModel,
+    page: number = 1,
+  ): Observable<OrganizationModel> {
+    const resultsPagePage = 100;
+
+    const apiUrl = OrganizationService.getGitHubApiUrl(
+      organizationModel.name, RepositoryType.ORGANIZATION);
+
+    const fullUrl = `${apiUrl}/repos?per_page=${resultsPagePage}&page=${page}`;
+
+    if (this.storageService.has(fullUrl)) {
+      console.log('Loading repositories from cache...');
+      return of(this.storageService.get(fullUrl));
+    }
+
+    let exhausted = false;
+
+    return this.httpClient.get(fullUrl, { responseType: 'json' })
+      .pipe(
+        map((repositoriesResult: any) => {
+          console.log('Loading repositories from GitHub API...');
+
+          if (!organizationModel.repositories) {
+            organizationModel.repositories = [];
+          }
+
+          for (const repository of repositoriesResult) {
+            organizationModel.repositories.push({
+              name: repository['name'],
+              url: repository['url'],
+            });
+          }
+
+          exhausted = repositoriesResult.length < resultsPagePage;
+          return organizationModel;
+        }),
+        switchMap((organizationModel) => {
+          if (exhausted) {
+            this.storageService.set(fullUrl, organizationModel);
+            return of(organizationModel);
+          }
+
+          return this.getOrganizationRepositories(organizationModel, page + 1);
+        }),
+      );
+  }
+
+  /**
+   * Return the full GitHub api url.
+   */
+  protected static getGitHubApiUrl(
+    name: string,
+    type: RepositoryType
+  ): string {
+    if (type == RepositoryType.ORGANIZATION) {
+      return `https://api.github.com/orgs/${name}`;
+    } else if (type == RepositoryType.USER) {
+      return `https://api.github.com/users/${name}`;
+    }
+
+    throw new Error('Unsupported repository type.');
   }
 }
