@@ -39,7 +39,7 @@
 
       > div {
         display: flex;
-        padding: .5rem 0;
+        padding: 1rem 0;
 
         &:not(:last-of-type) {
           border-bottom: rgba(0, 0, 0, .15) 1px solid;
@@ -59,9 +59,10 @@
           align-items: center;
           justify-content: center;
           border: #ccc 1px solid;
-          border-radius: 100%;
+          border-radius: 4px;
           padding: .5rem;
           font-size: .9rem;
+          box-shadow: var(--default-box-shadow);
         }
       }
     }
