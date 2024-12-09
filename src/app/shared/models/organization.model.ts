@@ -1,8 +1,3 @@
-import { RepositoryModel } from './repository.model';
-
-/**
- * Organization model.
- */
 export interface OrganizationModel {
   login: string
   name: string
@@ -13,5 +8,4 @@ export interface OrganizationModel {
   repositoriesWithScorecards: number
   followers: number
   url: string
-  repositories?: RepositoryModel[]
 }

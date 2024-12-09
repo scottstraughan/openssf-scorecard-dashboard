@@ -8,7 +8,8 @@ import { OrganizationModel } from '../shared/models/organization.model';
 import { OrganizationService } from '../shared/services/organization.service';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
-import { tap } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
+import { RepositoryModel } from '../shared/models/repository.model';
 
 @Component({
   selector: 'app-org-view',
@@ -24,10 +25,15 @@ import { tap } from 'rxjs';
   styleUrl: './org-view.component.scss'
 })
 export class OrgViewComponent implements OnInit {
+  readonly LoadingState = LoadingState;
+  readonly organization: WritableSignal<OrganizationModel | undefined> = signal(undefined);
+  readonly repositories: WritableSignal<RepositoryModel[]> = signal([]);
+  readonly loadingOrganization: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly loadingRepositories: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+
   searchString: string = '';
-  organization: OrganizationModel | undefined;
-  loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  protected readonly LoadingState = LoadingState;
+  organizationSubscription: Subscription | undefined;
+  repositorySubscription: Subscription | undefined;
 
   constructor(
     protected activatedRoute: ActivatedRoute,
@@ -38,14 +44,28 @@ export class OrgViewComponent implements OnInit {
     this.activatedRoute.params
       .pipe(
         tap((params) => {
-          this.loading.set(LoadingState.LOADING);
+          if (this.repositorySubscription) {
+            this.repositorySubscription.unsubscribe();
+          }
 
-          this.organizationService.getOrganizationByTag(params['organization'])
+          if (this.organizationSubscription) {
+            this.organizationSubscription.unsubscribe();
+          }
+
+          this.loadingOrganization.set(LoadingState.LOADING);
+          this.loadingRepositories.set(LoadingState.LOADING);
+          this.repositories.set([]);
+
+          this.organizationSubscription = this.organizationService.getOrganizationByTag(params['organization'])
             .subscribe((organization) => {
-              this.organizationService.getOrganizationRepositories(organization)
-                .subscribe(organization => this.organization = organization);
+              this.organization.set(organization);
+              this.loadingOrganization.set(LoadingState.LOAD_SUCCESS);
 
-              this.loading.set(LoadingState.LOAD_SUCCESS);
+              this.repositorySubscription = this.organizationService.getOrganizationRepositories(organization)
+                .subscribe((repositories) => {
+                  this.repositories.set(repositories);
+                  this.loadingRepositories.set(LoadingState.LOAD_SUCCESS);
+                });
             });
         })
       )

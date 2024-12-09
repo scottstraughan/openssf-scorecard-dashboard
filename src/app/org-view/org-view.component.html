@@ -1,6 +1,6 @@
-@if (loading() == LoadingState.LOAD_SUCCESS) {
-  @if (organization) {
-    <div class="panel overview">
+<div class="panel overview">
+  @if (loadingOrganization() == LoadingState.LOAD_SUCCESS) {
+    @if (organization(); as organization) {
       <div class="header">
         <osf-ring [score]="organization.averageScore" [thickness]="'10px'" fontSize="4rem"></osf-ring>
       </div>
@@ -35,9 +35,15 @@
         </a>
         <osf-button icon="delete">Remove</osf-button>
       </div>
-    </div>
+    }
+  } @else {
+    <osf-loading></osf-loading>
+  }
+</div>
 
-    <div class="panel repositories">
+<div class="panel repositories">
+  @if (loadingRepositories() == LoadingState.LOAD_SUCCESS) {
+    @if (organization(); as organization) {
       <div class="header">
         <div>
           <osf-search [(value)]="searchString" placeholder="type to filter repositories"></osf-search>
@@ -47,15 +53,12 @@
         </div>
       </div>
       <div class="list">
-        @for (repository of organization.repositories; track repository.name) {
+        @for (repository of repositories(); track repository.url) {
           <osf-repository [organization]="organization" [repository]="repository"></osf-repository>
         }
       </div>
-    </div>
+    }
+  } @else {
+    <osf-loading></osf-loading>
   }
-} @else if (loading() == LoadingState.LOAD_FAILURE) {
-  ERROR
-} @else {
-  <osf-loading></osf-loading>
-}
-
+</div>
