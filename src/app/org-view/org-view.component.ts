@@ -7,6 +7,8 @@ import { SearchComponent } from '../shared/components/search/search.component';
 import { RingComponent } from '../shared/components/ring/ring.component';
 import { tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { OrganizationModel } from '../shared/models/organization.model';
+import { OrganizationService } from '../shared/services/organization.service';
 
 @Component({
   selector: 'app-org-view',
@@ -23,14 +25,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class OrgViewComponent {
   searchString: string = '';
 
+  organization: OrganizationModel | undefined;
+
   constructor(
     protected activatedRoute: ActivatedRoute,
-    protected router: Router
+    protected router: Router,
+    protected organizationService: OrganizationService,
   ) {
     this.activatedRoute.params
       .pipe(
         tap((params) => {
-          console.log(params);
+          for (const o of this.organizationService.getOrganizations()) {
+            if (o.name == params['organization']) {
+              this.organization = o;
+            }
+          }
         })
       )
       .subscribe();

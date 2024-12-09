@@ -8,7 +8,7 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'view/:test',
+    path: 'view/:organization',
     component: OrgViewComponent
   },
 ];

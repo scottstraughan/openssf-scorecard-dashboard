@@ -1,51 +1,53 @@
-<div class="panel overview">
-  <div class="header">
-    <osf-ring [score]="8.3" [thickness]="'10px'" fontSize="4rem"></osf-ring>
-  </div>
-  <div class="details">
-    <h1>Hello World!</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-      et dolore magna aliqua.</p>
+@if (organization) {
+  <div class="panel overview">
+    <div class="header">
+      <osf-ring [score]="organization.averageScore" [thickness]="'10px'" fontSize="4rem"></osf-ring>
+    </div>
+    <div class="details">
+      <h1 [innerHTML]="organization.name"></h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.</p>
 
-    <div class="stats">
-      <div>
-        <div>Total Repositories</div>
+      <div class="stats">
         <div>
-          <span class="number">12</span>
+          <div>Total Repositories</div>
+          <div>
+            <span class="number" [innerHTML]="organization.totalRepositories"></span>
+          </div>
         </div>
-      </div>
-      <div>
-        <div>Repositories with Scores</div>
         <div>
-          <span class="number">12</span>
+          <div>Repositories with Scores</div>
+          <div>
+            <span class="number" [innerHTML]="organization.repositoriesWithScorecards">12</span>
+          </div>
         </div>
-      </div>
-      <div>
-        <div>Total Forks</div>
         <div>
-          <span class="number">12</span>
+          <div>Total Forks</div>
+          <div>
+            <span class="number" [innerHTML]="organization.totalStars">12</span>
+          </div>
         </div>
       </div>
     </div>
+    <div class="actions">
+      <osf-button icon="alt_route">Visit Repository</osf-button>
+      <osf-button icon="delete">Remove</osf-button>
+    </div>
   </div>
-  <div class="actions">
-    <osf-button icon="alt_route">Visit Repository</osf-button>
-    <osf-button icon="delete">Remove</osf-button>
-  </div>
-</div>
 
-<div class="panel repositories">
-  <div class="header">
-    <div>
-      <osf-search [(value)]="searchString"></osf-search>
+  <div class="panel repositories">
+    <div class="header">
+      <div>
+        <osf-search [(value)]="searchString"></osf-search>
+      </div>
+      <div>
+        <osf-button icon="grid_view">Hello</osf-button>
+      </div>
     </div>
-    <div>
-      <osf-button icon="grid_view">Hello</osf-button>
+    <div class="list">
+      @for (repository of repositories; track repository.name) {
+        <osf-repository [repository]="repository"></osf-repository>
+      }
     </div>
   </div>
-  <div class="list">
-    @for (repository of repositories; track repository.name) {
-      <osf-repository [repository]="repository"></osf-repository>
-    }
-  </div>
-</div>
+}
