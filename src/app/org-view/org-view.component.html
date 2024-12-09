@@ -10,7 +10,7 @@
 
       <div class="stats">
         <div>
-          <div>Total Repositories</div>
+          <div>Public Repositories</div>
           <div>
             <span class="number" [innerHTML]="organization.totalRepositories"></span>
           </div>
@@ -22,15 +22,17 @@
           </div>
         </div>
         <div>
-          <div>Total Forks</div>
+          <div>Total Followers</div>
           <div>
-            <span class="number" [innerHTML]="organization.totalStars">12</span>
+            <span class="number" [innerHTML]="organization.followers">12</span>
           </div>
         </div>
       </div>
     </div>
     <div class="actions">
-      <osf-button icon="alt_route">Visit Repository</osf-button>
+      <a [href]="organization.url" target="_blank" rel="noopener">
+        <osf-button icon="alt_route">Visit Repository</osf-button>
+      </a>
       <osf-button icon="delete">Remove</osf-button>
     </div>
   </div>
@@ -38,14 +40,14 @@
   <div class="panel repositories">
     <div class="header">
       <div>
-        <osf-search [(value)]="searchString"></osf-search>
+        <osf-search [(value)]="searchString" placeholder="type to filter repositories"></osf-search>
       </div>
       <div>
         <osf-button icon="grid_view">Hello</osf-button>
       </div>
     </div>
     <div class="list">
-      @for (repository of repositories; track repository.name) {
+      @for (repository of organization.repositories; track repository.name) {
         <osf-repository [repository]="repository"></osf-repository>
       }
     </div>

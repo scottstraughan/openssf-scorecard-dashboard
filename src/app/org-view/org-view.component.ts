@@ -7,7 +7,6 @@ import { tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { OrganizationModel } from '../shared/models/organization.model';
 import { OrganizationService } from '../shared/services/organization.service';
-import { RepositoryModel } from '../shared/models/repository.model';
 
 @Component({
   selector: 'app-org-view',
@@ -24,7 +23,6 @@ import { RepositoryModel } from '../shared/models/repository.model';
 export class OrgViewComponent {
   searchString: string = '';
   organization: OrganizationModel | undefined;
-  repositories: RepositoryModel[] = [];
 
   constructor(
     protected activatedRoute: ActivatedRoute,
@@ -35,12 +33,9 @@ export class OrgViewComponent {
         tap((params) => {
           this.organizationService.getOrganizationByTag(params['organization'])
             .subscribe((organization) => {
-              this.organization = organization;
-
-              this.organizationService.getRepos()
-                .subscribe(repos => this.repositories = repos);
+              this.organizationService.getOrganizationRepositories(organization)
+                .subscribe(organization => this.organization = organization);
             });
-
         })
       )
       .subscribe();
