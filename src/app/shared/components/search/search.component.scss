@@ -2,7 +2,6 @@
   display: flex;
   align-items: center;
   gap: .5rem;
-  height: 100%;
   border: rgba(0, 0, 0, .2) 1px solid;
   border-radius: 6px;
   box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .05);
@@ -33,5 +32,6 @@
     border-right: rgba(0, 0, 0, .2) 1px solid;
     background-color: rgba(0, 0, 0, .02);
     cursor: default;
+    height: 100%;
   }
 }

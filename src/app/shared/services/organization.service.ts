@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@angular/core';
 import { OrganizationModel } from '../models/organization.model';
 import { RepositoryModel, RepositoryType } from '../models/repository.model';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { ApiTokenStore } from '../../add-security-key-popup/add-security-key-popup.component';
 
 @Injectable({
   providedIn: 'root'
@@ -98,8 +99,18 @@ export class OrganizationService {
 
     let exhausted = false;
 
+    const headers = new HttpHeaders();
+
+    if (this.storageService.has('apiToken')) {
+      const apiToken: ApiTokenStore = this.storageService.get('apiToken');
+
+      if (apiToken.github) {
+        headers.set('authorization', 'bearer ' + apiToken.github);
+      }
+    }
+
     return this.httpClient.get(`${apiUrl}?per_page=${OrganizationService.RESULTS_PER_REQUEST}&page=${page}`,
-      { responseType: 'json', headers: { 'authorization': 'Bearer ' + this.getAuthorizationToken() } })
+      { responseType: 'json', headers: headers })
       .pipe(
         map((repositoriesResult: any) => {
           console.log('Loading repositories from GitHub API...');

@@ -1,5 +1,7 @@
-<div class="icon">
-  <span class="material-symbols-outlined">search</span>
-</div>
+@if (icon(); as icon) {
+  <div class="icon">
+    <span class="material-symbols-outlined">{{ icon }}</span>
+  </div>
+}
 
 <input type="text" [(ngModel)]="value" [placeholder]="placeholder()" />

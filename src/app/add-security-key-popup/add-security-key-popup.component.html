@@ -5,6 +5,31 @@
   backend.</p>
 </div>
 
-<div class="content">
-  RIGHT
+<div class="container">
+  <div class="content">
+    <div class="services">
+      <div class="selected" (click)="onSelectService('github')">
+        <img src="/assets/images/icons/github.png" />
+        <h1>GitHub.com</h1>
+      </div>
+      <div class="disabled">
+        <img src="/assets/images/icons/gitlab.svg" />
+        <h1>GitLab.com</h1>
+      </div>
+    </div>
+
+    <label>API Token</label>
+    <osf-search
+        [(value)]="apiToken"
+        icon="key"
+        placeholder="A-2XJSJ123JSJS188DNDJK19SK"></osf-search>
+  </div>
+
+  <div class="actions">
+    <osf-button
+        icon="save"
+        label="Save API Token"
+        [disabled]="this.apiToken().length == 0"
+        (onClicked)="onSaveToken()"></osf-button>
+  </div>
 </div>
