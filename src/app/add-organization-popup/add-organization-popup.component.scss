@@ -1,0 +1,103 @@
+:host {
+  display: flex;
+  width: 850px;
+  min-height: 500px;
+
+  .info {
+    background-color: var(--hint-color);
+    color: white;
+    backdrop-filter: blur(10px);
+    width: 350px;
+    padding: 4rem 3rem;
+
+    h1 {
+      margin: 0 0 2rem 0;
+
+      span {
+        font-size: 40px;
+        vertical-align: middle;
+        margin-right: .4rem;
+      }
+    }
+
+    p {
+      margin-top: 1rem;
+      opacity: .6;
+    }
+  }
+
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      background-color: white;
+      padding: 3rem;
+
+      label {
+        display: block;
+        opacity: .7;
+        padding: 0 0 .5rem 0;
+        font-weight: 500;
+      }
+
+      .details {
+        font-size: .9rem;
+        opacity: .4;
+        padding: 0 0 .7rem 0;
+      }
+
+      input {
+        display: block;
+      }
+
+      osf-button {
+        margin-top: 1rem;
+      }
+    }
+
+    .actions {
+      background-color: #efefef;
+      padding: 1rem;
+    }
+  }
+
+
+
+  .tabs {
+    display: flex;
+    background-color: #efefef;
+
+    > div {
+      padding: 2rem;
+      opacity: .7;
+      cursor: pointer;
+      user-select: none;
+
+      img {
+        max-width: 70px;
+        width: 100%;
+      }
+
+      &.selected {
+        background-color: white;
+        opacity: 1;
+      }
+
+      &.disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: .6;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
