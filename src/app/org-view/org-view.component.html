@@ -75,25 +75,34 @@
           <osf-button [icon]="getLayoutIcon()" (click)="onToggleLayout()"></osf-button>
         </div>
       </div>
-      <div class="container">
-        <div [ngClass]="{'list': layoutView() == LayoutView.LIST, 'grid': layoutView() == LayoutView.GRID}">
-          @for (repository of getVisibleRepositories(); track repository.url) {
-            <osf-repository
-                (onReloadScorecard)="onReloadScorecard(repository)"
-                [organization]="organization"
-                [scorecard]="repository.scorecard"
-                [repository]="repository"></osf-repository>
+
+      @if (getVisibleRepositories().length > 0) {
+        <div class="container">
+          <div [ngClass]="{'list': layoutView() == LayoutView.LIST, 'grid': layoutView() == LayoutView.GRID}">
+            @for (repository of getVisibleRepositories(); track repository.url) {
+              <osf-repository
+                  (onReloadScorecard)="onReloadScorecard(repository)"
+                  [organization]="organization"
+                  [scorecard]="repository.scorecard"
+                  [repository]="repository"></osf-repository>
+            }
+          </div>
+          @if (getVisibleRepositories().length < filteredRepositoriesCount) {
+            <osf-button
+                class="view-more"
+                label="View More Repositories"
+                icon="next_plan"
+                (click)="onViewMore()"></osf-button>
           }
         </div>
-
-        @if (getVisibleRepositories().length < filteredRepositoriesCount) {
-          <osf-button
-              class="view-more"
-              label="View More Repositories"
-              icon="next_plan"
-              (click)="onViewMore()"></osf-button>
-        }
-      </div>
+      } @else {
+        <div class="error-message">
+          <div>
+            <span class="material-symbols-outlined">info</span>
+            <h1>No Repositories Available</h1>
+          </div>
+        </div>
+      }
     }
   } @else {
     <osf-loading></osf-loading>
