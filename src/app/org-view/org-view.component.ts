@@ -11,8 +11,8 @@ import { RepositoryComponent } from '../shared/components/repository/repository.
 import { SearchComponent } from '../shared/components/search/search.component';
 import { RingComponent } from '../shared/components/ring/ring.component';
 import { ActivatedRoute } from '@angular/router';
-import { OrganizationModel } from '../shared/models/organization.model';
-import { OrganizationService } from '../shared/services/organization.service';
+import { ServiceAccountModel } from '../shared/models/service-account.model';
+import { ServiceStoreService } from '../shared/services/service-store.service';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
 import { forkJoin, Observable, Subscription, tap } from 'rxjs';
@@ -39,7 +39,7 @@ export class OrgViewComponent implements OnInit {
   static RESULTS_PER_PAGE = 40;
 
   readonly LoadingState = LoadingState;
-  readonly organization: WritableSignal<OrganizationModel | undefined> = signal(undefined);
+  readonly organization: WritableSignal<ServiceAccountModel | undefined> = signal(undefined);
 
   readonly repositories: WritableSignal<RepositoryModel[]> = signal([]);
   filteredRepositoriesCount: number = 0;
@@ -62,7 +62,7 @@ export class OrgViewComponent implements OnInit {
 
   constructor(
     protected activatedRoute: ActivatedRoute,
-    protected organizationService: OrganizationService,
+    protected serviceStoreService: ServiceStoreService,
     protected scorecardService: ScorecardService,
     protected changeDetectorRef: ChangeDetectorRef
   ) { }
@@ -120,12 +120,12 @@ export class OrgViewComponent implements OnInit {
 
           this.repositories.set([]);
 
-          this.organizationSubscription = this.organizationService.getOrganizationByTag(params['organization'])
+          this.organizationSubscription = this.serviceStoreService.getServiceAccountDetails(params['service'], params['account'])
             .subscribe((organization) => {
               this.organization.set(organization);
               this.loadingOrganization.set(LoadingState.LOAD_SUCCESS);
 
-              this.repositorySubscription = this.organizationService.getOrganizationRepositories(organization)
+              this.repositorySubscription = this.serviceStoreService.getRepositories(params['service'], params['account'])
                 .subscribe((repositories) => {
                   this.repositories.set(repositories);
                   this.loadingRepositories.set(LoadingState.LOAD_SUCCESS);
@@ -195,8 +195,6 @@ export class OrgViewComponent implements OnInit {
 
     this.totalRepositoriesWithScorecards.set(scoreCount);
     this.averageScorecardScore.set(Number(Math.round(totalScore / scoreCount).toFixed(2)));
-
-    this.organizationService.getOrganizations()
   }
 
   onSearchValueChanged() {
