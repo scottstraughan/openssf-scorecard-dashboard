@@ -118,7 +118,8 @@ export class OrgViewComponent implements OnInit {
               this.organization.set(organization);
               this.loadingOrganization.set(LoadingState.LOAD_SUCCESS);
 
-              this.repositorySubscription = this.serviceStoreService.getRepositories(params['service'], params['account'])
+              this.repositorySubscription = this.serviceStoreService.getRepositories(
+                params['service'], params['account'], organization.apiToken)
                 .pipe(
                   tap((repositories) => {
                     this.repositories.set(repositories);

@@ -56,14 +56,16 @@ export class ServiceStoreService {
    * Get the service account details.
    * @param service
    * @param accountName
+   * @param apiToken
    */
   getServiceAccountDetails(
     service: string,
     accountName: string,
+    apiToken?: string
   ): Observable<ServiceAccountModel> {
     switch(service) {
       case SupportedService.GITHUB: {
-        return this.githubService.getServiceDetails(accountName)
+        return this.githubService.getServiceDetails(accountName, apiToken)
       }
     }
 
@@ -74,14 +76,16 @@ export class ServiceStoreService {
    * Get repositories for a specific service account.
    * @param service
    * @param accountName
+   * @param apiToken
    */
   getRepositories(
     service: string,
     accountName: string,
+    apiToken?: string
   ): Observable<RepositoryModel[]> {
     switch(service) {
       case SupportedService.GITHUB: {
-        return this.githubService.getRepositories(accountName)
+        return this.githubService.getRepositories(accountName, apiToken)
       }
     }
 
@@ -92,12 +96,14 @@ export class ServiceStoreService {
    * Add a new service account to track.
    * @param service
    * @param accountName
+   * @param apiToken
    */
   add(
     service: string,
     accountName: string,
+    apiToken?: string
   ): Observable<ServiceAccountModel> {
-    return this.getServiceAccountDetails(service, accountName)
+    return this.getServiceAccountDetails(service, accountName, apiToken)
       .pipe(
         tap((service) => {
           this.addServiceAccount(service)

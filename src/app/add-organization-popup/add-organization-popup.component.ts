@@ -24,6 +24,7 @@ import { InvalidAccountError, RateLimitError } from '../shared/services/reposito
 export class AddOrganizationPopupComponent {
   readonly selectedService: WritableSignal<string> = signal('github');
   readonly accountName: WritableSignal<string> = signal('');
+  readonly apiToken: WritableSignal<string | undefined> = signal(undefined);
   readonly loading: WritableSignal<boolean> = signal(false);
 
   /**
@@ -55,7 +56,7 @@ export class AddOrganizationPopupComponent {
   onAdd() {
     this.loading.set(true);
 
-    this.serviceStoreService.add(this.selectedService(), this.accountName())
+    this.serviceStoreService.add(this.selectedService(), this.accountName(), this.apiToken())
       .pipe(
         tap(() => {
           this.popupReference.close();

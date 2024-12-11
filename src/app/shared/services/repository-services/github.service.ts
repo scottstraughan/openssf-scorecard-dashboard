@@ -10,11 +10,13 @@ export abstract class RepositoryService {
   protected httpClient: HttpClient = inject(HttpClient);
 
   abstract getServiceDetails(
-    accountName: string
+    accountName: string,
+    apiToken?: string
   ): Observable<ServiceAccountModel>;
 
   abstract getRepositories(
-    accountName: string
+    accountName: string,
+    apiToken?: string
   ): Observable<RepositoryModel[]>;
 }
 
@@ -30,13 +32,18 @@ export class GithubService extends RepositoryService {
    * @inheritdoc
    */
   public getServiceDetails(
-    accountName: string
+    accountName: string,
+    apiToken?: string
   ): Observable<ServiceAccountModel> {
     const apiUrl = `${GithubService.generateApiUrl(accountName)}`;
 
-    return this.httpClient.get(`${apiUrl}`, { responseType: 'json', headers: {
-      'authorization': 'Bearer ***REMOVED***'
-      } })
+    const headers: HttpHeaders = new HttpHeaders();
+
+    if (apiToken) {
+      headers.set('authorization', apiToken);
+    }
+
+    return this.httpClient.get(`${apiUrl}`, { responseType: 'json', headers: headers })
       .pipe(
         map((accountResult: any) => {
           return {
@@ -50,6 +57,7 @@ export class GithubService extends RepositoryService {
             repositoriesWithScorecards: 0,
             followers: accountResult['followers'],
             url: accountResult['html_url'],
+            apiToken: apiToken
           }
         }),
         catchError((error: HttpErrorResponse) => {
@@ -68,31 +76,37 @@ export class GithubService extends RepositoryService {
    * @inheritdoc
    */
   public getRepositories(
-    accountName: string
+    accountName: string,
+    apiToken?: string
   ): Observable<RepositoryModel[]> {
-    return this.getAllRepositories(accountName);
+    return this.getAllRepositories(accountName, apiToken);
   }
 
   /**
    * Fetch all the repositories for a given account, going through each API request page until complete.
    * @param accountName
+   * @param apiToken
    * @param page
    * @param repositories
    * @private
    */
   private getAllRepositories(
     accountName: string,
+    apiToken?: string,
     page: number = 1,
     repositories: RepositoryModel[] = []
   ): Observable<RepositoryModel[]> {
     let exhausted = false;
     const apiUrl = `${GithubService.generateApiUrl(accountName)}/repos`;
-    const headers = new HttpHeaders();
+
+    const headers: HttpHeaders = new HttpHeaders();
+
+    if (apiToken) {
+      headers.set('authorization', apiToken);
+    }
 
     return this.httpClient.get(`${apiUrl}?per_page=${GithubService.RESULTS_PER_PAGE}&page=${page}`,
-      { responseType: 'json', headers: {
-          'authorization': 'Bearer ***REMOVED***'
-        } })
+      { responseType: 'json', headers: headers })
       .pipe(
         map((repositoriesResult: any) => {
           for (const repository of repositoriesResult) {
@@ -113,7 +127,7 @@ export class GithubService extends RepositoryService {
             return of(repositories);
           }
 
-          return this.getAllRepositories(accountName, page + 1, repositories);
+          return this.getAllRepositories(accountName, apiToken, page + 1, repositories);
         }),
       );
   }
