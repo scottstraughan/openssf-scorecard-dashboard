@@ -8,7 +8,7 @@
   width: 350px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  overflow: auto;
 
   .header {
     display: flex;
