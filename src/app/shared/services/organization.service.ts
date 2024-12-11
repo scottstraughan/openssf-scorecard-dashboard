@@ -139,14 +139,6 @@ export class OrganizationService {
       );
   }
 
-  getAuthorizationToken(): string | undefined {
-    if (this.storageService.has('authorizationToken')) {
-      return this.storageService.get('authorizationToken')
-    }
-
-    return undefined;
-  }
-
   /**
    * Return the full GitHub api url.
    */
