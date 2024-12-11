@@ -1,4 +1,7 @@
 :host {
+  display: block;
+  user-select: none;
+
   > div {
     display: flex;
     justify-content: center;

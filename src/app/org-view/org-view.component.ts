@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
 import { RepositoryComponent } from '../shared/components/repository/repository.component';
 import { SearchComponent } from '../shared/components/search/search.component';
@@ -11,6 +18,7 @@ import { LoadingState } from '../shared/LoadingState';
 import { forkJoin, Observable, Subscription, tap } from 'rxjs';
 import { RepositoryModel } from '../shared/models/repository.model';
 import { ScorecardService } from '../shared/services/scorecard.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-org-view',
@@ -20,18 +28,21 @@ import { ScorecardService } from '../shared/services/scorecard.service';
     RepositoryComponent,
     SearchComponent,
     RingComponent,
-    LoadingComponent
+    LoadingComponent,
+    NgClass
   ],
   templateUrl: './org-view.component.html',
   styleUrl: './org-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrgViewComponent implements OnInit {
+  static RESULTS_PER_PAGE = 40;
+
   readonly LoadingState = LoadingState;
   readonly organization: WritableSignal<OrganizationModel | undefined> = signal(undefined);
+
   readonly repositories: WritableSignal<RepositoryModel[]> = signal([]);
-  readonly filteredRepositories: WritableSignal<RepositoryModel[]> = signal([]);
-  readonly visibleRepositories: WritableSignal<RepositoryModel[]> = signal([]);
+  filteredRepositoriesCount: number = 0;
 
   readonly loadingOrganization: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly loadingRepositories: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
@@ -40,7 +51,12 @@ export class OrgViewComponent implements OnInit {
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
   readonly averageScorecardScore: WritableSignal<number> = signal(0);
 
-  searchString: WritableSignal<string> = signal('');
+  readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
+  readonly layoutShowReposWithoutScorecards: WritableSignal<boolean> = signal(true);
+  readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
+  readonly layoutVisibleResults: WritableSignal<number> = signal(OrgViewComponent.RESULTS_PER_PAGE);
+
+  readonly searchString: WritableSignal<string> = signal('');
   organizationSubscription: Subscription | undefined;
   repositorySubscription: Subscription | undefined;
 
@@ -51,24 +67,58 @@ export class OrgViewComponent implements OnInit {
     protected changeDetectorRef: ChangeDetectorRef
   ) { }
 
+  getFilteredRepositories(): RepositoryModel[] {
+    let repositories: RepositoryModel[] = this.repositories().slice();
+
+    const searchString = this.searchString();
+
+    if (searchString.length > 0) {
+      repositories = repositories.filter((repo) =>
+        JSON.stringify(repo).toLowerCase().includes(searchString));
+    }
+
+    return repositories;
+  }
+
+  getVisibleRepositories(): RepositoryModel[] {
+    let repositories: RepositoryModel[] = this.getFilteredRepositories();
+
+    if (!this.layoutShowReposWithoutScorecards()) {
+      repositories = repositories.filter(
+        (repo) => repo.scorecard?.score !== undefined);
+    }
+
+    repositories.sort((a, b) => {
+      const aScore = a.scorecard?.score !== undefined ? a.scorecard.score : 0;
+      const bScore = b.scorecard?.score !== undefined ? b.scorecard.score : 0;
+
+      if (this.layoutSortMode() == LayoutSortMode.NAME_ASC) {
+        return a.name.localeCompare(b.name)
+      } else if (this.layoutSortMode() == LayoutSortMode.NAME_DESC) {
+        return b.name.localeCompare(a.name)
+      } else if (this.layoutSortMode() == LayoutSortMode.SCORE_ASC) {
+        return aScore > bScore ? -1 : 1;
+      } else if (this.layoutSortMode() == LayoutSortMode.SCORE_DESC) {
+        return bScore > aScore ? -1 : 1;
+      }
+
+      return 0;
+    });
+
+    this.filteredRepositoriesCount = repositories.length;
+    return repositories.slice(0, this.layoutVisibleResults());
+  }
+
   ngOnInit(): void {
     this.activatedRoute.params
       .pipe(
         tap((params) => {
-          if (this.repositorySubscription) {
-            this.repositorySubscription.unsubscribe();
-          }
-
-          if (this.organizationSubscription) {
-            this.organizationSubscription.unsubscribe();
-          }
+          this.cleanup();
 
           this.loadingOrganization.set(LoadingState.LOADING);
           this.loadingRepositories.set(LoadingState.LOADING);
 
           this.repositories.set([]);
-          this.filteredRepositories.set([]);
-          this.visibleRepositories.set([]);
 
           this.organizationSubscription = this.organizationService.getOrganizationByTag(params['organization'])
             .subscribe((organization) => {
@@ -78,17 +128,23 @@ export class OrgViewComponent implements OnInit {
               this.repositorySubscription = this.organizationService.getOrganizationRepositories(organization)
                 .subscribe((repositories) => {
                   this.repositories.set(repositories);
-                  this.filteredRepositories.set(repositories);
-                  this.visibleRepositories.set(repositories);
-
-                  this.reloadScorecardResults();
-
                   this.loadingRepositories.set(LoadingState.LOAD_SUCCESS);
+                  this.reloadScorecardResults();
                 });
             });
         })
       )
       .subscribe();
+  }
+
+  cleanup() {
+    if (this.repositorySubscription) {
+      this.repositorySubscription.unsubscribe();
+    }
+
+    if (this.organizationSubscription) {
+      this.organizationSubscription.unsubscribe();
+    }
   }
 
   reloadScorecardResults() {
@@ -144,20 +200,7 @@ export class OrgViewComponent implements OnInit {
   }
 
   onSearchValueChanged() {
-    const matchedRepos = [];
-    const searchString = this.searchString().toLowerCase();
-
-    if (searchString.length > 0) {
-      for (const repo of this.repositories()) {
-        if (repo.name.toLowerCase().includes(searchString)) {
-          matchedRepos.push(repo);
-        }
-      }
-
-      this.filteredRepositories.set(matchedRepos);
-    } else {
-      this.filteredRepositories.set(this.repositories());
-    }
+    //
   }
 
   onReloadScorecard(repository: RepositoryModel) {
@@ -179,4 +222,88 @@ export class OrgViewComponent implements OnInit {
         this.changeDetectorRef.detectChanges();
       });
   }
+
+  onToggleLayout() {
+    if (this.layoutView() == LayoutView.GRID) {
+      this.layoutView.set(LayoutView.LIST);
+    } else {
+      this.layoutView.set(LayoutView.GRID);
+    }
+  }
+
+  getLayoutIcon() {
+    switch(this.layoutView()) {
+      case LayoutView.LIST: return 'view_list'
+      case LayoutView.GRID: return 'grid_view'
+    }
+  }
+
+  protected readonly LayoutView = LayoutView;
+
+  onToggleRepoVisibility() {
+    this.layoutShowReposWithoutScorecards.set(!this.layoutShowReposWithoutScorecards());
+  }
+
+  getVisibilityIcon() {
+    return this.layoutShowReposWithoutScorecards() ? 'visibility' : 'visibility_off'
+  }
+
+  onToggleSortMode() {
+    switch (this.layoutSortMode()) {
+      case LayoutSortMode.NAME_ASC: {
+        this.layoutSortMode.set(LayoutSortMode.NAME_DESC);
+        break;
+      }
+      case LayoutSortMode.NAME_DESC: {
+        this.layoutSortMode.set(LayoutSortMode.SCORE_ASC);
+        break;
+      }
+      case LayoutSortMode.SCORE_ASC: {
+        this.layoutSortMode.set(LayoutSortMode.SCORE_DESC);
+        break;
+      }
+      case LayoutSortMode.SCORE_DESC: {
+        this.layoutSortMode.set(LayoutSortMode.NAME_ASC);
+        break;
+      }
+    }
+  }
+
+  getSortLabel() {
+    switch (this.layoutSortMode()) {
+      case LayoutSortMode.NAME_ASC:
+      case LayoutSortMode.NAME_DESC:
+        return 'Name';
+      case LayoutSortMode.SCORE_ASC:
+      case LayoutSortMode.SCORE_DESC:
+        return 'Score';
+    }
+  }
+
+  getSortIcon() {
+    switch (this.layoutSortMode()) {
+      case LayoutSortMode.NAME_ASC:
+      case LayoutSortMode.SCORE_ASC:
+        return 'arrow_downward';
+      case LayoutSortMode.NAME_DESC:
+      case LayoutSortMode.SCORE_DESC:
+        return 'arrow_upward';
+    }
+  }
+
+  onViewMore() {
+    this.layoutVisibleResults.set(this.layoutVisibleResults() + OrgViewComponent.RESULTS_PER_PAGE);
+  }
+}
+
+enum LayoutView {
+  GRID,
+  LIST
+}
+
+enum LayoutSortMode {
+  NAME_ASC,
+  NAME_DESC,
+  SCORE_ASC,
+  SCORE_DESC
 }

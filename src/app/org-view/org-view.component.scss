@@ -108,32 +108,44 @@
   }
 
   .container {
+    --seperation: 1rem;
+
     overflow: auto;
     container-type: inline-size;
     container-name: repo-container;
-  }
+    padding: var(--seperation);
 
-  .list {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-gap: 1rem;
-    padding: 1rem;
-
-    @container repo-container (min-width: 800px) {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    @container repo-container (min-width: 1000px) {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    osf-repository {
+    .list {
       display: flex;
-      opacity: .8;
+      gap: var(--seperation);
+      flex-direction: column;
+    }
 
-      &:hover {
-        opacity: 1;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: var(--seperation);
+
+      @container repo-container (min-width: 800px) {
+        grid-template-columns: 1fr 1fr;
       }
+
+      @container repo-container (min-width: 1200px) {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      osf-repository {
+        display: flex;
+        opacity: .8;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    .view-more {
+      margin-top: var(--seperation);
     }
   }
 }

@@ -1,0 +1,47 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  @media screen and (min-width: 800px) {
+    max-width: 470px !important;
+    width: 100%;
+  }
+
+  > header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 4rem;
+    background-color: var(--color-orange);
+    color: white;
+
+    span.popup-icon {
+      font-size: 60px;
+    }
+
+    p {
+      font-size: 1rem;
+      opacity: .6;
+    }
+  }
+
+  > main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--popup-bg-color);
+
+    article {
+      padding: 2rem 3rem;
+      flex: 1;
+    }
+
+    footer {
+      background-color: var(--color-hint-third);
+      padding: 1rem;
+    }
+  }
+}
