@@ -1,3 +1,3 @@
 export interface ScorecardModel {
-  score: number
+  score: number | undefined
 }

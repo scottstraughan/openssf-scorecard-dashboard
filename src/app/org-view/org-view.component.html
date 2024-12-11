@@ -2,7 +2,15 @@
   @if (loadingOrganization() == LoadingState.LOAD_SUCCESS) {
     @if (organization(); as organization) {
       <div class="header">
-        <osf-ring [score]="organization.averageScore" [thickness]="'10px'" fontSize="4rem"></osf-ring>
+        @if (scorecardLoadingState() == LoadingState.LOAD_SUCCESS) {
+          <osf-ring [score]="averageScorecardScore()"
+                    (click)="reloadScorecardResults()"
+                    [thickness]="'10px'"
+                    title="Click to re-check all scorecard scores"
+                    fontSize="4rem"></osf-ring>
+        } @else {
+          <osf-loading></osf-loading>
+        }
       </div>
       <div class="details">
         <h1 [innerHTML]="organization.name"></h1>
@@ -10,30 +18,39 @@
 
         <div class="stats">
           <div>
+            <div>
+              <span class="material-symbols-outlined">public</span>
+            </div>
             <div>Public Repositories</div>
             <div>
-              <span class="number" [innerHTML]="organization.totalRepositories"></span>
+              <span class="number" [innerHTML]="organization.totalRepositories">-</span>
             </div>
           </div>
           <div>
-            <div>Repositories with Scores</div>
             <div>
-              <span class="number" [innerHTML]="organization.repositoriesWithScorecards">12</span>
+              <span class="material-symbols-outlined">scoreboard</span>
+            </div>
+            <div>Available Scorecards</div>
+            <div>
+              <span class="number" [innerHTML]="totalRepositoriesWithScorecards()">-</span>
             </div>
           </div>
           <div>
-            <div>Total Followers</div>
             <div>
-              <span class="number" [innerHTML]="organization.followers">12</span>
+              <span class="material-symbols-outlined">group</span>
+            </div>
+            <div>Followers</div>
+            <div>
+              <span class="number" [innerHTML]="organization.followers">-</span>
             </div>
           </div>
         </div>
       </div>
       <div class="actions">
         <a [href]="organization.url" target="_blank" rel="noopener">
-          <osf-button icon="alt_route">Visit Repository</osf-button>
+          <osf-button icon="alt_route" label="Visit Repository"></osf-button>
         </a>
-        <osf-button icon="delete">Remove</osf-button>
+        <osf-button icon="delete" label="Remove"></osf-button>
       </div>
     }
   } @else {
@@ -46,16 +63,26 @@
     @if (organization(); as organization) {
       <div class="header">
         <div>
-          <osf-search [(value)]="searchString" placeholder="type to filter repositories"></osf-search>
+          <osf-search [(value)]="searchString"
+                      (valueChange)="onSearchValueChanged()"
+                      placeholder="type to filter repositories"></osf-search>
         </div>
         <div>
-          <osf-button icon="grid_view">Hello</osf-button>
+          <osf-button icon="arrow_downward" label="Name"></osf-button>
+          <osf-button icon="visibility"></osf-button>
+          <osf-button icon="grid_view"></osf-button>
         </div>
       </div>
-      <div class="list">
-        @for (repository of repositories(); track repository.url) {
-          <osf-repository [organization]="organization" [repository]="repository"></osf-repository>
-        }
+      <div class="container">
+        <div class="list">
+          @for (repository of repositories(); track repository.url) {
+            <osf-repository
+                (onReloadScorecard)="onReloadScorecard(repository)"
+                [organization]="organization"
+                [scorecard]="repository.scorecard"
+                [repository]="repository"></osf-repository>
+          }
+        </div>
       </div>
     }
   } @else {
