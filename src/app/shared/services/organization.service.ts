@@ -4,7 +4,6 @@ import { RepositoryModel, RepositoryType } from '../models/repository.model';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { ScorecardModel } from '../models/scorecard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -93,17 +92,17 @@ export class OrganizationService {
       organizationModel.login, RepositoryType.ORGANIZATION) + '/repos';
 
     if (this.storageService.has(apiUrl)) {
-      //console.log('Loading repositories from cache...');
-      //return of(this.storageService.get(apiUrl));
+      console.log('Loading repositories from cache...');
+      return of(this.storageService.get(apiUrl));
     }
 
     let exhausted = false;
 
     return this.httpClient.get(`${apiUrl}?per_page=${OrganizationService.RESULTS_PER_REQUEST}&page=${page}`,
-      { responseType: 'json' })
+      { responseType: 'json', headers: { 'authorization': 'Bearer ' + this.getAuthorizationToken() } })
       .pipe(
         map((repositoriesResult: any) => {
-          //console.log('Loading repositories from GitHub API...');
+          console.log('Loading repositories from GitHub API...');
 
           for (const repository of repositoriesResult) {
             repositories.push({
@@ -127,6 +126,14 @@ export class OrganizationService {
           return this.getOrganizationRepositories(organizationModel, page + 1, repositories);
         }),
       );
+  }
+
+  getAuthorizationToken(): string | undefined {
+    if (this.storageService.has('authorizationToken')) {
+      return this.storageService.get('authorizationToken')
+    }
+
+    return undefined;
   }
 
   /**

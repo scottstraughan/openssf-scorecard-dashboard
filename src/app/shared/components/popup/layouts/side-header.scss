@@ -1,0 +1,66 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  @media screen and (min-width: 800px) {
+    flex-direction: row;
+    max-width: 800px !important;
+    min-height: 550px;
+  }
+
+  > header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 40%;
+    background-color: var(--color-orange);
+    color: var(--color-white);
+    padding: 3rem;
+
+    span.popup-icon {
+      font-size: 55px;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-weight: normal;
+      opacity: .8;
+    }
+
+    p {
+      font-size: 1rem;
+      opacity: .6;
+    }
+  }
+
+  > main {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--popup-bg-color);
+    flex: 1;
+
+    article {
+      padding: 2rem;
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow: auto;
+    }
+
+    footer {
+      background-color: var(--color-hint-third);
+      padding: 1rem 2rem;
+      display: flex;
+      gap: .5rem;
+      box-shadow: var(--box-shadow-focused);
+    }
+  }
+}

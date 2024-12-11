@@ -1,0 +1,45 @@
+@import 'common';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  @media screen and (min-width: 800px) {
+    max-width: 600px;
+    width: 100vw;
+  }
+
+  header {
+    display: flex;
+    padding: 1rem 2rem;
+    background-color: var(--color-orange);
+    color: var(--color-white);
+    gap: 1rem;
+
+    > div {
+      display: flex;
+      align-items: center;
+
+      &:nth-of-type(1) {
+        flex: 1;
+
+        span.popup-icon {
+          margin-right: .5rem;
+          font-size: 40px;
+          vertical-align: middle;
+        }
+      }
+
+      a.button {
+        background-color: #8f2500;
+      }
+    }
+  }
+
+  main {
+    background-color: var(--popup-bg-color);
+    padding: 2rem;
+    flex: 1;
+  }
+}
