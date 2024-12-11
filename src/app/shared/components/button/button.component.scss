@@ -1,25 +1,31 @@
 :host {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: .5rem;
-  height: 100%;
-  border: rgba(0, 0, 0, .2) 1px solid;
-  padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .05);
-  opacity: .7;
-  transition: var(--default-transition);
-  cursor: pointer;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(255, 255, 255, .5);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .1);
-  }
-
-  .icon {
+  > div {
     display: flex;
+    justify-content: center;
     align-items: center;
+    gap: .5rem;
+    height: 100%;
+    border: rgba(0, 0, 0, .2) 1px solid;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .05);
+    opacity: .7;
+    transition: var(--default-transition);
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+      background-color: rgba(255, 255, 255, .5);
+      box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .1);
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+    }
+
+    &.selected {
+      background-color: rgba(255, 255, 255, .8);
+    }
   }
 }
