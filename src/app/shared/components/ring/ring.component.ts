@@ -65,8 +65,10 @@ export class RingComponent {
       return 'var(--color-shocking)';
     } else if (score >= 2.5 && score < 5) {
       return 'var(--color-poor)';
-    } else if (score >= 5 && score < 7.5) {
+    } else if (score >= 5 && score < 7) {
       return 'var(--color-good)';
+    } else if (score >= 7 && score < 7.5) {
+      return 'var(--color-verygood)';
     } else {
       return 'var(--color-excellent)';
     }

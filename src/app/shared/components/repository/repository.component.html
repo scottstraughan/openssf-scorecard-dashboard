@@ -1,29 +1,31 @@
-<div class="overview">
-  <div class="details">
-    <h1 [innerHTML]="repository().name"></h1>
-    <p [innerHTML]="repository().description"></p>
+@if (repository(); as repository) {
+  <div class="overview">
+    <div class="details">
+      <h1 [innerHTML]="repository.name"></h1>
+      <p [innerHTML]="repository.description"></p>
+    </div>
+
+    <div class="stats">
+      <div>
+        <span class="material-symbols-outlined">event</span>
+        <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
+      </div>
+      <div>
+        <span class="material-symbols-outlined">star</span>
+        <h1 [innerHTML]="repository.stars"></h1>
+      </div>
+    </div>
   </div>
 
-  <div class="stats">
-    <div>
-      <span class="material-symbols-outlined">event</span>
-      <h1 [innerHTML]="repository().lastUpdated | date: 'mediumDate'"></h1>
-    </div>
-    <div>
-      <span class="material-symbols-outlined">star</span>
-      <h1 [innerHTML]="repository().stars"></h1>
-    </div>
-  </div>
-</div>
-
-<div class="score" (click)="onReloadScore()" title="Click to recheck score">
-  @if (loading() == LoadingState.LOAD_SUCCESS) {
+  <div class="score" title="Click to recheck score" (click)="onReloadScorecard.emit()">
     @if (scorecard(); as scorecard) {
-      <osf-ring [score]="scorecard.score"></osf-ring>
+      @if (scorecard.score; as score) {
+        <osf-ring [score]="score"></osf-ring>
+      } @else {
+        <span class="material-symbols-outlined" title="No scorecard available">block</span>
+      }
     } @else {
-      <span class="material-symbols-outlined" title="No scorecard available">block</span>
+      <osf-loading></osf-loading>
     }
-  } @else if (loading() == LoadingState.LOADING) {
-    <osf-loading></osf-loading>
-  }
-</div>
+  </div>
+}

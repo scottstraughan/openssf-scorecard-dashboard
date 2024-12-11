@@ -4,6 +4,7 @@ import { RepositoryModel, RepositoryType } from '../models/repository.model';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { ScorecardModel } from '../models/scorecard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,32 +22,31 @@ export class OrganizationService {
       {
         login: 'codeplaysoftware',
         icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4',
-        totalRepositories: 121,
-        repositoriesWithScorecards: 24,
-        followers: 300,
-        averageScore: 8.3,
+        totalRepositories: 0,
+        repositoriesWithScorecards: 0,
+        followers: 0,
+        averageScore: 0,
         url: 'https://github.com',
         description: '', name: ''
       },
       {
         login: 'jetbrains',
         icon: 'https://avatars.githubusercontent.com/u/878437?s=48&v=4',
-        totalRepositories: 42,
-        repositoriesWithScorecards: 12,
-        followers: 23,
-        averageScore: 5,
+        totalRepositories: 0,
+        repositoriesWithScorecards: 0,
+        followers: 0,
+        averageScore: 0,
         url: 'https://github.com',
         description: '', name: ''
       },
       {
         login: 'uxlfoundation',
         icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4',
-        totalRepositories: 5,
-        repositoriesWithScorecards: 2,
-        followers: 123,
-        averageScore: 3.2,
+        totalRepositories: 0,
+        repositoriesWithScorecards: 0,
+        followers: 0,
+        averageScore: 0,
         url: 'https://github.com',description: '', name: ''
-
       }
     ]);
   }
@@ -72,7 +72,7 @@ export class OrganizationService {
             name: organizationResult['name'],
             icon: organizationResult['avatar_url'],
             description: organizationResult['description'],
-            averageScore: 8.3,
+            averageScore: 0,
             totalRepositories: organizationResult['public_repos'],
             repositoriesWithScorecards: 0,
             followers: organizationResult['followers'],
@@ -93,8 +93,8 @@ export class OrganizationService {
       organizationModel.login, RepositoryType.ORGANIZATION) + '/repos';
 
     if (this.storageService.has(apiUrl)) {
-      console.log('Loading repositories from cache...');
-      return of(this.storageService.get(apiUrl));
+      //console.log('Loading repositories from cache...');
+      //return of(this.storageService.get(apiUrl));
     }
 
     let exhausted = false;
@@ -103,7 +103,7 @@ export class OrganizationService {
       { responseType: 'json' })
       .pipe(
         map((repositoriesResult: any) => {
-          console.log('Loading repositories from GitHub API...');
+          //console.log('Loading repositories from GitHub API...');
 
           for (const repository of repositoriesResult) {
             repositories.push({
@@ -111,7 +111,7 @@ export class OrganizationService {
               url: repository['url'],
               lastUpdated: new Date(repository['updated_at']),
               stars: repository['stargazers_count'],
-              description: repository['description'],
+              description: repository['description']
             });
           }
 
