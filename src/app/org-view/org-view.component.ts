@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-  signal,
-  WritableSignal
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
 import { RepositoryComponent } from '../shared/components/repository/repository.component';
 import { SearchComponent } from '../shared/components/search/search.component';
@@ -126,11 +119,14 @@ export class OrgViewComponent implements OnInit {
               this.loadingOrganization.set(LoadingState.LOAD_SUCCESS);
 
               this.repositorySubscription = this.serviceStoreService.getRepositories(params['service'], params['account'])
-                .subscribe((repositories) => {
-                  this.repositories.set(repositories);
-                  this.loadingRepositories.set(LoadingState.LOAD_SUCCESS);
-                  this.reloadScorecardResults();
-                });
+                .pipe(
+                  tap((repositories) => {
+                    this.repositories.set(repositories);
+                    this.loadingRepositories.set(LoadingState.LOAD_SUCCESS);
+                    this.reloadScorecardResults();
+                  })
+                )
+                .subscribe();
             });
         })
       )
@@ -145,6 +141,11 @@ export class OrgViewComponent implements OnInit {
     if (this.organizationSubscription) {
       this.organizationSubscription.unsubscribe();
     }
+
+    this.loadingOrganization.set(LoadingState.LOADING);
+    this.loadingRepositories.set(LoadingState.LOADING);
+    this.totalRepositoriesWithScorecards.set(0);
+    this.averageScorecardScore.set(0);
   }
 
   reloadScorecardResults() {
@@ -169,14 +170,18 @@ export class OrgViewComponent implements OnInit {
       );
     }
 
-    this.scorecardLoadingState.set(LoadingState.LOADING);
+    if (scorecardObservables.length > 0) {
+      this.scorecardLoadingState.set(LoadingState.LOADING);
 
-    forkJoin(scorecardObservables)
-      .subscribe(() => {
-        this.recalculateScorecards();
-        this.scorecardLoadingState.set(LoadingState.LOAD_SUCCESS);
-        this.changeDetectorRef.detectChanges();
-      });
+      forkJoin(scorecardObservables)
+        .subscribe(() => {
+          this.recalculateScorecards();
+          this.scorecardLoadingState.set(LoadingState.LOAD_SUCCESS);
+          this.changeDetectorRef.detectChanges();
+        });
+    } else {
+      this.scorecardLoadingState.set(LoadingState.LOAD_SUCCESS);
+    }
   }
 
   /**

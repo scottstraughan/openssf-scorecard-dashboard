@@ -42,9 +42,9 @@ export class GithubService extends RepositoryService {
           return {
             service: 'github',
             account: accountResult['login'],
-            name: accountResult['name'],
+            name: accountResult['name'] ? accountResult['name'] : accountName,
             icon: accountResult['avatar_url'],
-            description: accountResult['description'],
+            description: accountResult['description'] ? accountResult['description'] : 'This account does not have a description.',
             averageScore: 0,
             totalRepositories: accountResult['public_repos'],
             repositoriesWithScorecards: 0,
@@ -90,7 +90,9 @@ export class GithubService extends RepositoryService {
     const headers = new HttpHeaders();
 
     return this.httpClient.get(`${apiUrl}?per_page=${GithubService.RESULTS_PER_PAGE}&page=${page}`,
-      { responseType: 'json', headers: headers })
+      { responseType: 'json', headers: {
+          'authorization': 'Bearer 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'
+        } })
       .pipe(
         map((repositoriesResult: any) => {
           for (const repository of repositoriesResult) {
