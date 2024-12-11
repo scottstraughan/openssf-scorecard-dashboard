@@ -1,0 +1,10 @@
+@if (visible) {
+  <div class="popup-container" (click)="onContainerClick()">
+    <div class="close">
+      <span class="material-symbols-outlined" title="Close">close</span>
+    </div>
+    <div class="popup" (click)="onPopupClick($event)">
+      <div #popupTarget></div>
+    </div>
+  </div>
+}
