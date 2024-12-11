@@ -1,9 +1,11 @@
-@if (icon(); as icon) {
-  <div class="icon">
-    <span class="material-symbols-outlined">{{ icon }}</span>
-  </div>
-}
+<div [ngClass]="{'selected': selected()}">
+  @if (icon(); as icon) {
+    <div class="icon">
+      <span class="material-symbols-outlined">{{ icon }}</span>
+    </div>
+  }
 
-<div class="content">
-  <ng-content></ng-content>
+  @if (label(); as label) {
+    <div class="content" [innerHTML]="label"></div>
+  }
 </div>
