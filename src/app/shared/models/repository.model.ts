@@ -8,8 +8,3 @@ export interface RepositoryModel {
   description: string
   scorecard?: ScorecardModel
 }
-
-export enum RepositoryType {
-  USER,
-  ORGANIZATION
-}

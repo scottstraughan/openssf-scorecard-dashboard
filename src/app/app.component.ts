@@ -1,11 +1,12 @@
 import { Component, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { OrganizationModel } from './shared/models/organization.model';
+import { ServiceAccountModel } from './shared/models/service-account.model';
 import { NgClass } from '@angular/common';
-import { OrganizationService } from './shared/services/organization.service';
+import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
 import { AddSecurityKeyPopupComponent } from './add-security-key-popup/add-security-key-popup.component';
+import { AddOrganizationPopupComponent } from './add-organization-popup/add-organization-popup.component';
 
 @Component({
   selector: 'app-root',
@@ -15,23 +16,29 @@ import { AddSecurityKeyPopupComponent } from './add-security-key-popup/add-secur
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  organizations: Signal<OrganizationModel[]> = signal([]);
-  selectedOrganization: OrganizationModel | undefined;
+  organizations: Signal<ServiceAccountModel[]> = signal([]);
+  selectedOrganization: ServiceAccountModel | undefined;
 
   constructor(
-    protected organizationService: OrganizationService,
+    protected organizationService: ServiceStoreService,
     protected popupService: PopupService
   ) {
-    this.organizations = toSignal(this.organizationService.getOrganizations(), { initialValue: [] });
+    this.organizations = toSignal(this.organizationService.getServiceAccounts(),
+      { initialValue: ServiceStoreService.DEFAULT_ORGANIZATIONS });
+
     this.setSelectedOrganization(this.organizations()[0]);
+
+    setTimeout(() => {
+      //this.onAddOrg();
+    })
   }
 
-  setSelectedOrganization(organization: OrganizationModel) {
+  setSelectedOrganization(organization: ServiceAccountModel) {
     this.selectedOrganization = organization;
   }
 
   onAddOrg() {
-    alert();
+    this.popupService.create(AddOrganizationPopupComponent, null, true);
   }
 
   onAddAuthorizationKey() {

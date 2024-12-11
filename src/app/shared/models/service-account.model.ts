@@ -1,5 +1,6 @@
-export interface OrganizationModel {
-  login: string
+export interface ServiceAccountModel {
+  service: string
+  account: string
   name: string
   icon: string
   description: string

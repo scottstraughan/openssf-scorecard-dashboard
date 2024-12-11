@@ -4,11 +4,11 @@ import { OrgViewComponent } from './org-view/org-view.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'view/codeplaysoftware',
+    redirectTo: 'inspect/github/codeplaysoftware',
     pathMatch: 'full'
   },
   {
-    path: 'view/:organization',
+    path: 'inspect/:service/:account',
     component: OrgViewComponent
   },
 ];
