@@ -1,0 +1,19 @@
+:host {
+  display: flex;
+  width: 800px;
+  min-height: 500px;
+
+  .info {
+    background-color: var(--hint-color);
+    color: white;
+    backdrop-filter: blur(10px);
+    width: 320px;
+    padding: 4rem 3rem;
+  }
+
+  .content {
+    background-color: white;
+    flex: 1;
+    padding: 2rem;
+  }
+}

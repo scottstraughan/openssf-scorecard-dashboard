@@ -4,6 +4,8 @@ import { OrganizationModel } from './shared/models/organization.model';
 import { NgClass } from '@angular/common';
 import { OrganizationService } from './shared/services/organization.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { PopupService } from './shared/components/popup/popup.service';
+import { AddSecurityKeyPopupComponent } from './add-security-key-popup/add-security-key-popup.component';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +20,7 @@ export class AppComponent {
 
   constructor(
     protected organizationService: OrganizationService,
+    protected popupService: PopupService
   ) {
     this.organizations = toSignal(this.organizationService.getOrganizations(), { initialValue: [] });
     this.setSelectedOrganization(this.organizations()[0]);
@@ -29,5 +32,9 @@ export class AppComponent {
 
   onAddOrg() {
     alert();
+  }
+
+  onAddAuthorizationKey() {
+    this.popupService.create(AddSecurityKeyPopupComponent, null, true);
   }
 }

@@ -72,13 +72,32 @@ nav {
   }
 
   .settings {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 0 1rem;
+
+    .button {
+      cursor: pointer;
+      padding: .5rem 0;
+      border-radius: var(--default-border-radius);
+      transition: var(--default-transition);
+
+      &:hover {
+        background-color: rgba(0, 0, 0, .1);
+      }
+
+      span {
+        font-size: 24px;
+      }
+    }
 
     .url {
       background-color: rgba(0, 0, 0, .05);
       border-radius: 6px;
       padding: .5rem;
       font-size: .8rem;
-      color: rgba(0, 0, 0, .5);
+      color: rgba(0, 0, 0, .4);
       cursor: pointer;
     }
   }
