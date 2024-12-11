@@ -13,4 +13,5 @@ import { FormsModule } from '@angular/forms';
 export class SearchComponent {
   value = model<string>('');
   placeholder = model<string>('');
+  icon = model<string | undefined>(undefined);
 }

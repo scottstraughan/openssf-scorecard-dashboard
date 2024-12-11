@@ -1,4 +1,4 @@
-import { Component, HostListener, input, model } from '@angular/core';
+import { Component, HostListener, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 
 @Component({
@@ -13,10 +13,15 @@ import { NgClass } from '@angular/common';
 export class ButtonComponent {
   icon = input<string | undefined>(undefined);
   label = input<string | undefined>(undefined);
-  selected = model<boolean>(false);
+  disabled = input<boolean>(true);
+  onClicked = output();
 
   @HostListener('click')
   onClick() {
-    this.selected.set(!this.selected());
+    if (this.disabled()) {
+      return ;
+    }
+
+    this.onClicked.emit();
   }
 }
