@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, Signal } from '@angular/core';
+import { Component, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { OrganizationModel } from './shared/models/organization.model';
 import { NgClass } from '@angular/common';
@@ -14,7 +14,7 @@ import { AddSecurityKeyPopupComponent } from './add-security-key-popup/add-secur
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   organizations: Signal<OrganizationModel[]> = signal([]);
   selectedOrganization: OrganizationModel | undefined;
 
@@ -24,12 +24,6 @@ export class AppComponent implements OnInit {
   ) {
     this.organizations = toSignal(this.organizationService.getOrganizations(), { initialValue: [] });
     this.setSelectedOrganization(this.organizations()[0]);
-  }
-
-  ngOnInit() {
-    setTimeout(() => {
-      this.onAddAuthorizationKey();
-    });
   }
 
   setSelectedOrganization(organization: OrganizationModel) {
