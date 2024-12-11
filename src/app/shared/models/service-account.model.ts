@@ -7,4 +7,5 @@ export interface ServiceAccountModel {
   totalRepositories: number
   followers: number
   url: string
+  apiToken?: string
 }
