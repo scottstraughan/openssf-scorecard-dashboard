@@ -60,8 +60,7 @@ export class ServiceStoreService {
 
     if (this.accounts.size == 0) {
       for (const defaultAccount of ServiceStoreService.DEFAULT_ORGANIZATIONS) {
-        this.add(
-          defaultAccount.service, defaultAccount.account, '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')
+        this.add(defaultAccount.service, defaultAccount.account)
           .subscribe();
       }
     }
