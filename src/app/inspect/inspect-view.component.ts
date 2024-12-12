@@ -5,10 +5,7 @@ import { SearchComponent } from '../shared/components/search/search.component';
 import { RingComponent } from '../shared/components/ring/ring.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceAccountModel } from '../shared/models/service-account.model';
-import {
-  MinimumServiceAccountError,
-  ServiceStoreService
-} from '../shared/services/service-store.service';
+import { ServiceStoreService } from '../shared/services/service-store.service';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
 import { catchError, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
@@ -18,7 +15,6 @@ import { NgClass } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ErrorPopupComponent } from '../popups/error-popup/error-popup.component';
 import { PopupService } from '../shared/components/popup/popup.service';
-import { InvalidAccountError, RateLimitError } from '../shared/services/repository-services/base-repository-service';
 
 @Component({
   selector: 'app-org-view',
@@ -397,30 +393,11 @@ export class InspectViewComponent implements OnInit {
   /**
    * Show an error popup.
    */
-  private handleErrorThrown(
+  handleErrorThrown(
     error: any
   ) {
-    let title = 'Error';
-    let message = error.message;
-    let icon = 'error';
-
-    if (error instanceof MinimumServiceAccountError) {
-      title = 'Cannot Remove Account';
-      message = 'You must have at least one account to track. Please add another account if you wish to delete this one.';
-    } else if (error instanceof RateLimitError) {
-      title = 'Rate Limited';
-      icon = 'speed';
-    } else if (error instanceof InvalidAccountError) {
-      title = 'Account Not Found';
-      icon = 'person_search';
-    } else {
-      title = error.message;
-      message = error.message;
-    }
-
-    this.popupService.create(ErrorPopupComponent, {
-      title: title, message: message, icon: icon
-    }, true);
+    this.popupService.create(
+      ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
   }
 
   /**

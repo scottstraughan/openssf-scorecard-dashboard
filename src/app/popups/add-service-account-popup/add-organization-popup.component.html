@@ -37,10 +37,22 @@
   </div>
 
   <div class="actions">
-    <osf-button
-        icon="add_circle"
-        label="Add Organization"
-        [disabled]="!isServiceFormsValid() || loading()"
-        (onClicked)="onAdd()"></osf-button>
+    <div>
+      <osf-button
+          (onClicked)="onCloseClicked()"
+          icon="close"
+          label="Cancel"></osf-button>
+    </div>
+    <div>
+      @if (loading()) {
+        <osf-loading></osf-loading>
+      } @else {
+        <osf-button
+            icon="add_circle"
+            label="Add Organization"
+            [disabled]="!isServiceFormsValid() || loading()"
+            (onClicked)="onAdd()"></osf-button>
+      }
+    </div>
   </div>
 </div>

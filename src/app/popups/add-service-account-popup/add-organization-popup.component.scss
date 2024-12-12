@@ -31,6 +31,38 @@
     display: flex;
     flex-direction: column;
 
+    .tabs {
+      display: flex;
+      background-color: #efefef;
+
+      > div {
+        padding: 2rem;
+        opacity: .7;
+        cursor: pointer;
+        user-select: none;
+
+        img {
+          max-width: 70px;
+          width: 100%;
+        }
+
+        &.selected {
+          background-color: white;
+          opacity: 1;
+        }
+
+        &.disabled {
+          pointer-events: none;
+          cursor: not-allowed;
+          opacity: .6;
+        }
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
     .content {
       flex: 1;
       display: flex;
@@ -55,48 +87,20 @@
       input {
         display: block;
       }
-
-      osf-button {
-        margin-top: 1rem;
-      }
     }
 
     .actions {
       background-color: #efefef;
       padding: 1rem;
-    }
-  }
+      display: flex;
+      gap: .5rem;
 
-
-
-  .tabs {
-    display: flex;
-    background-color: #efefef;
-
-    > div {
-      padding: 2rem;
-      opacity: .7;
-      cursor: pointer;
-      user-select: none;
-
-      img {
-        max-width: 70px;
-        width: 100%;
+      > div {
+        flex: 1;
       }
 
-      &.selected {
-        background-color: white;
-        opacity: 1;
-      }
-
-      &.disabled {
-        pointer-events: none;
-        cursor: not-allowed;
-        opacity: .6;
-      }
-
-      &:hover {
-        opacity: 1;
+      osf-loading {
+        height: 58px;
       }
     }
   }
