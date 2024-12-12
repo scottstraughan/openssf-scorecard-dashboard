@@ -3,7 +3,7 @@ import { PopupReference } from '../../shared/components/popup/popup.service';
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { MinimumServiceAccountError } from '../../shared/services/service-store.service';
+import { MinimumAccountError } from '../../shared/services/service-store.service';
 import { InvalidAccountError, RateLimitError } from '../../shared/services/repository-services/base-repository-service';
 
 @Component({
@@ -57,7 +57,7 @@ export class ErrorPopupComponent {
     let message = error.message;
     let icon = 'error';
 
-    if (error instanceof MinimumServiceAccountError) {
+    if (error instanceof MinimumAccountError) {
       title = 'Cannot Remove Account';
       message = 'You must have at least one account to track. Please add another account if you wish to delete this one.';
     } else if (error instanceof RateLimitError) {

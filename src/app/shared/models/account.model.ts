@@ -1,4 +1,4 @@
-export interface ServiceAccountModel {
+export interface AccountModel {
   id: string
   service: string
   account: string

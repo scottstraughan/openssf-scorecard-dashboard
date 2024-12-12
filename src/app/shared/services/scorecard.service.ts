@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ServiceAccountModel } from '../models/service-account.model';
+import { AccountModel } from '../models/account.model';
 import { RepositoryModel } from '../models/repository.model';
 import { catchError, map, Observable, of } from 'rxjs';
 
@@ -22,7 +22,7 @@ export class ScorecardService {
    * @param repository
    */
   getScore(
-    organization: ServiceAccountModel,
+    organization: AccountModel,
     repository: RepositoryModel
   ): Observable<number | undefined> {
     const url = `https://api.securityscorecards.dev/projects/github.com/${organization.account}/${repository.name}`;

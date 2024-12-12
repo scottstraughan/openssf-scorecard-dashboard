@@ -23,7 +23,7 @@ export class HomeViewComponent {
     protected serviceStoreService: ServiceStoreService,
     protected router: Router
   ) {
-    this.serviceStoreService.getServiceAccounts()
+    this.serviceStoreService.getAccounts()
       .subscribe((accounts) => {
         const firstAccount = accounts[0];
 

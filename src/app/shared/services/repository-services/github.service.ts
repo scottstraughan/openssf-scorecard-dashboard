@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
-import { ServiceAccountModel } from '../../models/service-account.model';
+import { AccountModel } from '../../models/account.model';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ServiceStoreService } from '../service-store.service';
 import { BaseRepositoryService, InvalidAccountError, RateLimitError } from './base-repository-service';
@@ -16,7 +16,7 @@ export class GithubService extends BaseRepositoryService {
   public getServiceDetails(
     accountName: string,
     apiToken?: string
-  ): Observable<ServiceAccountModel> {
+  ): Observable<AccountModel> {
     const apiUrl = `${GithubService.generateApiUrl(accountName)}`;
 
     return this.getRequestInstance(apiUrl, apiToken)
@@ -28,7 +28,7 @@ export class GithubService extends BaseRepositoryService {
             account: accountResult['login'],
             name: accountResult['name'] ? accountResult['name'] : accountName,
             icon: accountResult['avatar_url'],
-            description: accountResult['description'] ? accountResult['description'] : 'This account does not have a description.',
+            description: accountResult['description'] ?? 'This account does not have a description.',
             averageScore: 0,
             totalRepositories: accountResult['public_repos'],
             repositoriesWithScorecards: 0,
@@ -52,23 +52,6 @@ export class GithubService extends BaseRepositoryService {
     apiToken?: string
   ): Observable<RepositoryModel[]> {
     return this.getAllRepositories(accountName, apiToken);
-  }
-
-  /**
-   * Throw a more helpful error.
-   * @param error
-   * @private
-   */
-  private throwDecentError(error: HttpErrorResponse) {
-    if (error.status == 429) {
-      return new RateLimitError(
-        'You have been throttled by GitHub. Please wait 30 minutes or add a different API key to the account.');
-    } else if (error.status == 404) {
-      return new InvalidAccountError(
-        `No GitHub account with the provided name was found. Please recheck the account name.`);
-    }
-
-    return error;
   }
 
   /**
@@ -97,7 +80,7 @@ export class GithubService extends BaseRepositoryService {
               url: repository['url'],
               lastUpdated: new Date(repository['updated_at']),
               stars: repository['stargazers_count'],
-              description: repository['description']
+              description: repository['description'] ?? 'This repository has no description available.'
             });
           }
 
@@ -134,6 +117,23 @@ export class GithubService extends BaseRepositoryService {
     }
 
     return this.httpClient.get(url, { responseType: 'json', headers: headers });
+  }
+
+  /**
+   * Throw a more helpful error.
+   * @param error
+   * @private
+   */
+  private throwDecentError(error: HttpErrorResponse) {
+    if (error.status == 429) {
+      return new RateLimitError(
+        'You have been throttled by GitHub. Please wait 30 minutes or add a different API key to the account.');
+    } else if (error.status == 404) {
+      return new InvalidAccountError(
+        `No GitHub account with the provided name was found. Please recheck the account name.`);
+    }
+
+    return error;
   }
 
   /**
