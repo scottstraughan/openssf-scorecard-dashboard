@@ -3,7 +3,7 @@ import { RepositoryModel } from '../../models/repository.model';
 import { RingComponent } from '../ring/ring.component';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { LoadingComponent } from '../loading/loading.component';
-import { ServiceAccountModel } from '../../models/service-account.model';
+import { AccountModel } from '../../models/account.model';
 import { ScorecardModel } from '../../models/scorecard.model';
 
 @Component({
@@ -20,7 +20,7 @@ import { ScorecardModel } from '../../models/scorecard.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RepositoryComponent {
-  readonly organization = input.required<ServiceAccountModel>();
+  readonly organization = input.required<AccountModel>();
   readonly repository = input.required<RepositoryModel>();
   readonly scorecard = input<ScorecardModel | undefined>(undefined);
   readonly onReloadScorecard = output();

@@ -1,6 +1,6 @@
 import { Component, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ServiceAccountModel } from './shared/models/service-account.model';
+import { AccountModel } from './shared/models/account.model';
 import { NgClass } from '@angular/common';
 import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -19,7 +19,7 @@ export class AppComponent {
   /**
    * A list of service accounts.
    */
-  readonly serviceAccounts: Signal<ServiceAccountModel[]> = signal([]);
+  readonly serviceAccounts: Signal<AccountModel[]> = signal([]);
 
   /**
    * Constructor
@@ -31,7 +31,7 @@ export class AppComponent {
     protected popupService: PopupService
   ) {
     this.serviceAccounts = toSignal(
-      this.organizationService.getServiceAccounts(), { initialValue: [] });
+      this.organizationService.getAccounts(), { initialValue: [] });
   }
 
   /**

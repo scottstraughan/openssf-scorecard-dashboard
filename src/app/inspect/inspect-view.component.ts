@@ -4,7 +4,7 @@ import { RepositoryComponent } from '../shared/components/repository/repository.
 import { SearchComponent } from '../shared/components/search/search.component';
 import { RingComponent } from '../shared/components/ring/ring.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ServiceAccountModel } from '../shared/models/service-account.model';
+import { AccountModel } from '../shared/models/account.model';
 import { ServiceStoreService } from '../shared/services/service-store.service';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
@@ -47,7 +47,7 @@ export class InspectViewComponent implements OnInit {
    */
   readonly LayoutView = LayoutView;
 
-  readonly serviceAccount: WritableSignal<ServiceAccountModel | undefined> = signal(undefined);
+  readonly serviceAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly serviceAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
   readonly loadingServiceAccounts: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly loadingServiceAccountRepositories: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
@@ -112,9 +112,9 @@ export class InspectViewComponent implements OnInit {
 
           this.serviceAccountRepositories.set([]);
 
-          this.organizationSubscription = this.serviceStoreService.getServiceAccountDetails(params['service'], params['account'])
+          this.organizationSubscription = this.serviceStoreService.getAccountDetails(params['service'], params['account'])
             .pipe(
-              tap((serviceAccount: ServiceAccountModel) => {
+              tap((serviceAccount: AccountModel) => {
                 this.serviceAccount.set(serviceAccount);
                 this.loadingServiceAccounts.set(LoadingState.LOAD_SUCCESS);
 
@@ -393,7 +393,7 @@ export class InspectViewComponent implements OnInit {
   /**
    * Show an error popup.
    */
-  handleErrorThrown(
+  private handleErrorThrown(
     error: any
   ) {
     this.popupService.create(

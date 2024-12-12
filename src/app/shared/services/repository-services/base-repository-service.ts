@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ServiceAccountModel } from '../../models/service-account.model';
+import { AccountModel } from '../../models/account.model';
 import { RepositoryModel } from '../../models/repository.model';
 
 /**
@@ -27,7 +27,7 @@ export abstract class BaseRepositoryService {
   abstract getServiceDetails(
     accountName: string,
     apiToken?: string
-  ): Observable<ServiceAccountModel>;
+  ): Observable<AccountModel>;
 
   /**
    * Get the repositories fromm the service backend.
