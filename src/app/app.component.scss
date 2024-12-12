@@ -70,7 +70,6 @@ nav {
 
         span {
           font-size: 30px;
-          opacity: .6;
         }
 
         &:hover {
@@ -95,9 +94,11 @@ nav {
       padding: .5rem 0;
       border-radius: var(--default-border-radius);
       transition: var(--default-transition);
+      opacity: .5;
 
       &:hover {
         background-color: rgba(0, 0, 0, .1);
+        opacity: 1;
       }
 
       span {
