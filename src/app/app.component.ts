@@ -5,8 +5,7 @@ import { NgClass } from '@angular/common';
 import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
-import { AddSecurityKeyPopupComponent } from './add-security-key-popup/add-security-key-popup.component';
-import { AddOrganizationPopupComponent } from './add-organization-popup/add-organization-popup.component';
+import { AddOrganizationPopupComponent } from './popups/add-service-account-popup/add-organization-popup.component';
 
 @Component({
   selector: 'app-root',
@@ -16,32 +15,28 @@ import { AddOrganizationPopupComponent } from './add-organization-popup/add-orga
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  organizations: Signal<ServiceAccountModel[]> = signal([]);
-  selectedOrganization: ServiceAccountModel | undefined;
+  /**
+   * A list of service accounts.
+   */
+  readonly serviceAccounts: Signal<ServiceAccountModel[]> = signal([]);
 
+  /**
+   * Constructor
+   * @param organizationService
+   * @param popupService
+   */
   constructor(
     protected organizationService: ServiceStoreService,
     protected popupService: PopupService
   ) {
-    this.organizations = toSignal(this.organizationService.getServiceAccounts(),
-      { initialValue: ServiceStoreService.DEFAULT_ORGANIZATIONS });
-
-    this.setSelectedOrganization(this.organizations()[0]);
-
-    setTimeout(() => {
-      //this.onAddOrg();
-    })
+    this.serviceAccounts = toSignal(
+      this.organizationService.getServiceAccounts(), { initialValue: [] });
   }
 
-  setSelectedOrganization(organization: ServiceAccountModel) {
-    this.selectedOrganization = organization;
-  }
-
-  onAddOrg() {
+  /**
+   * Called when a user presses the add service button.
+   */
+  onAddServiceAccount() {
     this.popupService.create(AddOrganizationPopupComponent, null, true);
-  }
-
-  onAddAuthorizationKey() {
-    this.popupService.create(AddSecurityKeyPopupComponent, null, true);
   }
 }
