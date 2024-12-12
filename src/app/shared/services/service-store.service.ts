@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { ServiceAccountModel } from '../models/service-account.model';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
@@ -10,31 +10,19 @@ import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
 })
 export class ServiceStoreService {
   static readonly STORAGE_KEY = 'osf-services';
-  static readonly DEFAULT_ORGANIZATIONS: ServiceAccountModel[] = [
+  static readonly DEFAULT_ORGANIZATIONS: any[] = [
     {
       service: 'github',
-      account: 'codeplaysoftware',
-      url: 'https://github.com',
-      name: '',
-      description: '',
-      icon: 'https://avatars.githubusercontent.com/u/7440916?s=48&v=4',
-      totalRepositories: 0,
-      followers: 0
+      account: 'codeplaysoftware'
     },
     {
       service: 'github',
-      account: 'uxlfoundation',
-      url: 'https://github.com',
-      name: '',
-      description: '',
-      icon: 'https://avatars.githubusercontent.com/u/144704571?s=200&v=4',
-      totalRepositories: 0,
-      followers: 0
+      account: 'uxlfoundation'
     }
   ];
 
   protected observable: BehaviorSubject<ServiceAccountModel[]> = new BehaviorSubject<ServiceAccountModel[]>([]);
-  protected organizations: ServiceAccountModel[] = [];
+  protected organizations: Map<string, ServiceAccountModel> = new Map();
 
   /**
    * Constructor
@@ -46,9 +34,20 @@ export class ServiceStoreService {
     protected githubService: GithubService,
   ) {
     if (this.storageService.has(ServiceStoreService.STORAGE_KEY)) {
-      this.setServiceAccounts(this.storageService.get(ServiceStoreService.STORAGE_KEY));
-    } else {
-      this.setServiceAccounts(ServiceStoreService.DEFAULT_ORGANIZATIONS);
+     try {
+       const parsed: Map<string, ServiceAccountModel> = new Map(
+         JSON.parse(this.storageService.get(ServiceStoreService.STORAGE_KEY)));
+
+       this.setServiceAccounts(parsed);
+     } catch (error) { }
+    }
+
+    if (this.organizations.size == 0) {
+      for (const defaultServiceAccount of ServiceStoreService.DEFAULT_ORGANIZATIONS) {
+        this.add(
+          defaultServiceAccount.service, defaultServiceAccount.account, '***REMOVED***')
+          .subscribe();
+      }
     }
   }
 
@@ -63,6 +62,16 @@ export class ServiceStoreService {
     accountName: string,
     apiToken?: string
   ): Observable<ServiceAccountModel> {
+    const accountId = ServiceStoreService.generateUniqueId(service, accountName);
+
+    if (this.organizations.has(accountId)) {
+      const account = this.organizations.get(accountId);
+
+      if (account) {
+        return of(account);
+      }
+    }
+
     switch(service) {
       case SupportedService.GITHUB: {
         return this.githubService.getServiceDetails(accountName, apiToken)
@@ -97,6 +106,7 @@ export class ServiceStoreService {
    * @param service
    * @param accountName
    * @param apiToken
+   * @throws DuplicateServiceAccountError
    */
   add(
     service: string,
@@ -106,9 +116,27 @@ export class ServiceStoreService {
     return this.getServiceAccountDetails(service, accountName, apiToken)
       .pipe(
         tap((service) => {
-          this.addServiceAccount(service)
+          this.addServiceAccount(service);
         })
       );
+  }
+
+  /**
+   * Delete an account from being tracked.
+   * @param serviceAccountModel
+   */
+  delete(
+    serviceAccountModel: ServiceAccountModel
+  ) {
+    // Ensure we have at least one account to track
+    if (this.organizations.size == 1) {
+      throw new MinimumServiceAccountError();
+    }
+
+    if (this.organizations.has(serviceAccountModel.id)) {
+      this.organizations.delete(serviceAccountModel.id);
+      this.notifyObservers();
+    }
   }
 
   /**
@@ -124,23 +152,45 @@ export class ServiceStoreService {
    * @private
    */
   private setServiceAccounts(
-    serviceAccounts: ServiceAccountModel[]
+    serviceAccounts: Map<string, ServiceAccountModel>
   ) {
     this.organizations = serviceAccounts;
-    this.observable.next(this.organizations);
-    this.storageService.set(ServiceStoreService.STORAGE_KEY, this.organizations);
+    this.notifyObservers();
+  }
+
+  private notifyObservers() {
+    this.observable.next(Array.from(this.organizations.values()));
+    this.storageService.set(
+      ServiceStoreService.STORAGE_KEY, JSON.stringify(Array.from(this.organizations.entries())));
   }
 
   /**
    * Add a service account, notify observers.
    * @param account
+   * @throws DuplicateServiceAccountError
    * @private
    */
   private addServiceAccount(
     account: ServiceAccountModel
   ) {
-    this.organizations.push(account);
-    this.setServiceAccounts(this.organizations);
+    if (this.organizations.has(account.id)) {
+      throw new DuplicateServiceAccountError();
+    }
+
+    this.organizations.set(account.id, account);
+    this.notifyObservers();
+  }
+
+  /**
+   * Generate a unique identifier.
+   * @param service
+   * @param account
+   */
+  static generateUniqueId(
+    service: string,
+    account: string
+  ): string {
+    return service + '-' + account;
   }
 }
 
@@ -148,5 +198,8 @@ export class ServiceStoreService {
  * The list of supported services.
  */
 export enum SupportedService {
-  GITHUB= 'github'
+  GITHUB = 'github'
 }
+
+export class DuplicateServiceAccountError extends Error {}
+export class MinimumServiceAccountError extends Error {}
