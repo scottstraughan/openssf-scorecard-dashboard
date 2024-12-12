@@ -13,7 +13,7 @@ import { NgClass } from '@angular/common';
 export class ButtonComponent {
   icon = input<string | undefined>(undefined);
   label = input<string | undefined>(undefined);
-  disabled = input<boolean>(true);
+  disabled = input<boolean>(false);
   onClicked = output();
 
   @HostListener('click')
