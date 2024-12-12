@@ -1,4 +1,4 @@
-import { Component, model } from '@angular/core';
+import { Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -12,6 +12,6 @@ import { FormsModule } from '@angular/forms';
 })
 export class SearchComponent {
   value = model<string>('');
-  placeholder = model<string>('');
-  icon = model<string | undefined>(undefined);
+  placeholder = input<string>('');
+  icon = input<string | undefined>(undefined);
 }
