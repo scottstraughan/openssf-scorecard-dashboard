@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
-import { OrgViewComponent } from './org-view/org-view.component';
+import { InspectViewComponent } from './inspect/inspect-view.component';
+import { HomeViewComponent } from './home/home-view.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'inspect/github/codeplaysoftware',
-    pathMatch: 'full'
+    component: HomeViewComponent
   },
   {
     path: 'inspect/:service/:account',
-    component: OrgViewComponent
+    component: InspectViewComponent
   },
 ];

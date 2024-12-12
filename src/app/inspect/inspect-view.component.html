@@ -1,6 +1,6 @@
 <div class="panel overview">
-  @if (loadingOrganization() == LoadingState.LOAD_SUCCESS) {
-    @if (organization(); as organization) {
+  @if (loadingServiceAccounts() == LoadingState.LOAD_SUCCESS) {
+    @if (serviceAccount(); as organization) {
       <div class="header">
         @if (scorecardLoadingState() == LoadingState.LOAD_SUCCESS) {
           <osf-ring [score]="averageScorecardScore()"
@@ -50,7 +50,7 @@
         <a [href]="organization.url" target="_blank" rel="noopener">
           <osf-button icon="alt_route" label="Visit Repository"></osf-button>
         </a>
-        <osf-button icon="delete" label="Remove"></osf-button>
+        <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
       </div>
     }
   } @else {
@@ -59,20 +59,26 @@
 </div>
 
 <div class="panel repositories">
-  @if (loadingRepositories() == LoadingState.LOAD_SUCCESS) {
-    @if (organization(); as organization) {
+  @if (loadingServiceAccountRepositories() == LoadingState.LOAD_SUCCESS) {
+    @if (serviceAccount(); as organization) {
       <div class="header">
         <div>
           <osf-search
               [(value)]="searchString"
-              (valueChange)="onSearchValueChanged()"
               icon="search"
               placeholder="type to filter repositories"></osf-search>
         </div>
         <div>
-          <osf-button [icon]="getSortIcon()" [label]="getSortLabel()" (click)="onToggleSortMode()"></osf-button>
-          <osf-button [icon]="getVisibilityIcon()" (click)="onToggleRepoVisibility()"></osf-button>
-          <osf-button [icon]="getLayoutIcon()" (click)="onToggleLayout()"></osf-button>
+          <osf-button
+              [icon]="getIcon('sort')"
+              [label]="getSortLabel()"
+              (onClicked)="onToggleSortMode()"></osf-button>
+          <osf-button
+              [icon]="getIcon('visibility')"
+              (onClicked)="onToggleVisibility()"></osf-button>
+          <osf-button
+              [icon]="getIcon('layout')"
+              (onClicked)="onToggleLayout()"></osf-button>
         </div>
       </div>
 
@@ -92,7 +98,7 @@
                 class="view-more"
                 label="View More Repositories"
                 icon="next_plan"
-                (click)="onViewMore()"></osf-button>
+                (onClicked)="onViewMore()"></osf-button>
           }
         </div>
       } @else {

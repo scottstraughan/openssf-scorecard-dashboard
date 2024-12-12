@@ -37,7 +37,7 @@ nav {
         border-radius: 100%;
         overflow: hidden;
         padding: .3rem;
-        opacity: .8;
+        opacity: .7;
         transition: var(--default-transition);
         cursor: pointer;
 
@@ -60,17 +60,25 @@ nav {
       }
 
       .add {
-        > div {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: rgba(255, 255, 255, .2);
-          border: rgba(0, 0, 0, .3) 1px solid;
-        }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, .2);
+        border: rgba(0, 0, 0, .3) 1px solid;
+        transition: var(--default-transition);
+        box-shadow: var(--default-box-shadow);
 
         span {
           font-size: 30px;
           opacity: .6;
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, .6);
+
+          span {
+            opacity: 1;
+          }
         }
       }
     }
