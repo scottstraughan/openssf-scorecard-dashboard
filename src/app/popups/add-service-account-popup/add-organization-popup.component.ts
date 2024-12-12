@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
-import { PopupReference } from '../shared/components/popup/popup.service';
-import { SearchComponent } from '../shared/components/search/search.component';
-import { ButtonComponent } from '../shared/components/button/button.component';
+import { PopupReference } from '../../shared/components/popup/popup.service';
+import { SearchComponent } from '../../shared/components/search/search.component';
+import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { ServiceStoreService } from '../shared/services/service-store.service';
+import { DuplicateServiceAccountError, ServiceStoreService } from '../../shared/services/service-store.service';
 import { catchError, of, tap } from 'rxjs';
-import { InvalidAccountError, RateLimitError } from '../shared/services/repository-services/github.service';
+import { InvalidAccountError, RateLimitError } from '../../shared/services/repository-services/base-repository-service';
 
 @Component({
   selector: 'osf-add-organization-popup',
@@ -67,6 +67,8 @@ export class AddOrganizationPopupComponent {
             alert('RATE LIMITED');
           } else  if (error instanceof InvalidAccountError) {
             alert('INVALID ACCOUNT');
+          } else  if (error instanceof DuplicateServiceAccountError) {
+            alert('ACCOUNT ALREADY EXISTS');
           }
 
           this.loading.set(false);
