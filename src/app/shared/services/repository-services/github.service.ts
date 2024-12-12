@@ -1,33 +1,15 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { ServiceAccountModel } from '../../models/service-account.model';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-
-export abstract class RepositoryService {
-  static readonly RESULTS_PER_PAGE = 100;
-
-  protected httpClient: HttpClient = inject(HttpClient);
-
-  abstract getServiceDetails(
-    accountName: string,
-    apiToken?: string
-  ): Observable<ServiceAccountModel>;
-
-  abstract getRepositories(
-    accountName: string,
-    apiToken?: string
-  ): Observable<RepositoryModel[]>;
-}
-
-export class RateLimitError extends Error {}
-export class InvalidAccountError extends Error {}
-
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { ServiceStoreService } from '../service-store.service';
+import { BaseRepositoryService, InvalidAccountError, RateLimitError } from './base-repository-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GithubService extends RepositoryService {
+export class GithubService extends BaseRepositoryService {
   /**
    * @inheritdoc
    */
@@ -37,16 +19,11 @@ export class GithubService extends RepositoryService {
   ): Observable<ServiceAccountModel> {
     const apiUrl = `${GithubService.generateApiUrl(accountName)}`;
 
-    const headers: HttpHeaders = new HttpHeaders();
-
-    if (apiToken) {
-      headers.set('authorization', apiToken);
-    }
-
-    return this.httpClient.get(`${apiUrl}`, { responseType: 'json', headers: headers })
+    return this.getRequestInstance(apiUrl, apiToken)
       .pipe(
         map((accountResult: any) => {
           return {
+            id: ServiceStoreService.generateUniqueId('github', accountResult['login']),
             service: 'github',
             account: accountResult['login'],
             name: accountResult['name'] ? accountResult['name'] : accountName,
@@ -61,13 +38,8 @@ export class GithubService extends RepositoryService {
           }
         }),
         catchError((error: HttpErrorResponse) => {
-          if (error.status == 429) {
-            return throwError(() => new RateLimitError(error.error.message));
-          } else if (error.status == 404) {
-            return throwError(() => new InvalidAccountError(error.error.message));
-          }
-
-          return throwError(() => error);
+          return throwError(
+            () => this.throwDecentError(error));
         })
       );
   }
@@ -80,6 +52,23 @@ export class GithubService extends RepositoryService {
     apiToken?: string
   ): Observable<RepositoryModel[]> {
     return this.getAllRepositories(accountName, apiToken);
+  }
+
+  /**
+   * Throw a more helpful error.
+   * @param error
+   * @private
+   */
+  private throwDecentError(error: HttpErrorResponse) {
+    if (error.status == 429) {
+      return new RateLimitError(
+        'You have been throttled by GitHub. Please wait 30 minutes or add a different API key to the account.');
+    } else if (error.status == 404) {
+      return new InvalidAccountError(
+        `No GitHub account with the provided name was found. Please recheck the account name.`);
+    }
+
+    return error;
   }
 
   /**
@@ -96,17 +85,10 @@ export class GithubService extends RepositoryService {
     page: number = 1,
     repositories: RepositoryModel[] = []
   ): Observable<RepositoryModel[]> {
-    let exhausted = false;
     const apiUrl = `${GithubService.generateApiUrl(accountName)}/repos`;
 
-    const headers: HttpHeaders = new HttpHeaders();
-
-    if (apiToken) {
-      headers.set('authorization', apiToken);
-    }
-
-    return this.httpClient.get(`${apiUrl}?per_page=${GithubService.RESULTS_PER_PAGE}&page=${page}`,
-      { responseType: 'json', headers: headers })
+    let exhausted = false;
+    return this.getRequestInstance(`${apiUrl}?per_page=${GithubService.RESULTS_PER_PAGE}&page=${page}`, apiToken)
       .pipe(
         map((repositoriesResult: any) => {
           for (const repository of repositoriesResult) {
@@ -129,7 +111,29 @@ export class GithubService extends RepositoryService {
 
           return this.getAllRepositories(accountName, apiToken, page + 1, repositories);
         }),
+        catchError((error) => {
+          return throwError(
+            () => this.throwDecentError(error));
+        })
       );
+  }
+
+  /**
+   * Get a request instance, initialized with some defaults.
+   * @param url
+   * @param apiToken
+   */
+  private getRequestInstance(
+    url: string,
+    apiToken?: string
+  ) {
+    let headers: HttpHeaders = new HttpHeaders();
+
+    if (apiToken) {
+      headers = headers.set('Authorization', `Bearer ${apiToken}`);
+    }
+
+    return this.httpClient.get(url, { responseType: 'json', headers: headers });
   }
 
   /**
