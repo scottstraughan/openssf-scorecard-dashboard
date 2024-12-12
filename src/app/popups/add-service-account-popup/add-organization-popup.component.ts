@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
-import { PopupReference } from '../../shared/components/popup/popup.service';
+import { PopupReference, PopupService } from '../../shared/components/popup/popup.service';
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { DuplicateServiceAccountError, ServiceStoreService } from '../../shared/services/service-store.service';
+import { ServiceStoreService } from '../../shared/services/service-store.service';
 import { catchError, of, tap } from 'rxjs';
-import { InvalidAccountError, RateLimitError } from '../../shared/services/repository-services/base-repository-service';
+import { ErrorPopupComponent } from '../error-popup/error-popup.component';
+import { InspectViewComponent } from '../../inspect/inspect-view.component';
+import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'osf-add-organization-popup',
@@ -14,7 +16,8 @@ import { InvalidAccountError, RateLimitError } from '../../shared/services/repos
   imports: [
     SearchComponent,
     ButtonComponent,
-    FormsModule
+    FormsModule,
+    LoadingComponent
   ],
   styleUrls: [
     './add-organization-popup.component.scss'
@@ -31,10 +34,12 @@ export class AddOrganizationPopupComponent {
    * Constructor.
    * @param popupReference
    * @param serviceStoreService
+   * @param popupService
    */
   constructor(
     @Inject('POPUP_DATA') protected popupReference: PopupReference,
-    protected serviceStoreService: ServiceStoreService
+    protected serviceStoreService: ServiceStoreService,
+    protected popupService: PopupService
   ) { }
 
   /**
@@ -63,18 +68,20 @@ export class AddOrganizationPopupComponent {
           this.loading.set(false);
         }),
         catchError((error) => {
-          if (error instanceof RateLimitError) {
-            alert('RATE LIMITED');
-          } else  if (error instanceof InvalidAccountError) {
-            alert('INVALID ACCOUNT');
-          } else  if (error instanceof DuplicateServiceAccountError) {
-            alert('ACCOUNT ALREADY EXISTS');
-          }
+          this.popupService.create(
+            ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
 
           this.loading.set(false);
           return of();
         })
       )
       .subscribe();
+  }
+
+  /**
+   * Called when the user clicks to close the popup.
+   */
+  onCloseClicked() {
+    this.popupReference.close();
   }
 }

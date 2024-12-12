@@ -3,6 +3,8 @@ import { PopupReference } from '../../shared/components/popup/popup.service';
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
+import { MinimumServiceAccountError } from '../../shared/services/service-store.service';
+import { InvalidAccountError, RateLimitError } from '../../shared/services/repository-services/base-repository-service';
 
 @Component({
   selector: 'osf-error-popup',
@@ -43,5 +45,34 @@ export class ErrorPopupComponent {
    */
   onClose() {
     this.popupReference.close();
+  }
+
+  /**
+   * Generate an error response for the UI.
+   */
+  static handleErrorThrown(
+    error: any
+  ) {
+    let title = 'Error';
+    let message = error.message;
+    let icon = 'error';
+
+    if (error instanceof MinimumServiceAccountError) {
+      title = 'Cannot Remove Account';
+      message = 'You must have at least one account to track. Please add another account if you wish to delete this one.';
+    } else if (error instanceof RateLimitError) {
+      title = 'Rate Limited';
+      icon = 'speed';
+    } else if (error instanceof InvalidAccountError) {
+      title = 'Account Not Found';
+      icon = 'person_search';
+    } else {
+      title = error.message;
+      message = error.message;
+    }
+
+    return {
+      title: title, message: message, icon: icon
+    };
   }
 }
