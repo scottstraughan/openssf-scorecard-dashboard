@@ -1,4 +1,5 @@
 export interface ServiceAccountModel {
+  id: string
   service: string
   account: string
   name: string
