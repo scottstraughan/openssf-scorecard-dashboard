@@ -16,5 +16,5 @@ GitHub, GitLab or others.
 
 ## Support
 
-Contact <scotts@codpelay.com> if you need support or have questions.
+Contact <dev-rel@codpelay.com> if you need support or have questions.
 
