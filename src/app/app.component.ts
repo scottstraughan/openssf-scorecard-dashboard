@@ -6,6 +6,7 @@ import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
 import { AddOrganizationPopupComponent } from './popups/add-service-account-popup/add-organization-popup.component';
+import { AboutPopupComponent } from './popups/about-popup/about-popup.component';
 
 @Component({
   selector: 'app-root',
@@ -38,5 +39,13 @@ export class AppComponent {
    */
   onAddServiceAccount() {
     this.popupService.create(AddOrganizationPopupComponent, null, true);
+  }
+
+  /**
+   * Called when a user presses the view about button.
+   */
+  onAboutClicked() {
+    this.popupService.create(
+      AboutPopupComponent, undefined, true);
   }
 }
