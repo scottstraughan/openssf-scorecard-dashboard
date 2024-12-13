@@ -15,13 +15,9 @@ export class ServiceStoreService {
   static readonly STORAGE_ACCOUNT_LIST = 'osf-account-list';
 
   /**
-   * Default organizations.
+   * Default accounts if the user is visiting for the first time.
    */
-  static readonly DEFAULT_ORGANIZATIONS: any[] = [
-    {
-      service: 'github',
-      account: 'codeplaysoftware'
-    },
+  static readonly DEFAULT_ACCOUNTS: any[] = [
     {
       service: 'github',
       account: 'uxlfoundation'
@@ -59,7 +55,7 @@ export class ServiceStoreService {
     }
 
     if (this.accounts.size == 0) {
-      for (const defaultAccount of ServiceStoreService.DEFAULT_ORGANIZATIONS) {
+      for (const defaultAccount of ServiceStoreService.DEFAULT_ACCOUNTS) {
         this.add(defaultAccount.service, defaultAccount.account)
           .subscribe();
       }

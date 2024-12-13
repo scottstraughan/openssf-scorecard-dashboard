@@ -19,14 +19,14 @@ export class ScorecardService {
 
   /**
    * Get a score from the securityscorecards API.
-   * @param organization
+   * @param account
    * @param repository
    */
   getScorecard(
-    organization: AccountModel,
+    account: AccountModel,
     repository: RepositoryModel
   ): Observable<ScorecardModel | undefined> {
-    const url = `https://api.securityscorecards.dev/projects/github.com/${organization.account}/${repository.name}`;
+    const url = `https://api.securityscorecards.dev/projects/github.com/${account.account}/${repository.name}`;
 
     return this.httpClient.get(url, { responseType: 'json' })
       .pipe(

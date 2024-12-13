@@ -62,7 +62,7 @@ export class RepositoryViewComponent implements OnInit {
   readonly searchString: WritableSignal<string> = signal('');
 
   public filteredRepositoriesCount: number = 0;
-  private organizationSubscription: Subscription | undefined;
+  private accountSubscription: Subscription | undefined;
   private repositorySubscription: Subscription | undefined;
 
   /**
@@ -113,7 +113,7 @@ export class RepositoryViewComponent implements OnInit {
 
           this.serviceAccountRepositories.set([]);
 
-          this.organizationSubscription = this.serviceStoreService.getAccountDetails(params['service'], params['account'])
+          this.accountSubscription = this.serviceStoreService.getAccountDetails(params['service'], params['account'])
             .pipe(
               tap((serviceAccount: AccountModel) => {
                 this.serviceAccount.set(serviceAccount);
@@ -183,9 +183,9 @@ export class RepositoryViewComponent implements OnInit {
    * Reload all the scorecard results.
    */
   reloadScorecardResults() {
-    const organization = this.serviceAccount();
+    const account = this.serviceAccount();
 
-    if (!organization) {
+    if (!account) {
       return ;
     }
 
@@ -195,7 +195,7 @@ export class RepositoryViewComponent implements OnInit {
       repository.scorecard = undefined;
 
       scorecardObservables.push(
-        this.scorecardService.getScorecard(organization, repository)
+        this.scorecardService.getScorecard(account, repository)
           .pipe(
             tap((scorecard) => repository.scorecard = scorecard)
           )
@@ -223,15 +223,15 @@ export class RepositoryViewComponent implements OnInit {
   onReloadScorecard(
     repository: RepositoryModel
   ) {
-    const organization = this.serviceAccount();
+    const account = this.serviceAccount();
 
-    if (!organization) {
+    if (!account) {
       return ;
     }
 
     repository.scorecard = undefined;
 
-    this.scorecardService.getScorecard(organization, repository)
+    this.scorecardService.getScorecard(account, repository)
       .subscribe((scorecard) => {
         repository.scorecard = scorecard;
         this.recalculateScorecards();
@@ -438,8 +438,8 @@ export class RepositoryViewComponent implements OnInit {
       this.repositorySubscription.unsubscribe();
     }
 
-    if (this.organizationSubscription) {
-      this.organizationSubscription.unsubscribe();
+    if (this.accountSubscription) {
+      this.accountSubscription.unsubscribe();
     }
 
     this.scorecardLoadingState.set(LoadingState.LOADING);
