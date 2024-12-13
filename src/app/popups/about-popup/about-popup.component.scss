@@ -20,6 +20,14 @@
   .body {
     background-color: white;
     padding: 1rem 4rem;
+
+    a {
+      font-weight: bold;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   .actions {
