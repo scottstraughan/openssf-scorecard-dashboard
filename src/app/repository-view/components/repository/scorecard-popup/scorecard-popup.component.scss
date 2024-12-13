@@ -1,0 +1,143 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 800px;
+  height: 800px;
+
+  --color-shocking: #bc2323;
+  --color-poor: #ca5f1d;
+  --color-good: #bd9c52;
+  --color-verygood: #9abd76;
+  --color-excellent: #548318;
+
+  .header {
+    padding: 1rem;
+    background-color: #efefef;
+    backdrop-filter: blur(10px);
+    display: flex;
+    position: relative;
+    gap: 1rem;
+    box-shadow: var(--default-box-shadow);
+
+    > div {
+      display: flex;
+      align-items: center;
+
+      &.score {
+        padding-left: .5rem;
+
+        osf-score-ring {
+          height: 40px;
+          width: 40px;
+        }
+      }
+
+      &.title {
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        h1 {
+          margin: 0;
+          font-size: 1.4rem;
+          font-weight: 500;
+        }
+
+        h2 {
+          margin: .2rem 0 0 0;
+          font-size: .8rem;
+          opacity: .5;
+          font-weight: normal;
+        }
+      }
+    }
+  }
+
+  .container {
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 1rem;
+    gap: .5rem;
+  }
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+  border: var(--default-border);
+  border-radius: var(--default-border-radius);
+  box-shadow: var(--default-box-shadow);
+  position: relative;
+
+  --ring-size: 60px;
+
+  > div {
+    display: flex;
+    align-items: center;
+    padding: 2rem 2rem 1.5rem 2rem;
+
+    &.details {
+      flex: 1;
+    }
+  }
+
+  h1, p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+
+  p {
+    margin-top: .2rem;
+    opacity: .6;
+  }
+
+  .priority {
+    padding: .4rem .6rem;
+    background-color: red;
+    color: rgba(255, 255, 255, .9);
+    border-radius: 0 0 4px 4px;
+    font-size: .8rem;
+    vertical-align: middle;
+    margin-left: 1rem;
+    position: absolute;
+    top: -1px;
+    left: 1rem;
+
+    &.critical {
+      background-color: #960003;
+    }
+
+    &.high {
+      background-color: #DF2A19;
+    }
+
+    &.medium {
+      background-color: #F7860F;
+    }
+
+    &.low {
+      background-color: #F4BD0C;
+    }
+  }
+
+  osf-score-ring {
+    width: var(--ring-size);
+    height: var(--ring-size);
+  }
+}
+
+.score-color-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: red;
+  opacity: .2;
+}
