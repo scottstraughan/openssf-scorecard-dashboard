@@ -27,7 +27,7 @@ export class HomeViewComponent {
       .subscribe((accounts) => {
         const firstAccount = accounts[0];
 
-        this.router.navigate([`/inspect/${firstAccount.service}/${firstAccount.account}`])
+        this.router.navigate([`/${firstAccount.service}/${firstAccount.account}`])
           .then();
       });
   }

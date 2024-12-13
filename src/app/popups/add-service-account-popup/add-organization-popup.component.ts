@@ -5,8 +5,8 @@ import { ButtonComponent } from '../../shared/components/button/button.component
 import { FormsModule } from '@angular/forms';
 import { ServiceStoreService } from '../../shared/services/service-store.service';
 import { catchError, of, tap } from 'rxjs';
-import { ErrorPopupComponent } from '../error-popup/error-popup.component';
-import { InspectViewComponent } from '../../inspect/inspect-view.component';
+import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
+import { RepositoryViewComponent } from '../../repository-view/repository-view.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({

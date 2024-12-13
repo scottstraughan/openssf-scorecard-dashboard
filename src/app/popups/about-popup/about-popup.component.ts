@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule
   ],
   styleUrls: [
-    './../error-popup/error-popup.component.scss',
+    '../../shared/popups/error-popup/error-popup.component.scss',
     './about-popup.component.scss',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
