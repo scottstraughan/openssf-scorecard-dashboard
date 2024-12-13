@@ -5,7 +5,7 @@ import { NgClass } from '@angular/common';
 import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
-import { AddOrganizationPopupComponent } from './popups/add-service-account-popup/add-organization-popup.component';
+import { AddAccountPopupComponent } from './popups/add-account-popup/add-account-popup.component';
 import { AboutPopupComponent } from './popups/about-popup/about-popup.component';
 
 @Component({
@@ -23,22 +23,22 @@ export class AppComponent {
 
   /**
    * Constructor
-   * @param organizationService
+   * @param serviceStoreService
    * @param popupService
    */
   constructor(
-    protected organizationService: ServiceStoreService,
+    protected serviceStoreService: ServiceStoreService,
     protected popupService: PopupService
   ) {
     this.serviceAccounts = toSignal(
-      this.organizationService.getAccounts(), { initialValue: [] });
+      this.serviceStoreService.getAccounts(), { initialValue: [] });
   }
 
   /**
    * Called when a user presses the add service button.
    */
   onAddServiceAccount() {
-    this.popupService.create(AddOrganizationPopupComponent, null, true);
+    this.popupService.create(AddAccountPopupComponent, null, true);
   }
 
   /**

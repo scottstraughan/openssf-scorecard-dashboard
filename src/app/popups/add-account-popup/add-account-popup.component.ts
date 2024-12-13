@@ -10,9 +10,9 @@ import { RepositoryViewComponent } from '../../repository-view/repository-view.c
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
-  selector: 'osf-add-organization-popup',
+  selector: 'osf-add-account-popup',
   standalone: true,
-  templateUrl: './add-organization-popup.component.html',
+  templateUrl: './add-account-popup.component.html',
   imports: [
     SearchComponent,
     ButtonComponent,
@@ -20,11 +20,11 @@ import { LoadingComponent } from '../../shared/components/loading/loading.compon
     LoadingComponent
   ],
   styleUrls: [
-    './add-organization-popup.component.scss'
+    './add-account-popup.component.scss'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AddOrganizationPopupComponent {
+export class AddAccountPopupComponent {
   readonly selectedService: WritableSignal<string> = signal('github');
   readonly accountName: WritableSignal<string> = signal('');
   readonly apiToken: WritableSignal<string | undefined> = signal(undefined);

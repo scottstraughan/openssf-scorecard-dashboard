@@ -1,6 +1,6 @@
 <div class="panel overview">
   @if (loadingServiceAccounts() == LoadingState.LOAD_SUCCESS) {
-    @if (serviceAccount(); as organization) {
+    @if (serviceAccount(); as account) {
       <div class="header">
         @if (scorecardLoadingState() == LoadingState.LOAD_SUCCESS) {
           <osf-score-ring [score]="averageScorecardScore()"
@@ -13,8 +13,8 @@
         }
       </div>
       <div class="details">
-        <h1 [innerHTML]="organization.name"></h1>
-        <p [innerHTML]="organization.description"></p>
+        <h1 [innerHTML]="account.name"></h1>
+        <p [innerHTML]="account.description"></p>
 
         <div class="stats">
           <div>
@@ -23,7 +23,7 @@
             </div>
             <div>Public Repositories</div>
             <div>
-              <span class="number" [innerHTML]="organization.totalRepositories">-</span>
+              <span class="number" [innerHTML]="account.totalRepositories">-</span>
             </div>
           </div>
           <div>
@@ -41,13 +41,13 @@
             </div>
             <div>Followers</div>
             <div>
-              <span class="number" [innerHTML]="organization.followers">-</span>
+              <span class="number" [innerHTML]="account.followers">-</span>
             </div>
           </div>
         </div>
       </div>
       <div class="actions">
-        <a [href]="organization.url" target="_blank" rel="noopener">
+        <a [href]="account.url" target="_blank" rel="noopener">
           <osf-button icon="alt_route" label="Visit Repository"></osf-button>
         </a>
         <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
@@ -60,7 +60,7 @@
 
 <div class="panel repositories">
   @if (loadingServiceAccountRepositories() == LoadingState.LOAD_SUCCESS) {
-    @if (serviceAccount(); as organization) {
+    @if (serviceAccount(); as account) {
       <div class="header">
         <div>
           <osf-search
@@ -88,7 +88,7 @@
             @for (repository of getVisibleRepositories(); track repository.url) {
               <osf-repository
                   (onReloadScorecard)="onReloadScorecard(repository)"
-                  [account]="organization"
+                  [account]="account"
                   [scorecard]="repository.scorecard"
                   [repository]="repository"></osf-repository>
             }

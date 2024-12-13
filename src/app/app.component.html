@@ -3,13 +3,13 @@
     <img src="/assets/images/logo.svg" alt="OpenSSF Logo" />
   </div>
 
-  <div class="organizations">
+  <div class="accounts">
     <div class="list">
-      @for (organization of serviceAccounts(); track organization.account) {
-        <a [routerLink]="organization.service + '/' + organization.account"
+      @for (account of serviceAccounts(); track account.account) {
+        <a [routerLink]="account.service + '/' + account.account"
            class="item"
            routerLinkActive="selected">
-          <div [style.background-image]="'url(' + organization.icon + ')'"></div>
+          <div [style.background-image]="'url(' + account.icon + ')'"></div>
         </a>
       }
       <div class="item add" (click)="onAddServiceAccount()">
