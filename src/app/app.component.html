@@ -6,7 +6,7 @@
   <div class="organizations">
     <div class="list">
       @for (organization of serviceAccounts(); track organization.account) {
-        <a [routerLink]="'inspect/' + organization.service + '/' + organization.account"
+        <a [routerLink]="organization.service + '/' + organization.account"
            class="item"
            routerLinkActive="selected">
           <div [style.background-image]="'url(' + organization.icon + ')'"></div>

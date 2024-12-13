@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { InspectViewComponent } from './inspect/inspect-view.component';
+import { RepositoryViewComponent } from './repository-view/repository-view.component';
 import { HomeViewComponent } from './home/home-view.component';
 
 export const routes: Routes = [
@@ -8,7 +8,7 @@ export const routes: Routes = [
     component: HomeViewComponent
   },
   {
-    path: 'inspect/:service/:account',
-    component: InspectViewComponent
-  },
+    path: ':service/:account',
+    component: RepositoryViewComponent
+  }
 ];
