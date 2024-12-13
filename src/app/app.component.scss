@@ -8,14 +8,23 @@ nav {
   display: flex;
   flex-direction: column;
   text-align: center;
-  padding: 1.5rem 0;
+  padding: 1rem 0;
 
   .logo {
-    padding: 1rem 0;
+    display: flex;
+    padding: 1.2rem 1.4rem;
+    background-color: var(--hint-color);
+    border-radius: 0 6px 6px 0;
+    margin-right: .7rem;
+    box-shadow: var(--default-box-shadow);
+    cursor: pointer;
+
+    &:hover {
+      opacity: .96;
+    }
 
     img {
       width: 100%;
-      max-width: 70px;
     }
   }
 
