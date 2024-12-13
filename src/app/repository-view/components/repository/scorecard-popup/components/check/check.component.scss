@@ -2,10 +2,11 @@
   --ring-size: 60px;
 
   display: block;
+  container: check-container / inline-size;
 
   a {
     display: flex;
-    gap: 1rem;
+    flex-direction: column-reverse;
     border: var(--default-border);
     border-radius: var(--default-border-radius);
     box-shadow: var(--default-box-shadow);
@@ -16,11 +17,20 @@
       background-color: rgba(0, 0, 0, 0.05);
     }
 
+    @container check-container (min-width: 450px) {
+      flex-direction: row;
+      gap: 1rem;
+    }
+
     .details,
     .score {
       display: flex;
       align-items: center;
-      padding: 1.8rem 1.8rem 1.2rem 1.8rem;
+      padding: .2rem;
+
+      @container check-container (min-width: 450px) {
+        padding: 1.8rem 1.8rem 1.2rem 1.8rem;
+      }
     }
 
     .details {
@@ -35,10 +45,12 @@
       font-size: .7rem;
       display: inline-block;
       vertical-align: middle;
-      margin-left: 1rem;
-      position: absolute;
-      top: -1px;
-      left: 1rem;
+
+      @container check-container (min-width: 450px) {
+        position: absolute;
+        left: 2rem;
+        top: -1px;
+      }
 
       &.critical {
         background-color: #960003;

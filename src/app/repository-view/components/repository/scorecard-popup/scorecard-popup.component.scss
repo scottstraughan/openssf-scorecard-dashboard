@@ -3,6 +3,7 @@
   flex-direction: column;
   width: 800px;
   height: 800px;
+  container: scorecard-popup / inline-size;
 
   --color-shocking: #bc2323;
   --color-poor: #ca5f1d;
@@ -17,11 +18,21 @@
     display: flex;
     position: relative;
     gap: 1rem;
+    flex-direction: column;
     box-shadow: var(--default-box-shadow);
+
+    @container scorecard-popup (min-width: 650px) {
+      flex-direction: row;
+    }
 
     > div {
       display: flex;
       align-items: center;
+      justify-content: center;
+
+      @container scorecard-popup (min-width: 650px) {
+        justify-content: left;
+      }
 
       &.score {
         padding-left: .5rem;
