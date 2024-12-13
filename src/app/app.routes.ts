@@ -28,5 +28,9 @@ export const routes: Routes = [
   {
     path: ':service/:account',
     component: RepositoryViewComponent
+  },
+  {
+    path: ':service/:account',
+    component: RepositoryViewComponent
   }
 ];
