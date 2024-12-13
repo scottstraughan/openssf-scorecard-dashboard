@@ -21,7 +21,5 @@
  */
 export enum LoadingState {
   LOADING,
-  LOAD_SUCCESS,
-  LOAD_FAILURE,
-  NOT_STARTED
+  LOAD_SUCCESS
 }
