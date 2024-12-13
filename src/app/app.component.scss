@@ -1,23 +1,37 @@
 :host {
   display: flex;
   height: 100%;
+  flex-direction: column;
+
+  @media (min-width: 1000px) {
+    flex-direction: row;
+  }
 }
 
 nav {
-  width: 115px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   text-align: center;
-  padding: 1rem 0;
+
+  @media (min-width: 1000px) {
+    width: 115px;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
 
   .logo {
     display: flex;
     padding: 1.2rem 1.4rem;
     background-color: var(--hint-color);
-    border-radius: 0 6px 6px 0;
     margin-right: .7rem;
     box-shadow: var(--default-box-shadow);
     cursor: pointer;
+    max-width: 104px;
+    border-radius: 0 0 6px 0;
+
+    @media (min-width: 1000px) {
+      border-radius: 0 6px 6px 0;
+    }
 
     &:hover {
       opacity: .96;
@@ -32,13 +46,22 @@ nav {
     overflow: auto;
     flex: 1;
 
+    @media screen and (max-width: 1000px) {
+      display: flex;
+      align-items: center;
+    }
+
     .list {
       display: flex;
       align-items: center;
-      flex-direction: column;
+      flex-direction: row;
       gap: 1.5rem;
-      padding-top: 3rem;
-      overflow: auto;
+      padding-top: 0;
+
+      @media screen and (min-width: 1000px) {
+        flex-direction: column;
+        padding-top: 3rem;
+      }
 
       .item {
         width: 61px;
@@ -49,6 +72,7 @@ nav {
         opacity: .7;
         transition: var(--default-transition);
         cursor: pointer;
+        flex-shrink: 0;
 
         > div {
           background-color: rgba(0, 0, 0, .2);
@@ -98,6 +122,10 @@ nav {
     gap: .5rem;
     padding: 0 1rem;
 
+    @media screen and (max-width: 1000px) {
+      display: none;
+    }
+
     .button {
       cursor: pointer;
       padding: .5rem 0;
@@ -128,5 +156,10 @@ nav {
 
 main {
   flex: 1;
-  padding: 1rem 1rem 1rem 0;
+  padding: 1rem;
+  container: main / inline-size;
+
+  @media screen and (min-width: 1000px) {
+    padding: 1rem 1rem 1rem 0;
+  }
 }
