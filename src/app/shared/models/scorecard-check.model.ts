@@ -16,14 +16,18 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ScorecardCheck } from './scorecard-check.model';
+import { ResultPriority } from '../services/scorecard.service';
 
 /**
- * Represents a scorecard.
+ * Represents a scorecard check item.
  */
-export interface ScorecardModel {
-  score?: number
-  checks: ScorecardCheck[]
-  url: string
+export interface ScorecardCheck {
+  name: string
+  score: number
+  reason: string
+  details: string | undefined
+  priority: ResultPriority
+  documentation: {
+    url: string
+  }
 }
-

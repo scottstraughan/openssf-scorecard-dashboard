@@ -18,6 +18,9 @@
 
 import { ScorecardModel } from './scorecard.model';
 
+/**
+ * Represents a repository.
+ */
 export interface RepositoryModel {
   name: string
   url: string

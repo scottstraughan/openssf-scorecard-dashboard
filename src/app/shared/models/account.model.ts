@@ -16,6 +16,9 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
+/**
+ * Represents an account.
+ */
 export interface AccountModel {
   id: string
   service: string
