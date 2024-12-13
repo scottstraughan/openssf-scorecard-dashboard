@@ -26,6 +26,7 @@ import { catchError, of, tap } from 'rxjs';
 import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
 import { RepositoryViewComponent } from '../../repository-view/repository-view.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'osf-add-account-popup',
@@ -43,7 +44,7 @@ import { LoadingComponent } from '../../shared/components/loading/loading.compon
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddAccountPopupComponent {
-  readonly selectedService: WritableSignal<string> = signal('github');
+  readonly service: WritableSignal<string> = signal('github');
   readonly accountName: WritableSignal<string> = signal('');
   readonly apiToken: WritableSignal<string | undefined> = signal(undefined);
   readonly loading: WritableSignal<boolean> = signal(false);
@@ -53,18 +54,20 @@ export class AddAccountPopupComponent {
    * @param popupReference
    * @param serviceStoreService
    * @param popupService
+   * @param router
    */
   constructor(
     @Inject('POPUP_DATA') protected popupReference: PopupReference,
     protected serviceStoreService: ServiceStoreService,
-    protected popupService: PopupService
+    protected popupService: PopupService,
+    protected router: Router
   ) { }
 
   /**
    * Determine if all the forms are valid.
    */
   isServiceFormsValid(): boolean {
-    if (this.selectedService() == 'github') {
+    if (this.service() == 'github') {
       if (this.accountName().length == 0) {
         return false;
       }
@@ -79,11 +82,12 @@ export class AddAccountPopupComponent {
   onAdd() {
     this.loading.set(true);
 
-    this.serviceStoreService.add(this.selectedService(), this.accountName(), this.apiToken())
+    this.serviceStoreService.add(this.service(), this.accountName(), this.apiToken())
       .pipe(
-        tap(() => {
+        tap((account) => {
           this.popupReference.close();
           this.loading.set(false);
+          this.router.navigate([`/${account.service}/${account.account}`]);
         }),
         catchError((error) => {
           this.popupService.create(
