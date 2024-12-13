@@ -23,7 +23,8 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { NgClass } from '@angular/common';
 import { RepositoryModel } from '../../../../shared/models/repository.model';
 import { PopupReference } from '../../../../shared/components/popup/popup.service';
-import { ScorecardCheck } from '../../../../shared/models/scorecard.model';
+
+import { ScorecardCheck } from '../../../../shared/models/scorecard-check.model';
 
 @Component({
   selector: 'app-scorecard-view',
