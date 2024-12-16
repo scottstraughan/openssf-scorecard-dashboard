@@ -3,9 +3,11 @@
 
 # OpenSSF Dashboard
 
-[![Open the Dashboard|250](https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/run-button.png)](https://scottstraughan.github.io/openssf-dashboard/)
+<a href="https://scottstraughan.github.io/openssf-dashboard/" target="_blank">
+  <img src="https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/run-button.png" width="250" />
+</a>
 
-![View the Dashboard](https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/workflow.jpg)
+![View the Dashboard](https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/dashboard.jpg)
 
 The OpenSSF dashboard can be used to inspect the OpenSSF scorecards for users/organizations or accounts stored on
 GitHub, GitLab or others.
