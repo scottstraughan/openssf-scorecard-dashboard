@@ -35,7 +35,7 @@ Angular-cli and then run with `ng serve`. You can build with `ng build`.
 
 ## Support
 
-Contact <dev-rel@codpelay.com> if you need support or have questions.
+Contact <scotts@codpelay.com> if you need support or have questions.
 
 [angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
 [node.js]: https://img.shields.io/badge/Nodejs-DD0031?style=for-the-badge&logo=angular&logoColor=white
