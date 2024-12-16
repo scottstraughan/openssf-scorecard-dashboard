@@ -23,7 +23,7 @@
             </div>
             <div>Public Repositories</div>
             <div>
-              <span class="number" [innerHTML]="account.totalRepositories">-</span>
+              <span class="number" [innerHTML]="serviceAccountRepositories().length">-</span>
             </div>
           </div>
           <div>
@@ -32,7 +32,13 @@
             </div>
             <div>Available Scorecards</div>
             <div>
-              <span class="number" [innerHTML]="totalRepositoriesWithScorecards()">-</span>
+              <span class="number">
+                @if (scorecardLoadingState() == LoadingState.LOAD_SUCCESS) {
+                  {{ totalRepositoriesWithScorecards() }}
+                } @else {
+                  <osf-loading></osf-loading>
+                }
+              </span>
             </div>
           </div>
           <div>
@@ -50,7 +56,10 @@
         <a [href]="account.url" target="_blank" rel="noopener">
           <osf-button icon="alt_route" label="Visit Repository"></osf-button>
         </a>
-        <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
+        <div class="group">
+          <osf-button icon="sync" label="Sync" (onClicked)="onDeleteServiceAccount()"></osf-button>
+          <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
+        </div>
       </div>
     }
   } @else {
