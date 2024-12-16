@@ -19,7 +19,7 @@
 import { Component, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AccountModel } from './shared/models/account.model';
-import { NgClass } from '@angular/common';
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import { ServiceStoreService } from './shared/services/service-store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
@@ -29,7 +29,7 @@ import { AboutPopupComponent } from './popups/about-popup/about-popup.component'
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NgClass, RouterLinkActive, RouterLink],
+  imports: [RouterOutlet, NgClass, RouterLinkActive, RouterLink, NgOptimizedImage],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
