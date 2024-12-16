@@ -15,8 +15,8 @@
     padding: 1rem;
     background-color: #efefef;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: flex;
-    position: relative;
     gap: 1rem;
     flex-direction: column;
     box-shadow: var(--default-box-shadow);
