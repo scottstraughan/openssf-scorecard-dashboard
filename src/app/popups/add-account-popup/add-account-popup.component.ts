@@ -27,6 +27,7 @@ import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup
 import { RepositoryViewComponent } from '../../repository-view/repository-view.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'osf-add-account-popup',
@@ -36,7 +37,8 @@ import { Router } from '@angular/router';
     SearchComponent,
     ButtonComponent,
     FormsModule,
-    LoadingComponent
+    LoadingComponent,
+    NgOptimizedImage
   ],
   styleUrls: [
     './add-account-popup.component.scss'
