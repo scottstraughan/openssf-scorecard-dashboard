@@ -55,7 +55,8 @@ export class ScorecardService {
               check.priority = ScorecardService.getPriority(check.name);
               return check;
             }),
-            url: `https://scorecard.dev/viewer/?uri=${scorecardResult['repo']['name']}`
+            url: `https://scorecard.dev/viewer/?uri=${scorecardResult['repo']['name']}`,
+            dateGenerated: new Date(scorecardResult['date'])
           }
         }),
         catchError(() => {
@@ -63,6 +64,7 @@ export class ScorecardService {
             score: undefined,
             checks: [],
             url: '',
+            dateGenerated: new Date()
           });
         })
       );

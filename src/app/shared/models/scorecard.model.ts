@@ -25,5 +25,5 @@ export interface ScorecardModel {
   score?: number
   checks: ScorecardCheck[]
   url: string
+  dateGenerated: Date
 }
-

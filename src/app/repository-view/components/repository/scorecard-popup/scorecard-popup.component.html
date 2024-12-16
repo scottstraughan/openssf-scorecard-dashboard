@@ -12,7 +12,7 @@
       <div class="title">
         <div>
           <h1 [innerHTML]="repository.name"></h1>
-          <h2>Scorecard generated at 2024-12-08T15:33:21Z</h2>
+          <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
         </div>
       </div>
 
