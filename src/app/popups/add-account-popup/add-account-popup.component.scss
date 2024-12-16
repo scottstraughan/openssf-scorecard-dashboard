@@ -53,18 +53,15 @@
         &.selected {
           background-color: white;
           opacity: 1;
-
           border-top: var(--color-verygood) 6px solid;
-        }
-
-        &.disabled {
-          pointer-events: none;
-          cursor: not-allowed;
-          opacity: .6;
         }
 
         &:hover {
           opacity: 1;
+        }
+
+        &.gitlab img {
+          margin-top: 6px;
         }
       }
     }
