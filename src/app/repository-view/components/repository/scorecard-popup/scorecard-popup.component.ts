@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } fr
 import { ScoreRingComponent } from '../../../../shared/components/score-ring/score-ring.component';
 import { CheckComponent } from './components/check/check.component';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { NgClass } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { RepositoryModel } from '../../../../shared/models/repository.model';
 import { PopupReference } from '../../../../shared/components/popup/popup.service';
 
@@ -33,7 +33,8 @@ import { ScorecardCheck } from '../../../../shared/models/scorecard-check.model'
     ScoreRingComponent,
     CheckComponent,
     ButtonComponent,
-    NgClass
+    NgClass,
+    DatePipe
   ],
   templateUrl: './scorecard-popup.component.html',
   styleUrl: './scorecard-popup.component.scss',
