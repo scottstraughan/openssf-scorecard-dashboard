@@ -22,10 +22,14 @@ GitHub, GitLab or others.
 - Responsive design
 - Created in 7 days
 
-
 ## Tech Stack
 
 ![Angular][angular.io] ![Node.JS][node.js] ![SASS][sass]
+
+## Running Locally
+
+If you want to run your own version of this dashboard on your own machine, please fork/clone this repo, install
+Angular-cli and then run with `ng serve`. You can build with `ng build`.
 
 ## Support
 
