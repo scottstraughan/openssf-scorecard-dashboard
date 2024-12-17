@@ -17,7 +17,7 @@
       background-color: rgba(0, 0, 0, 0.05);
     }
 
-    @container check-container (min-width: 450px) {
+    @container check-container (min-width: 430px) {
       flex-direction: row;
       gap: 1rem;
     }
@@ -26,10 +26,15 @@
     .score {
       display: flex;
       align-items: center;
-      padding: .2rem;
+      padding: 1rem;
 
       @container check-container (min-width: 450px) {
         padding: 1.8rem;
+      }
+
+      @container check-container (max-width: 430px) {
+        justify-content: center;
+        text-align: center;
       }
     }
 

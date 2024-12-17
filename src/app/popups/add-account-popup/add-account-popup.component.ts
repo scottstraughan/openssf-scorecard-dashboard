@@ -108,4 +108,16 @@ export class AddAccountPopupComponent {
   onCloseClicked() {
     this.popupReference.close();
   }
+
+  /**
+   * Called when a user clicks the gitlab icon (temporary).
+   */
+  onGitlabClicked() {
+    this.popupService.create(
+      ErrorPopupComponent, {
+        title: 'Coming Soon!',
+        message: 'GitLab is currently not supported, but its coming soon!',
+        icon: 'coffee'
+      }, true);
+  }
 }

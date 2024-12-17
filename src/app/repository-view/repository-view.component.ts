@@ -327,7 +327,7 @@ export class RepositoryViewComponent implements OnInit {
         return 'view_list';
       }
     } else if (element == 'visibility') {
-      if (this.layoutVisibility()) {
+      if (this.layoutVisibility() == LayoutVisibility.ALL) {
         return 'visibility';
       } else {
         return 'visibility_off';
