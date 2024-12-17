@@ -25,6 +25,10 @@
       flex-direction: row;
     }
 
+    @container scorecard-popup (max-width: 650px) {
+      text-align: center;
+    }
+
     > div {
       display: flex;
       align-items: center;
