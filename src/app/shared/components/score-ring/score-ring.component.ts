@@ -22,11 +22,12 @@ import {
   Component,
   effect,
   HostBinding,
-  input,
-  SkipSelf
+  input, signal,
+  SkipSelf, WritableSignal
 } from '@angular/core';
 import { NgCircleProgressModule } from 'ng-circle-progress';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'osf-score-ring',
@@ -34,15 +35,27 @@ import { NgClass } from '@angular/common';
   templateUrl: './score-ring.component.html',
   imports: [
     NgCircleProgressModule,
-    NgClass
+    NgClass,
+    NgIf
   ],
   styleUrl: './score-ring.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('rotateAndFade', [
+      state('blurred', style({ opacity: 0, transform: 'rotate(-180deg)' })),
+      state('focused', style({ opacity: 1, transform: 'rotate(0deg)' })),
+      transition('blurred => focused', [animate('0.2s')]),
+      transition('focused => blurred', [animate('0.2s')]),
+    ])
+  ],
 })
 export class ScoreRingComponent {
+  readonly hoverDelay: number = 200;
   readonly score = input.required<number>();
   readonly thickness = input<string>('5px');
   readonly fontSize = input<string>('1.5rem');
+
+  protected timeout: number | undefined;
 
   @HostBinding('style.--progress')
   percentage: string = '0%';
@@ -50,8 +63,7 @@ export class ScoreRingComponent {
   @HostBinding('style.--thickness')
   thicknessBinding: string = '5px';
 
-  @HostBinding('style.--font-size')
-  fontSizeBinding: string = this.fontSize();
+  hover: WritableSignal<boolean> = signal(false);
 
   /**
    * Constructor.
@@ -62,7 +74,6 @@ export class ScoreRingComponent {
     effect(() => {
       this.percentage = Math.round(this.score() * 10) + '%';
       this.thicknessBinding = this.thickness();
-      this.fontSizeBinding = this.fontSize();
 
       this.cdRef.detectChanges();
     });
@@ -76,6 +87,25 @@ export class ScoreRingComponent {
     score?: number
   ) {
     return ScoreRingComponent.getColorVariableForScore(score);
+  }
+
+  /**
+   * Called when a user hovers-enters the score ring with their mouse.
+   */
+  onMouseEnter() {
+    // Set a timer that is invalided if the user hovers-outs
+    this.timeout = setTimeout(() => {
+      this.hover.set(true);
+    }, this.hoverDelay);
+  }
+
+  /**
+   * Called when a user hovers-out the score ring with their mouse.
+   */
+  onMouseLeave() {
+    this.hover.set(false)
+    clearTimeout(this.timeout);
+    this.timeout = undefined;
   }
 
   /**
