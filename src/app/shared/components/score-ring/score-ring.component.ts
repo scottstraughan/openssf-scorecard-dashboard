@@ -50,7 +50,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   ],
 })
 export class ScoreRingComponent {
-  readonly hoverDelay: number = 200;
+  readonly hoverDelay: number = 350;
   readonly score = input.required<number>();
   readonly thickness = input<string>('5px');
   readonly fontSize = input<string>('1.5rem');
