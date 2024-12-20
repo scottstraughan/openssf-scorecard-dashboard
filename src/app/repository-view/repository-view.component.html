@@ -56,10 +56,7 @@
         <a [href]="account.url" target="_blank" rel="noopener">
           <osf-button icon="alt_route" label="Visit Repository"></osf-button>
         </a>
-        <div class="group">
-          <osf-button icon="sync" label="Sync" (onClicked)="onDeleteServiceAccount()"></osf-button>
-          <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
-        </div>
+        <osf-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osf-button>
       </div>
     }
   } @else {

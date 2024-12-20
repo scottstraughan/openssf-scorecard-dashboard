@@ -3,4 +3,16 @@
 <div class="progress"
      [style.border-color]="getColorVariableForScore(score())"></div>
 
-<div class="score" [innerHTML]="score()"></div>
+<div class="contents"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()">
+
+  <!-- Value of the score ring -->
+  <div [@rotateAndFade]="!hover() ? 'focused' : 'blurred'"
+       class="score"
+       [innerHTML]="score()"></div>
+
+  <!-- Shown on hover -->
+  <span [@rotateAndFade]="hover() ? 'focused' : 'blurred'"
+        class="sync material-symbols-outlined">sync</span>
+</div>
