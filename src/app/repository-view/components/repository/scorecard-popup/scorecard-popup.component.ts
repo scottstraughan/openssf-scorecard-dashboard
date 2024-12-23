@@ -24,8 +24,6 @@ import { DatePipe, NgClass } from '@angular/common';
 import { RepositoryModel } from '../../../../shared/models/repository.model';
 import { PopupReference } from '../../../../shared/components/popup/popup.service';
 
-import { ScorecardCheck } from '../../../../shared/models/scorecard-check.model';
-
 @Component({
   selector: 'app-scorecard-view',
   standalone: true,
