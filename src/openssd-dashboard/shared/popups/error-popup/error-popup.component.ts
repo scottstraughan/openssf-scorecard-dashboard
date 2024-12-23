@@ -18,7 +18,7 @@
 
 import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference } from '../../components/popup/popup.service';
-import { InputComponent } from '../../components/search/input.component';
+import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { FormsModule } from '@angular/forms';
 import { InvalidAccountError, RateLimitError } from '../../services/repository-services/base-repository-service';

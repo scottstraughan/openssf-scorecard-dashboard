@@ -18,7 +18,7 @@
 
 import { ChangeDetectionStrategy, Component, HostListener, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference, PopupService } from '../../shared/components/popup/popup.service';
-import { InputComponent } from '../../shared/components/search/input.component';
+import { InputComponent } from '../../shared/components/input/input.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../shared/services/account.service';
