@@ -47,6 +47,8 @@ import { DuplicateAccountError } from '../../shared/errors/account';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddAccountPopupComponent {
+  readonly Service = Service;
+
   readonly service: WritableSignal<Service> = signal(Service.GITHUB);
   readonly accountName: WritableSignal<string> = signal('');
   readonly apiToken: WritableSignal<string | undefined> = signal(undefined);
