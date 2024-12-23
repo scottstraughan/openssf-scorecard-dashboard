@@ -21,7 +21,7 @@ import { PopupReference, PopupService } from '../../shared/components/popup/popu
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { AccountService } from '../../shared/services/account.service';
+import { AccountService, Service } from '../../shared/services/account.service';
 import { catchError, of, tap } from 'rxjs';
 import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
@@ -45,7 +45,7 @@ import { NgOptimizedImage } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddAccountPopupComponent {
-  readonly service: WritableSignal<string> = signal('github');
+  readonly service: WritableSignal<Service> = signal(Service.GITHUB);
   readonly accountName: WritableSignal<string> = signal('');
   readonly apiToken: WritableSignal<string | undefined> = signal(undefined);
   readonly loading: WritableSignal<boolean> = signal(false);
@@ -88,7 +88,7 @@ export class AddAccountPopupComponent {
         tap((account) => {
           this.popupReference.close();
           this.loading.set(false);
-          this.router.navigate([`/${account.service}/${account.account}`]);
+          this.router.navigate([`/${account.service}/${account.account}`]).then();
         }),
         catchError((error) => {
           this.popupService.create(
