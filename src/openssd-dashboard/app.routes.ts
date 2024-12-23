@@ -16,9 +16,17 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+import { Routes } from '@angular/router';
+import { RepositoryViewComponent } from './repository-view/repository-view.component';
+import { HomeViewComponent } from './home/home-view.component';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+export const routes: Routes = [
+  {
+    path: '',
+    component: HomeViewComponent
+  },
+  {
+    path: ':service/:account',
+    component: RepositoryViewComponent
+  }
+];

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,17 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+/**
+ * Error used for when an account already exists.
+ */
+export class DuplicateAccountError extends Error {}
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+/**
+ * Error used when the user has tried to remove all the accounts (requires at least one).
+ */
+export class MinimumAccountError extends Error {}
+
+/**
+ * Error used for when a service is not supported.
+ */
+export class ServiceNotSupportedError extends Error {}
