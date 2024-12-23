@@ -116,6 +116,7 @@ export class RepositoryViewComponent implements OnInit {
 
         if (loadState == LoadingState.LOAD_SUCCESS) {
           this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
+          this.totalRepositoriesWithScorecards.set(this.selectedAccountService.countValidScorecards());
         }
       }))
       .subscribe();

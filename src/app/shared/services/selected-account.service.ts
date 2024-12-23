@@ -115,6 +115,14 @@ export class SelectedAccountService {
   }
 
   /**
+   * Count the number of repositories that have valid scorecards.
+   */
+  countValidScorecards(): number {
+    return Array.from(this.scorecardRequests.values())
+      .filter(scorecard => scorecard.scorecard !== undefined).length
+  }
+
+  /**
    * Get all the repositories for a provided account.
    * @param account
    * @private
