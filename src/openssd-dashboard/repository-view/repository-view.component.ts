@@ -27,7 +27,7 @@ import {
 } from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
 import { RepositoryWidgetComponent } from './components/repository/repository-widget.component';
-import { InputComponent } from '../shared/components/search/input.component';
+import { InputComponent } from '../shared/components/input/input.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
