@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RepositoryModel } from '../models/repository.model';
-import { BehaviorSubject, catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, take, tap } from 'rxjs';
 import { ScorecardService } from './scorecard.service';
 import { ScorecardModel } from '../models/scorecard.model';
 import { LoadingState } from '../LoadingState';
