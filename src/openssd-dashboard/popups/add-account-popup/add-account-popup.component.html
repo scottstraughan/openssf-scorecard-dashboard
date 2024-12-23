@@ -40,7 +40,7 @@
   <div class="actions">
     <div>
       <osd-button
-          (onClicked)="onCloseClicked()"
+          (clicked)="onCloseClicked()"
           icon="close"
           label="Cancel"></osd-button>
     </div>
@@ -52,7 +52,7 @@
             icon="add_circle"
             label="Add Account"
             [disabled]="!isServiceFormsValid() || loading()"
-            (onClicked)="onAdd()"></osd-button>
+            (clicked)="onAdd()"></osd-button>
       }
     </div>
   </div>

@@ -58,8 +58,8 @@
             <osd-button icon="alt_route" label="Visit Repository"></osd-button>
           </a>
           <div class="side-by-side">
-            <osd-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osd-button>
-            <osd-button icon="sync" label="Fetch Repos" (onClicked)="onFetchRepositories()"></osd-button>
+            <osd-button icon="delete" label="Remove" (clicked)="onDeleteServiceAccount()"></osd-button>
+            <osd-button icon="sync" label="Fetch Repos" (clicked)="onFetchRepositories()"></osd-button>
           </div>
         </div>
       }
@@ -82,13 +82,13 @@
             <osd-button
                 [icon]="getIcon('sort')"
                 [label]="getSortLabel()"
-                (onClicked)="onToggleSortMode()"></osd-button>
+                (clicked)="onToggleSortMode()"></osd-button>
             <osd-button
                 [icon]="getIcon('visibility')"
-                (onClicked)="onToggleVisibility()"></osd-button>
+                (clicked)="onToggleVisibility()"></osd-button>
             <osd-button
                 [icon]="getIcon('layout')"
-                (onClicked)="onToggleLayout()"></osd-button>
+                (clicked)="onToggleLayout()"></osd-button>
           </div>
         </div>
 
@@ -106,7 +106,7 @@
                   class="view-more"
                   label="View More Repositories"
                   icon="next_plan"
-                  (onClicked)="onViewMore()"></osd-button>
+                  (clicked)="onViewMore()"></osd-button>
             }
           </div>
         } @else {
