@@ -32,7 +32,7 @@ export class ButtonComponent {
   icon = input<string | undefined>(undefined);
   label = input<string | undefined>(undefined);
   disabled = input<boolean>(false);
-  onClicked = output();
+  clicked = output();
 
   /**
    * Called when a user clicks on the button.
@@ -43,6 +43,6 @@ export class ButtonComponent {
       return ;
     }
 
-    this.onClicked.emit();
+    this.clicked.emit();
   }
 }
