@@ -386,6 +386,19 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Called when a user wishes to re-fetch the repositories.
+   */
+  onFetchRepositories() {
+    const account = this.selectedAccount();
+
+    if (!account) {
+      return
+    }
+
+    this.selectedAccountService.getRepositories(account, true);
+  }
+
+  /**
    * Show an error popup.
    */
   private handleErrorThrown(

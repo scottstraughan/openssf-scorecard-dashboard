@@ -87,11 +87,17 @@ export class AccountService {
   /**
    * Get repositories either from storage or requested from the backend service.
    * @param account
+   * @param reload
    */
   getRepositories(
-    account: AccountModel
+    account: AccountModel,
+    reload: boolean = false
   ): Observable<RepositoryModel[]> {
     const storageKey = AccountService.createRepositoryStorageKey(account);
+
+    if (reload) {
+      this.storageService.remove(storageKey);
+    }
 
     const repositories = this.storageService.get(storageKey);
 
@@ -144,6 +150,7 @@ export class AccountService {
       throw new MinimumAccountError();
     }
 
+    this.storageService.remove(AccountService.createRepositoryStorageKey(account));
     this.accounts.delete(AccountService.createAccountMapKey(account.service, account.account));
     this.setAccounts(Array.from(this.accounts.values()));
   }
