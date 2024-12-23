@@ -34,6 +34,9 @@ export class ButtonComponent {
   disabled = input<boolean>(false);
   onClicked = output();
 
+  /**
+   * Called when a user clicks on the button.
+   */
   @HostListener('click')
   onClick() {
     if (this.disabled()) {
