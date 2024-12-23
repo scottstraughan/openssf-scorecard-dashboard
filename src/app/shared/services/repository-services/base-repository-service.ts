@@ -42,18 +42,18 @@ export abstract class BaseRepositoryService {
    * @param accountName
    * @param apiToken
    */
-  abstract getServiceDetails(
+  abstract getAccount(
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel>;
 
   /**
    * Get the repositories fromm the service backend.
-   * @param accountName
+   * @param account
    * @param apiToken
    */
   abstract getRepositories(
-    accountName: string,
+    account: AccountModel,
     apiToken?: string
   ): Observable<RepositoryModel[]>;
 }

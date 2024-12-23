@@ -17,9 +17,9 @@
     </div>
   </div>
 
-  <div class="score" title="Click to recheck score" (click)="onReloadScorecard.emit()">
-    @if (scorecard(); as scorecard) {
-      @if (scorecard.score; as score) {
+  <div class="score" title="Click to recheck score" (click)="onReloadScore()">
+    @if (loading() == LoadingState.LOAD_SUCCESS) {
+      @if (scorecard()?.score; as score) {
         <osf-score-ring [score]="score"></osf-score-ring>
       } @else {
         <span class="material-symbols-outlined" title="No scorecard available">block</span>

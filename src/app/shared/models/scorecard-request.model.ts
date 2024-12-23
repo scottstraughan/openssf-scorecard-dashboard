@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Service } from '../services/account.service';
+import { RepositoryModel } from './repository.model';
+import { ScorecardModel } from './scorecard.model';
+import { LoadingState } from '../LoadingState';
 
 /**
  * Represents an account.
  */
-export interface AccountModel {
-  service: Service
-  account: string
-  name: string
-  icon: string
-  description: string
-  totalRepositories: number
-  followers: number
-  url: string
-  apiToken?: string
+export interface ScorecardRequest {
+  repository: RepositoryModel
+  scorecard: ScorecardModel | undefined
+  loadState: LoadingState
 }

@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ServiceStoreService } from '../shared/services/service-store.service';
+import { AccountService } from '../shared/services/account.service';
 import { Router } from '@angular/router';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 
@@ -38,10 +38,10 @@ export class HomeViewComponent {
    * @param router
    */
   constructor(
-    protected serviceStoreService: ServiceStoreService,
+    protected serviceStoreService: AccountService,
     protected router: Router
   ) {
-    this.serviceStoreService.getAccounts()
+    this.serviceStoreService.accounts$
       .subscribe((accounts) => {
         const firstAccount = accounts[0];
 
