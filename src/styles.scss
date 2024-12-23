@@ -60,8 +60,15 @@ input {
     font-size: 50px;
   }
 
+  h1, h2 {
+    font-weight: normal;
+  }
+
   h1 {
     font-size: 1.4rem;
-    font-weight: normal;
+  }
+
+  h2 {
+    font-size: 1.1rem;
   }
 }

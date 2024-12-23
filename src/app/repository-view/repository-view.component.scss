@@ -126,7 +126,7 @@
       &:nth-child(1) {
         flex: 1;
 
-        osf-search {
+        osf-input {
           width: 100%;
         }
       }
@@ -173,4 +173,8 @@
       margin-top: var(--seperation);
     }
   }
+}
+
+.panel.error-message {
+  flex: 1;
 }

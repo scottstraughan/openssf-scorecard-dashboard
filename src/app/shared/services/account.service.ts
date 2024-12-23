@@ -18,15 +18,12 @@
 
 import { Inject, Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { BehaviorSubject, Observable, of, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, Observer, of, take, tap, throwError } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-
-export enum Service {
-  GITHUB = 'github',
-  GITLAB = 'gitlab'
-}
+import { DuplicateAccountError, MinimumAccountError, ServiceNotSupportedError } from '../errors/account';
+import { Service } from '../enums/service';
 
 @Injectable({
   providedIn: 'root'
@@ -52,9 +49,27 @@ export class AccountService {
     @Inject(LOCAL_STORAGE) private storageService: StorageService,
     private githubAccountService: GithubService
   ) {
-    this.load();
+    if (this.storageService.has(AccountService.STORAGE_KEY)) {
+      try {
+        this.setAccounts(this.storageService.get(AccountService.STORAGE_KEY));
+      } catch (error) { }
+    }
+
+    if (this.accounts.size == 0) {
+      for (const defaultAccount of AccountService.DEFAULT_ACCOUNTS) {
+        this.add(defaultAccount.service, defaultAccount.account)
+          .pipe(take(1))
+          .subscribe();
+      }
+    }
   }
 
+  /**
+   * Get an account either from storage or requested from the backend service.
+   * @param service
+   * @param accountName
+   * @param apiToken
+   */
   getAccount(
     service: Service,
     accountName: string,
@@ -69,6 +84,10 @@ export class AccountService {
     return this.add(service, accountName, apiToken);
   }
 
+  /**
+   * Get repositories either from storage or requested from the backend service.
+   * @param account
+   */
   getRepositories(
     account: AccountModel
   ): Observable<RepositoryModel[]> {
@@ -91,6 +110,12 @@ export class AccountService {
     throw Error('Unsupported account service type.');
   }
 
+  /**
+   * Add a new account.
+   * @param service
+   * @param accountName
+   * @param apiToken
+   */
   add(
     service: Service,
     accountName: string,
@@ -108,19 +133,60 @@ export class AccountService {
       )
   }
 
+  /**
+   * Delete an account.
+   * @param account
+   */
+  delete(
+    account: AccountModel
+  ) {
+    if (this.accounts.size == 1) {
+      throw new MinimumAccountError();
+    }
+
+    this.accounts.delete(AccountService.createAccountMapKey(account.service, account.account));
+    this.setAccounts(Array.from(this.accounts.values()));
+  }
+
+  /**
+   * Fetch an account from the backend service.
+   * @param service
+   * @param accountName
+   * @param apiToken
+   * @private
+   */
   private fetchAccount(
     service: Service,
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
-    switch (service) {
-      case Service.GITHUB:
-        return this.githubAccountService.getAccount(accountName, apiToken)
-    }
-
-    throw new ServiceNotSupportedError();
+    return new Observable((observer: Observer<AccountModel>) => {
+      switch (service) {
+        case Service.GITHUB:
+          return this.githubAccountService.getAccount(accountName, apiToken)
+            .pipe(
+              tap(account => {
+                observer.next(account);
+                observer.complete();
+              }),
+              take(1),
+              catchError(error => {
+                observer.error(error);
+                return throwError(() => error);
+              })
+            )
+            .subscribe();
+      }
+      
+      throw new ServiceNotSupportedError(`The service ${service} is not currently supported, check back soon!`);
+    });
   }
 
+  /**
+   * Set the accounts, notifying any observers of changes.
+   * @param accounts
+   * @private
+   */
   private setAccounts(
     accounts: AccountModel[]
   ) {
@@ -129,34 +195,17 @@ export class AccountService {
         AccountService.createAccountMapKey(account.service, account.account), account);
     }
 
-    this.updateObservers();
-    this.save();
-  }
-
-  private updateObservers() {
     this.accounts$.next(Array.from(this.accounts.values()));
-  }
 
-  private load() {
-    if (this.storageService.has(AccountService.STORAGE_KEY)) {
-      try {
-        this.setAccounts(this.storageService.get(AccountService.STORAGE_KEY));
-      } catch (error) { }
-    }
-
-    if (this.accounts.size == 0) {
-      for (const defaultAccount of AccountService.DEFAULT_ACCOUNTS) {
-        this.add(defaultAccount.service, defaultAccount.account)
-          .pipe(take(1))
-          .subscribe();
-      }
-    }
-  }
-
-  private save() {
     this.storageService.set(AccountService.STORAGE_KEY, Array.from(this.accounts.values()));
   }
 
+  /**
+   * Create a new key for storing an account in a map.
+   * @param service
+   * @param accountName
+   * @private
+   */
   private static createAccountMapKey(
     service: Service,
     accountName: string
@@ -164,6 +213,11 @@ export class AccountService {
     return service.toString() + '-' + accountName;
   }
 
+  /**
+   * Create a key for storing a value in the storage service.
+   * @param account
+   * @private
+   */
   private static createRepositoryStorageKey(
     account: AccountModel
   ): string {
@@ -171,6 +225,3 @@ export class AccountService {
   }
 }
 
-export class DuplicateAccountError extends Error {}
-export class MinimumAccountError extends Error {}
-export class ServiceNotSupportedError extends Error {}

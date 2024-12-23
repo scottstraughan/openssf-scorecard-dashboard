@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,20 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input, model } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
-@Component({
-  selector: 'osf-search',
-  standalone: true,
-  imports: [
-    FormsModule
-  ],
-  templateUrl: './search.component.html',
-  styleUrl: './search.component.scss'
-})
-export class SearchComponent {
-  value = model<string>('');
-  placeholder = input<string>('');
-  icon = input<string | undefined>(undefined);
+export enum Service {
+  GITHUB = 'github',
+  GITLAB = 'gitlab'
 }

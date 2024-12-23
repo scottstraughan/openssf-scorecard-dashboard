@@ -17,14 +17,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RepositoryModel } from '../models/repository.model';
-import { BehaviorSubject, forkJoin, Observable, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { ScorecardService } from './scorecard.service';
 import { ScorecardModel } from '../models/scorecard.model';
 import { LoadingState } from '../LoadingState';
 import { AccountModel } from '../models/account.model';
 import { Injectable } from '@angular/core';
-import { AccountService, Service } from './account.service';
+import { AccountService } from './account.service';
 import { ScorecardRequest } from '../models/scorecard-request.model';
+import { Service } from '../enums/service';
 
 @Injectable({
   providedIn: 'root'
@@ -61,21 +62,19 @@ export class SelectedAccountService {
   setAccount(
     service: Service,
     accountName: string
-  ) {
-    this.tidy();
+  ): Observable<AccountModel> {
+    this.reset();
 
     this.accountLoadState$.next(LoadingState.LOADING);
 
-    this.accountService.getAccount(service, accountName)
+    return this.accountService.getAccount(service, accountName)
       .pipe(
         tap(account => {
           this.account$.next(account);
           this.getRepositories(account);
           this.accountLoadState$.next(LoadingState.LOAD_SUCCESS);
-        }),
-        take(1)
-      )
-      .subscribe();
+        })
+      );
   }
 
   /**
@@ -227,14 +226,10 @@ export class SelectedAccountService {
   }
 
   /**
-   * Tidy up between accounts.
+   * Reset between switching accounts.
    * @private
    */
-  private tidy() {
+  private reset() {
     this.scorecardRequests.clear();
-    this.account$.next(undefined);
-    this.repositories$.next([]);
-    this.scorecardsRequests$.next([]);
-    this.scorecardsLoading$.next(LoadingState.LOADING);
   }
 }
