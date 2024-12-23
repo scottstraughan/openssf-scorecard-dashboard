@@ -21,7 +21,7 @@ import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { AccountModel } from '../../models/account.model';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { ServiceStoreService } from '../service-store.service';
+import { Service } from '../account.service';
 import { BaseRepositoryService, InvalidAccountError, RateLimitError } from './base-repository-service';
 
 @Injectable({
@@ -31,7 +31,7 @@ export class GithubService extends BaseRepositoryService {
   /**
    * @inheritdoc
    */
-  public getServiceDetails(
+  public getAccount(
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
@@ -41,8 +41,7 @@ export class GithubService extends BaseRepositoryService {
       .pipe(
         map((accountResult: any) => {
           return {
-            id: ServiceStoreService.generateUniqueId('github', accountResult['login']),
-            service: 'github',
+            service: Service.GITHUB,
             account: accountResult['login'],
             name: accountResult['name'] ? accountResult['name'] : accountName,
             icon: accountResult['avatar_url'],
@@ -66,10 +65,10 @@ export class GithubService extends BaseRepositoryService {
    * @inheritdoc
    */
   public getRepositories(
-    accountName: string,
+    account: AccountModel,
     apiToken?: string
   ): Observable<RepositoryModel[]> {
-    return this.getAllRepositories(accountName, apiToken);
+    return this.getAllRepositories(account.account, apiToken);
   }
 
   /**
@@ -89,6 +88,7 @@ export class GithubService extends BaseRepositoryService {
     const apiUrl = `${GithubService.generateApiUrl(accountName)}/repos`;
 
     let exhausted = false;
+
     return this.getRequestInstance(`${apiUrl}?per_page=${GithubService.RESULTS_PER_PAGE}&page=${page}`, apiToken)
       .pipe(
         map((repositoriesResult: any) => {

@@ -20,7 +20,7 @@ import { Component, signal, Signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AccountModel } from './shared/models/account.model';
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { ServiceStoreService } from './shared/services/service-store.service';
+import { AccountService } from './shared/services/account.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
 import { AddAccountPopupComponent } from './popups/add-account-popup/add-account-popup.component';
@@ -45,11 +45,11 @@ export class AppComponent {
    * @param popupService
    */
   constructor(
-    protected serviceStoreService: ServiceStoreService,
+    protected serviceStoreService: AccountService,
     protected popupService: PopupService
   ) {
     this.serviceAccounts = toSignal(
-      this.serviceStoreService.getAccounts(), { initialValue: [] });
+      this.serviceStoreService.accounts$, { initialValue: [] });
   }
 
   /**

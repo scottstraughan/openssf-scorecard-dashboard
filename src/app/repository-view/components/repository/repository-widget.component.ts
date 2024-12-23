@@ -16,43 +16,68 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, OnInit, signal, WritableSignal, } from '@angular/core';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
-import { DatePipe, JsonPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { AccountModel } from '../../../shared/models/account.model';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { ScorecardPopupComponent } from './scorecard-popup/scorecard-popup.component';
 import { ErrorPopupComponent } from '../../../shared/popups/error-popup/error-popup.component';
+import { LoadingState } from '../../../shared/LoadingState';
+import { tap } from 'rxjs';
+import { SelectedAccountService } from '../../../shared/services/selected-account.service';
 
 @Component({
-  selector: 'osf-repository',
+  selector: 'osf-repository-widget',
   standalone: true,
   imports: [
     ScoreRingComponent,
     DatePipe,
-    LoadingComponent,
-    JsonPipe
+    LoadingComponent
   ],
-  templateUrl: './repository.component.html',
-  styleUrl: './repository.component.scss',
+  templateUrl: './repository-widget.component.html',
+  styleUrl: './repository-widget.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoryComponent {
+export class RepositoryWidgetComponent implements OnInit {
+  protected readonly LoadingState = LoadingState;
+
   readonly account = input.required<AccountModel>();
   readonly repository = input.required<RepositoryModel>();
-  readonly scorecard = input<ScorecardModel>();
-  readonly onReloadScorecard = output();
+
+  readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
+  readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
 
   /**
    * Constructor.
    * @param popupService
+   * @param selectedAccountService
    */
   constructor(
-    protected popupService: PopupService
+    protected popupService: PopupService,
+    protected selectedAccountService: SelectedAccountService,
   ) { }
+
+  /**
+   * @inheritdoc
+   */
+  ngOnInit(): void {
+    this.selectedAccountService.scorecardsRequests$
+      .pipe(
+        tap(scorecardRequests => {
+          for (const scorecardRequest of scorecardRequests) {
+            if (scorecardRequest.repository.url == this.repository().url) {
+              this.scorecard.set(scorecardRequest.scorecard);
+              this.loading.set(scorecardRequest.loadState);
+            }
+          }
+        })
+      )
+      .subscribe()
+  }
 
   /**
    * Called when a user clicks on the main body of the repository view.
@@ -68,5 +93,14 @@ export class RepositoryComponent {
           message: 'This repository does not have any associated scorecard available.',
         }, true);
     }
+  }
+
+  /**
+   * Called when a user clicks the score ring to reload the score.
+   */
+  onReloadScore() {
+    this.loading.set(LoadingState.LOADING);
+
+    this.selectedAccountService.reloadScorecards(this.account(), this.repository());
   }
 }

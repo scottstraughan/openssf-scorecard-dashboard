@@ -18,29 +18,28 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
-import { RepositoryComponent } from './components/repository/repository.component';
+import { RepositoryWidgetComponent } from './components/repository/repository-widget.component';
 import { SearchComponent } from '../shared/components/search/search.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
-import { ServiceStoreService } from '../shared/services/service-store.service';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
-import { catchError, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
+import { catchError, of, Subscription, tap } from 'rxjs';
 import { RepositoryModel } from '../shared/models/repository.model';
-import { ScorecardService } from '../shared/services/scorecard.service';
 import { NgClass } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ErrorPopupComponent } from '../shared/popups/error-popup/error-popup.component';
 import { PopupService } from '../shared/components/popup/popup.service';
-import { ScorecardModel } from '../shared/models/scorecard.model';
+import { SelectedAccountService } from '../shared/services/selected-account.service';
+import { Service } from '../shared/services/account.service';
 
 @Component({
-  selector: 'app-repository-view',
+  selector: 'osf-repository-view',
   standalone: true,
   imports: [
     ButtonComponent,
-    RepositoryComponent,
+    RepositoryWidgetComponent,
     SearchComponent,
     ScoreRingComponent,
     LoadingComponent,
@@ -54,7 +53,7 @@ export class RepositoryViewComponent implements OnInit {
   /**
    * The max number of repositories to show per "page".
    */
-  static readonly RESULTS_PER_PAGE = 40;
+  static readonly RESULTS_PER_PAGE = 10;
 
   /**
    * For the UI, a reference to LoadingState.
@@ -66,11 +65,13 @@ export class RepositoryViewComponent implements OnInit {
    */
   readonly LayoutView = LayoutView;
 
-  readonly serviceAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
-  readonly serviceAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
-  readonly loadingServiceAccounts: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly loadingServiceAccountRepositories: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly scorecardLoadingState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
+  readonly selectedAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
+
+  readonly accountLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly repositoryLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly scorecardLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
   readonly averageScorecardScore: WritableSignal<number> = signal(0);
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
@@ -86,27 +87,63 @@ export class RepositoryViewComponent implements OnInit {
   /**
    * Constructor
    * @param activatedRoute
-   * @param serviceStoreService
-   * @param scorecardService
    * @param changeDetectorRef
    * @param router
    * @param title
    * @param popupService
+   * @param selectedAccountService
    */
   constructor(
     protected activatedRoute: ActivatedRoute,
-    protected serviceStoreService: ServiceStoreService,
-    protected scorecardService: ScorecardService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected router: Router,
     protected title: Title,
-    protected popupService: PopupService
+    protected popupService: PopupService,
+    protected selectedAccountService: SelectedAccountService
   ) { }
 
   /**
    * @inheritdoc
    */
   ngOnInit(): void {
+    this.selectedAccountService.repositoriesLoadState$
+      .pipe(tap(loadState => this.repositoryLoadState.set(loadState)))
+      .subscribe();
+
+    this.selectedAccountService.scorecardsLoading$
+      .pipe(tap(loadState => {
+        this.scorecardLoadState.set(loadState);
+
+        if (loadState == LoadingState.LOAD_SUCCESS) {
+          this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
+        }
+      }))
+      .subscribe();
+
+    this.selectedAccountService.repositories$
+      .pipe(
+        tap(repositories => {
+          this.selectedAccountRepositories.set(repositories);
+        })
+      )
+      .subscribe()
+
+    this.selectedAccountService.account$
+      .pipe(
+        tap(account => {
+          if (account) {
+            this.selectedAccount.set(account);
+            this.title.setTitle(account?.name + ' - ' + this.title.getTitle());
+            this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
+          }
+        }),
+        catchError((error) => {
+          this.handleErrorThrown(error);
+          return of(error);
+        })
+      )
+      .subscribe()
+
     this.activatedRoute.queryParams.subscribe((params) => {
       if (params['visible']) {
         this.layoutVisibility.set(params['visible']);
@@ -126,40 +163,10 @@ export class RepositoryViewComponent implements OnInit {
         tap((params) => {
           this.cleanup();
 
-          this.loadingServiceAccounts.set(LoadingState.LOADING);
-          this.loadingServiceAccountRepositories.set(LoadingState.LOADING);
+          this.accountLoadState.set(LoadingState.LOADING);
+          this.repositoryLoadState.set(LoadingState.LOADING);
 
-          this.serviceAccountRepositories.set([]);
-
-          this.accountSubscription = this.serviceStoreService.getAccountDetails(params['service'], params['account'])
-            .pipe(
-              tap((serviceAccount: AccountModel) => {
-                this.serviceAccount.set(serviceAccount);
-                this.loadingServiceAccounts.set(LoadingState.LOAD_SUCCESS);
-
-                this.title.setTitle(serviceAccount.name + ' - ' + this.title.getTitle())
-
-                this.repositorySubscription = this.serviceStoreService.getRepositories(
-                  params['service'], params['account'], serviceAccount.apiToken)
-                  .pipe(
-                    tap((repositories) => {
-                      this.serviceAccountRepositories.set(repositories);
-                      this.loadingServiceAccountRepositories.set(LoadingState.LOAD_SUCCESS);
-                      this.reloadScorecardResults();
-                    }),
-                    catchError((error) => {
-                      this.handleErrorThrown(error);
-                      return of(error);
-                    })
-                  )
-                  .subscribe();
-              }),
-              catchError((error) => {
-                this.handleErrorThrown(error);
-                return of(error);
-              })
-            )
-            .subscribe();
+          this.selectedAccountService.setAccount(Service.GITHUB, params['account']);
         })
       )
       .subscribe();
@@ -201,60 +208,13 @@ export class RepositoryViewComponent implements OnInit {
    * Reload all the scorecard results.
    */
   reloadScorecardResults() {
-    const account = this.serviceAccount();
+    const account = this.selectedAccount();
 
     if (!account) {
       return ;
     }
 
-    const scorecardObservables: Observable<ScorecardModel | undefined>[] = [];
-
-    for (const repository of this.serviceAccountRepositories()) {
-      repository.scorecard = undefined;
-
-      scorecardObservables.push(
-        this.scorecardService.getScorecard(account, repository)
-          .pipe(
-            tap((scorecard) => repository.scorecard = scorecard)
-          )
-      );
-    }
-
-    if (scorecardObservables.length > 0) {
-      this.scorecardLoadingState.set(LoadingState.LOADING);
-
-      forkJoin(scorecardObservables)
-        .subscribe(() => {
-          this.recalculateScorecards();
-          this.scorecardLoadingState.set(LoadingState.LOAD_SUCCESS);
-          this.changeDetectorRef.detectChanges();
-        });
-    } else {
-      this.scorecardLoadingState.set(LoadingState.LOAD_SUCCESS);
-    }
-  }
-
-  /**
-   * Reload a specific repository scorecard.
-   * @param repository
-   */
-  onReloadScorecard(
-    repository: RepositoryModel
-  ) {
-    const account = this.serviceAccount();
-
-    if (!account) {
-      return ;
-    }
-
-    repository.scorecard = undefined;
-
-    this.scorecardService.getScorecard(account, repository)
-      .subscribe((scorecard) => {
-        repository.scorecard = scorecard;
-        this.recalculateScorecards();
-        this.changeDetectorRef.detectChanges();
-      });
+    this.selectedAccountService.reloadScorecards(account);
   }
 
   /**
@@ -387,7 +347,7 @@ export class RepositoryViewComponent implements OnInit {
    * Called when a user presses the delete service account button.
    */
   onDeleteServiceAccount() {
-    const serviceAccount = this.serviceAccount();
+    const serviceAccount = this.selectedAccount();
 
     if (!serviceAccount) {
       return  ;
@@ -395,7 +355,7 @@ export class RepositoryViewComponent implements OnInit {
 
     try {
       // Delete the account
-      this.serviceStoreService.delete(serviceAccount);
+      //this.serviceStoreService.delete(serviceAccount);
 
       // On success, navigate to the root where we will redirect to the correct place
       this.router.navigate(['/']).then();
@@ -415,28 +375,10 @@ export class RepositoryViewComponent implements OnInit {
   }
 
   /**
-   * Recalculate the average score for all repositories.
-   */
-  private recalculateScorecards() {
-    let totalScore = 0;
-    let scoreCount = 0;
-
-    for (const repository of this.serviceAccountRepositories()) {
-      if (repository.scorecard?.score) {
-        totalScore += repository.scorecard.score;
-        scoreCount += 1;
-      }
-    }
-
-    this.totalRepositoriesWithScorecards.set(scoreCount);
-    this.averageScorecardScore.set(Number(Math.round(totalScore / scoreCount).toFixed(2)));
-  }
-
-  /**
    * Get a list of repositories after the results have been filtered.
    */
   private getFilteredRepositories(): RepositoryModel[] {
-    let repositories: RepositoryModel[] = this.serviceAccountRepositories().slice();
+    let repositories: RepositoryModel[] = this.selectedAccountRepositories().slice();
 
     const searchString = this.searchString();
 
@@ -460,9 +402,8 @@ export class RepositoryViewComponent implements OnInit {
       this.accountSubscription.unsubscribe();
     }
 
-    this.scorecardLoadingState.set(LoadingState.LOADING);
-    this.loadingServiceAccounts.set(LoadingState.LOADING);
-    this.loadingServiceAccountRepositories.set(LoadingState.LOADING);
+    this.accountLoadState.set(LoadingState.LOADING);
+    this.repositoryLoadState.set(LoadingState.LOADING);
     this.totalRepositoriesWithScorecards.set(0);
     this.averageScorecardScore.set(0);
   }

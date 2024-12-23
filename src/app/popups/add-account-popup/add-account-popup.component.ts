@@ -21,10 +21,9 @@ import { PopupReference, PopupService } from '../../shared/components/popup/popu
 import { SearchComponent } from '../../shared/components/search/search.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { ServiceStoreService } from '../../shared/services/service-store.service';
+import { AccountService } from '../../shared/services/account.service';
 import { catchError, of, tap } from 'rxjs';
 import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
-import { RepositoryViewComponent } from '../../repository-view/repository-view.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
@@ -54,13 +53,13 @@ export class AddAccountPopupComponent {
   /**
    * Constructor.
    * @param popupReference
-   * @param serviceStoreService
+   * @param accountService
    * @param popupService
    * @param router
    */
   constructor(
     @Inject('POPUP_DATA') protected popupReference: PopupReference,
-    protected serviceStoreService: ServiceStoreService,
+    protected accountService: AccountService,
     protected popupService: PopupService,
     protected router: Router
   ) { }
@@ -84,7 +83,7 @@ export class AddAccountPopupComponent {
   onAdd() {
     this.loading.set(true);
 
-    this.serviceStoreService.add(this.service(), this.accountName(), this.apiToken())
+    this.accountService.add(this.service(), this.accountName(), this.apiToken())
       .pipe(
         tap((account) => {
           this.popupReference.close();

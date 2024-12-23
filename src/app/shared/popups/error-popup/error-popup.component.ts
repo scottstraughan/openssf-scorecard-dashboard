@@ -21,7 +21,7 @@ import { PopupReference } from '../../components/popup/popup.service';
 import { SearchComponent } from '../../components/search/search.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { MinimumAccountError } from '../../services/service-store.service';
+import { MinimumAccountError } from '../../services/account.service';
 import { InvalidAccountError, RateLimitError } from '../../services/repository-services/base-repository-service';
 
 @Component({
