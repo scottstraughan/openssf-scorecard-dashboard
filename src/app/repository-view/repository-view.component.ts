@@ -91,7 +91,6 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
 
   public filteredRepositoriesCount: number = 0;
   private cleanup = new Subject<void>();
-  private t: any;
 
   /**
    * Constructor
@@ -101,6 +100,7 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
    * @param title
    * @param popupService
    * @param selectedAccountService
+   * @param accountService
    */
   constructor(
     protected activatedRoute: ActivatedRoute,
