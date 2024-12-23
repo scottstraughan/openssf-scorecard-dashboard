@@ -1,6 +1,7 @@
 {
   "name": "openssf-dashboard",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "author": "Scott Straughan",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
