@@ -57,7 +57,10 @@
           <a [href]="account.url" target="_blank" rel="noopener">
             <osd-button icon="alt_route" label="Visit Repository"></osd-button>
           </a>
-          <osd-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osd-button>
+          <div class="side-by-side">
+            <osd-button icon="delete" label="Remove" (onClicked)="onDeleteServiceAccount()"></osd-button>
+            <osd-button icon="sync" label="Fetch Repos" (onClicked)="onFetchRepositories()"></osd-button>
+          </div>
         </div>
       }
     } @else {

@@ -124,14 +124,16 @@ export class SelectedAccountService {
   /**
    * Get all the repositories for a provided account.
    * @param account
+   * @param reload
    * @private
    */
-  private getRepositories(
-    account: AccountModel
+  getRepositories(
+    account: AccountModel,
+    reload: boolean = false
   ) {
     this.repositoriesLoadState$.next(LoadingState.LOADING);
 
-    return this.accountService.getRepositories(account)
+    return this.accountService.getRepositories(account, reload)
       .pipe(
         tap(repositories => {
           this.repositories$.next(repositories);
