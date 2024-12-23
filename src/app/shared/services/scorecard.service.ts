@@ -33,29 +33,6 @@ export class ScorecardService {
   }
 
   /**
-   * Get scorecards for all the provided repositories.
-   * @param account
-   * @param repositories
-   */
-  getScorecards(
-    account: AccountModel,
-    repositories: RepositoryModel[],
-  ): Observable<(ScorecardModel | undefined)[]> {
-    const observables = [];
-
-    for (const repository of repositories) {
-      observables.push(
-        this.fetchScorecard(account, repository)
-          .pipe(
-            tap(scorecard => repository.scorecard = scorecard)
-          )
-      );
-    }
-
-    return forkJoin(observables);
-  }
-
-  /**
    * Fetch a scorecard from the OpenSSF API.
    * @param account
    * @param repository
