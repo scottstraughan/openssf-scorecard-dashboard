@@ -1,0 +1,12 @@
+<div class="header">
+  <span class="material-symbols-outlined">{{ icon() }}</span>
+  <h1 [innerHTML]="title()"></h1>
+</div>
+
+<div class="body">
+  <p [innerHTML]="message()"></p>
+</div>
+
+<div class="actions">
+  <osd-button label="Close" icon="close" (onClicked)="onClose()"></osd-button>
+</div>
