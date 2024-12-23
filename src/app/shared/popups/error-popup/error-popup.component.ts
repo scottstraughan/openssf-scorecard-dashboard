@@ -18,18 +18,18 @@
 
 import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference } from '../../components/popup/popup.service';
-import { SearchComponent } from '../../components/search/search.component';
+import { InputComponent } from '../../components/search/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { MinimumAccountError } from '../../services/account.service';
 import { InvalidAccountError, RateLimitError } from '../../services/repository-services/base-repository-service';
+import { DuplicateAccountError, MinimumAccountError, ServiceNotSupportedError } from '../../errors/account';
 
 @Component({
   selector: 'osf-error-popup',
   standalone: true,
   templateUrl: './error-popup.component.html',
   imports: [
-    SearchComponent,
+    InputComponent,
     ButtonComponent,
     FormsModule
   ],
@@ -71,7 +71,7 @@ export class ErrorPopupComponent {
   static handleErrorThrown(
     error: any
   ) {
-    let title = 'Error';
+    let title = error.message;
     let message = error.message;
     let icon = 'error';
 
@@ -84,9 +84,12 @@ export class ErrorPopupComponent {
     } else if (error instanceof InvalidAccountError) {
       title = 'Account Not Found';
       icon = 'person_search';
-    } else {
-      title = error.message;
-      message = error.message;
+    } else if (error instanceof ServiceNotSupportedError) {
+      title = 'Service Not Supported';
+      icon = 'person_search';
+    } else if (error instanceof DuplicateAccountError) {
+      title = 'Account Already Exists';
+      icon = 'person_search';
     }
 
     return {

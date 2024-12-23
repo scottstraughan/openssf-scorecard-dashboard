@@ -16,23 +16,31 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
 import { RepositoryWidgetComponent } from './components/repository/repository-widget.component';
-import { SearchComponent } from '../shared/components/search/search.component';
+import { InputComponent } from '../shared/components/search/input.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
-import { catchError, of, Subscription, tap } from 'rxjs';
+import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
 import { RepositoryModel } from '../shared/models/repository.model';
 import { NgClass } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { ErrorPopupComponent } from '../shared/popups/error-popup/error-popup.component';
 import { PopupService } from '../shared/components/popup/popup.service';
 import { SelectedAccountService } from '../shared/services/selected-account.service';
-import { Service } from '../shared/services/account.service';
+import { AccountService } from '../shared/services/account.service';
 
 @Component({
   selector: 'osf-repository-view',
@@ -40,7 +48,7 @@ import { Service } from '../shared/services/account.service';
   imports: [
     ButtonComponent,
     RepositoryWidgetComponent,
-    SearchComponent,
+    InputComponent,
     ScoreRingComponent,
     LoadingComponent,
     NgClass
@@ -49,7 +57,7 @@ import { Service } from '../shared/services/account.service';
   styleUrl: './repository-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoryViewComponent implements OnInit {
+export class RepositoryViewComponent implements OnInit, OnDestroy {
   /**
    * The max number of repositories to show per "page".
    */
@@ -67,6 +75,7 @@ export class RepositoryViewComponent implements OnInit {
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly selectedAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
+  readonly fatalError: WritableSignal<boolean> = signal(false);
 
   readonly accountLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly repositoryLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
@@ -81,8 +90,8 @@ export class RepositoryViewComponent implements OnInit {
   readonly searchString: WritableSignal<string> = signal('');
 
   public filteredRepositoriesCount: number = 0;
-  private accountSubscription: Subscription | undefined;
-  private repositorySubscription: Subscription | undefined;
+  private cleanup = new Subject<void>();
+  private t: any;
 
   /**
    * Constructor
@@ -99,7 +108,8 @@ export class RepositoryViewComponent implements OnInit {
     protected router: Router,
     protected title: Title,
     protected popupService: PopupService,
-    protected selectedAccountService: SelectedAccountService
+    protected selectedAccountService: SelectedAccountService,
+    protected accountService: AccountService
   ) { }
 
   /**
@@ -107,41 +117,32 @@ export class RepositoryViewComponent implements OnInit {
    */
   ngOnInit(): void {
     this.selectedAccountService.repositoriesLoadState$
-      .pipe(tap(loadState => this.repositoryLoadState.set(loadState)))
+      .pipe(
+        tap(loadState => this.repositoryLoadState.set(loadState)),
+        takeUntil(this.cleanup)
+      )
       .subscribe();
 
     this.selectedAccountService.scorecardsLoading$
-      .pipe(tap(loadState => {
-        this.scorecardLoadState.set(loadState);
+      .pipe(
+        tap(loadState => {
+          this.scorecardLoadState.set(loadState);
 
-        if (loadState == LoadingState.LOAD_SUCCESS) {
-          this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
-          this.totalRepositoriesWithScorecards.set(this.selectedAccountService.countValidScorecards());
-        }
-      }))
+          if (loadState == LoadingState.LOAD_SUCCESS) {
+            this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
+            this.totalRepositoriesWithScorecards.set(this.selectedAccountService.countValidScorecards());
+          }
+        }),
+        takeUntil(this.cleanup)
+      )
       .subscribe();
 
     this.selectedAccountService.repositories$
       .pipe(
         tap(repositories => {
           this.selectedAccountRepositories.set(repositories);
-        })
-      )
-      .subscribe()
-
-    this.selectedAccountService.account$
-      .pipe(
-        tap(account => {
-          if (account) {
-            this.selectedAccount.set(account);
-            this.title.setTitle(account?.name + ' - ' + this.title.getTitle());
-            this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
-          }
         }),
-        catchError((error) => {
-          this.handleErrorThrown(error);
-          return of(error);
-        })
+        takeUntil(this.cleanup)
       )
       .subscribe()
 
@@ -162,15 +163,34 @@ export class RepositoryViewComponent implements OnInit {
     this.activatedRoute.params
       .pipe(
         tap((params) => {
-          this.cleanup();
+          this.reset();
 
-          this.accountLoadState.set(LoadingState.LOADING);
-          this.repositoryLoadState.set(LoadingState.LOADING);
-
-          this.selectedAccountService.setAccount(Service.GITHUB, params['account']);
-        })
+          this.selectedAccountService.setAccount(params['service'], params['account'])
+            .pipe(
+              tap(account => {
+                this.title.setTitle(account.name + ' - ' + this.title.getTitle());
+                this.selectedAccount.set(account);
+                this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
+              }),
+              catchError((error) => {
+                this.handleErrorThrown(error);
+                this.fatalError.set(true);
+                return of(error);
+              }),
+              takeUntil(this.cleanup)
+            )
+            .subscribe();
+        }),
       )
       .subscribe();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  ngOnDestroy() {
+    this.cleanup.next();
+    this.cleanup.complete();
   }
 
   /**
@@ -356,7 +376,7 @@ export class RepositoryViewComponent implements OnInit {
 
     try {
       // Delete the account
-      //this.serviceStoreService.delete(serviceAccount);
+      this.accountService.delete(serviceAccount);
 
       // On success, navigate to the root where we will redirect to the correct place
       this.router.navigate(['/']).then();
@@ -371,8 +391,12 @@ export class RepositoryViewComponent implements OnInit {
   private handleErrorThrown(
     error: any
   ) {
-    this.popupService.create(
-      ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
+    setTimeout(() => {
+      this.popupService.create(
+        ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
+
+      console.error(error);
+    });
   }
 
   /**
@@ -392,19 +416,17 @@ export class RepositoryViewComponent implements OnInit {
   }
 
   /**
-   * Cleanup the UI.
+   * Reset the UI.
    */
-  private cleanup() {
-    if (this.repositorySubscription) {
-      this.repositorySubscription.unsubscribe();
-    }
-
-    if (this.accountSubscription) {
-      this.accountSubscription.unsubscribe();
-    }
+  private reset() {
+    this.fatalError.set(false);
+    this.selectedAccount.set(undefined);
+    this.selectedAccountRepositories.set([]);
 
     this.accountLoadState.set(LoadingState.LOADING);
     this.repositoryLoadState.set(LoadingState.LOADING);
+    this.scorecardLoadState.set(LoadingState.LOADING);
+
     this.totalRepositoriesWithScorecards.set(0);
     this.averageScorecardScore.set(0);
   }

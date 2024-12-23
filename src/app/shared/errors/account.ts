@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Service } from '../enums/service';
+/**
+ * Error used for when an account already exists.
+ */
+export class DuplicateAccountError extends Error {}
 
 /**
- * Represents an account.
+ * Error used when the user has tried to remove all the accounts (requires at least one).
  */
-export interface AccountModel {
-  service: Service
-  account: string
-  name: string
-  icon: string
-  description: string
-  totalRepositories: number
-  followers: number
-  url: string
-  apiToken?: string
-}
+export class MinimumAccountError extends Error {}
+
+/**
+ * Error used for when a service is not supported.
+ */
+export class ServiceNotSupportedError extends Error {}

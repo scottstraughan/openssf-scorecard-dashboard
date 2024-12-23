@@ -21,8 +21,8 @@ import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { AccountModel } from '../../models/account.model';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Service } from '../account.service';
 import { BaseRepositoryService, InvalidAccountError, RateLimitError } from './base-repository-service';
+import { Service } from '../../enums/service';
 
 @Injectable({
   providedIn: 'root'
@@ -54,10 +54,8 @@ export class GithubService extends BaseRepositoryService {
             apiToken: apiToken
           }
         }),
-        catchError((error: HttpErrorResponse) => {
-          return throwError(
-            () => this.throwDecentError(error));
-        })
+        catchError(error =>
+          throwError(() => this.throwDecentError(error)))
       );
   }
 
@@ -105,17 +103,15 @@ export class GithubService extends BaseRepositoryService {
           exhausted = repositoriesResult.length < GithubService.RESULTS_PER_PAGE;
           return repositories;
         }),
-        switchMap((repositories) => {
+        switchMap(repositories => {
           if (exhausted) {
             return of(repositories);
           }
 
           return this.getAllRepositories(accountName, apiToken, page + 1, repositories);
         }),
-        catchError((error) => {
-          return throwError(
-            () => this.throwDecentError(error));
-        })
+        catchError(error =>
+          throwError(() => this.throwDecentError(error)))
       );
   }
 
@@ -143,7 +139,7 @@ export class GithubService extends BaseRepositoryService {
    * @private
    */
   private throwDecentError(error: HttpErrorResponse) {
-    if (error.status == 429) {
+    if (error.status == 429 || error.status == 403) {
       return new RateLimitError(
         'You have been throttled by GitHub. Please wait 30 minutes or add a different API key to the account.');
     } else if (error.status == 404) {

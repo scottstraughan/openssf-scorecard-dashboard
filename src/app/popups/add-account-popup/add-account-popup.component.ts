@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Codeplay Software Ltd, Scott Straughan.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,24 +16,26 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference, PopupService } from '../../shared/components/popup/popup.service';
-import { SearchComponent } from '../../shared/components/search/search.component';
+import { InputComponent } from '../../shared/components/search/input.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { AccountService, Service } from '../../shared/services/account.service';
+import { AccountService } from '../../shared/services/account.service';
 import { catchError, of, tap } from 'rxjs';
 import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
+import { Service } from '../../shared/enums/service';
+import { DuplicateAccountError } from '../../shared/errors/account';
 
 @Component({
   selector: 'osf-add-account-popup',
   standalone: true,
   templateUrl: './add-account-popup.component.html',
   imports: [
-    SearchComponent,
+    InputComponent,
     ButtonComponent,
     FormsModule,
     LoadingComponent,
@@ -65,6 +67,18 @@ export class AddAccountPopupComponent {
   ) { }
 
   /**
+   * Called when the user presses enter, anywhere!
+   */
+  @HostListener('document:keydown.enter', ['$event'])
+  onKeydownHandler() {
+    if (!this.isServiceFormsValid()) {
+      return;
+    }
+
+    this.onAdd();
+  }
+
+  /**
    * Determine if all the forms are valid.
    */
   isServiceFormsValid(): boolean {
@@ -91,6 +105,12 @@ export class AddAccountPopupComponent {
           this.router.navigate([`/${account.service}/${account.account}`]).then();
         }),
         catchError((error) => {
+          if (error instanceof DuplicateAccountError) {
+            this.router.navigate([`/${this.service()}/${this.accountName()}`]).then();
+            this.popupReference.close();
+            return of();
+          }
+
           this.popupService.create(
             ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
 

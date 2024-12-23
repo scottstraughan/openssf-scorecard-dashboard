@@ -16,40 +16,35 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { PopupReference } from '../../shared/components/popup/popup.service';
-import { InputComponent } from '../../shared/components/search/input.component';
-import { ButtonComponent } from '../../shared/components/button/button.component';
+import { Component, ElementRef, input, model, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'osf-about-popup',
+  selector: 'osf-input',
   standalone: true,
-  templateUrl: './about-popup.component.html',
   imports: [
-    InputComponent,
-    ButtonComponent,
     FormsModule
   ],
-  styleUrls: [
-    '../../shared/popups/error-popup/error-popup.component.scss',
-    './about-popup.component.scss',
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './input.component.html',
+  styleUrl: './input.component.scss'
 })
-export class AboutPopupComponent {
-  /**
-   * Constructor
-   * @param popupReference
-   */
-  constructor(
-    @Inject('POPUP_DATA') protected popupReference: PopupReference
-  ) { }
+export class InputComponent implements OnInit {
+  value = model<string>('');
+  placeholder = input<string>('');
+  icon = input<string | undefined>(undefined);
+  focus = input<boolean>(false);
 
-  /**
-   * Called when the user presses the close button.
-   */
-  onClose() {
-    this.popupReference.close();
+  @ViewChild('input') inputElement: ElementRef | undefined;
+
+  ngOnInit(): void {
+    if (this.focus()) {
+      setTimeout(() => {
+        if (!this.inputElement) {
+          return;
+        }
+
+        this.inputElement.nativeElement.focus();
+      });
+    }
   }
 }
