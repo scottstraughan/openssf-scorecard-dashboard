@@ -16,9 +16,35 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+import { Component, ElementRef, input, model, OnInit, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+@Component({
+  selector: 'osd-input',
+  standalone: true,
+  imports: [
+    FormsModule
+  ],
+  templateUrl: './input.component.html',
+  styleUrl: './input.component.scss'
+})
+export class InputComponent implements OnInit {
+  value = model<string>('');
+  placeholder = input<string>('');
+  icon = input<string | undefined>(undefined);
+  focus = input<boolean>(false);
+
+  @ViewChild('input') inputElement: ElementRef | undefined;
+
+  ngOnInit(): void {
+    if (this.focus()) {
+      setTimeout(() => {
+        if (!this.inputElement) {
+          return;
+        }
+
+        this.inputElement.nativeElement.focus();
+      });
+    }
+  }
+}

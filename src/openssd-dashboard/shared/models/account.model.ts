@@ -16,9 +16,19 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+import { Service } from '../enums/service';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+/**
+ * Represents an account.
+ */
+export interface AccountModel {
+  service: Service
+  account: string
+  name: string
+  icon: string
+  description: string
+  totalRepositories: number
+  followers: number
+  url: string
+  apiToken?: string
+}

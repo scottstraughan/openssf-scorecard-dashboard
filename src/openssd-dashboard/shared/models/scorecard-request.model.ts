@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,15 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+import { RepositoryModel } from './repository.model';
+import { ScorecardModel } from './scorecard.model';
+import { LoadingState } from '../LoadingState';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+/**
+ * Represents an account.
+ */
+export interface ScorecardRequest {
+  repository: RepositoryModel
+  scorecard: ScorecardModel | undefined
+  loadState: LoadingState
+}

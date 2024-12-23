@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
-
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+export enum Service {
+  GITHUB = 'github',
+  GITLAB = 'gitlab'
+}
