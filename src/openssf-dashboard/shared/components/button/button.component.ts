@@ -16,9 +16,32 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-dashboard/app.config';
-import { AppComponent } from './openssf-dashboard/app.component';
+import { Component, input, output } from '@angular/core';
+import { NgClass } from '@angular/common';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+@Component({
+  selector: 'osd-button',
+  standalone: true,
+  imports: [
+    NgClass
+  ],
+  templateUrl: './button.component.html',
+  styleUrl: './button.component.scss'
+})
+export class ButtonComponent {
+  readonly icon = input<string | undefined>(undefined);
+  readonly label = input<string | undefined>(undefined);
+  readonly disabled = input<boolean>(false);
+  readonly clicked = output();
+
+  /**
+   * Called when a user clicks on the button.
+   */
+  onClick() {
+    if (this.disabled()) {
+      return ;
+    }
+
+    this.clicked.emit();
+  }
+}

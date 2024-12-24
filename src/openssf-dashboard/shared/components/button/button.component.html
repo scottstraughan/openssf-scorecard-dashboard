@@ -1,0 +1,11 @@
+<div (click)="onClick()" [ngClass]="{disabled: disabled()}">
+  @if (icon(); as icon) {
+    <div class="icon">
+      <span class="material-symbols-outlined">{{ icon }}</span>
+    </div>
+  }
+
+  @if (label(); as label) {
+    <div class="content" [innerHTML]="label"></div>
+  }
+</div>

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,30 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-dashboard/app.config';
-import { AppComponent } from './openssf-dashboard/app.component';
+import { GenericError } from './generic';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+/**
+ * Error used for when a service is not supported.
+ */
+export class ServiceNotSupportedError extends GenericError {
+  /**
+   * Constructor.
+   * @param message
+   */
+  constructor(
+    message?: string
+  ) {
+    super('Service Not Supported', message || 'The repository service provided is not currently supported.');
+  }
+}
+
+/**
+ * Error that is thrown when the backend has rate limited the user.
+ */
+export class RateLimitError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Rate Limited', message || 'You have been rated limited by the repository service, try again later.');
+  }
+}

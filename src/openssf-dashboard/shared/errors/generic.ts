@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,19 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-dashboard/app.config';
-import { AppComponent } from './openssf-dashboard/app.component';
+export class GenericError extends Error {
+  public title: string | undefined;
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+  /**
+   * Constructor.
+   * @param title
+   * @param message
+   */
+  constructor(
+    title: string,
+    message: string
+  ) {
+    super(message);
+    this.title = title;
+  }
+}
