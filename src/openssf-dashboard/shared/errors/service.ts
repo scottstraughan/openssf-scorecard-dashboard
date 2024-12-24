@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,32 +16,30 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { GenericError } from './generic';
 
-@Component({
-  selector: 'osd-button',
-  standalone: true,
-  imports: [
-    NgClass
-  ],
-  templateUrl: './button.component.html',
-  styleUrl: './button.component.scss'
-})
-export class ButtonComponent {
-  readonly icon = input<string | undefined>(undefined);
-  readonly label = input<string | undefined>(undefined);
-  readonly disabled = input<boolean>(false);
-  readonly clicked = output();
-
+/**
+ * Error used for when a service is not supported.
+ */
+export class ServiceNotSupportedError extends GenericError {
   /**
-   * Called when a user clicks on the button.
+   * Constructor.
+   * @param message
    */
-  onClick() {
-    if (this.disabled()) {
-      return ;
-    }
+  constructor(
+    message?: string
+  ) {
+    super('Service Not Supported', message || 'The repository service provided is not currently supported.');
+  }
+}
 
-    this.clicked.emit();
+/**
+ * Error that is thrown when the backend has rate limited the user.
+ */
+export class RateLimitError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Rate Limited', message || 'You have been rated limited by the repository service, try again later.');
   }
 }
