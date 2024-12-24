@@ -6,9 +6,7 @@
   <div class="accounts">
     <div class="list">
       @for (account of serviceAccounts(); track account.account) {
-        <a [routerLink]="account.service + '/' + account.account"
-           class="item"
-           routerLinkActive="selected">
+        <a [routerLink]="account.service + '/' + account.account" class="item" routerLinkActive="selected">
           <div [style.background-image]="'url(' + account.icon + ')'"></div>
         </a>
       }
