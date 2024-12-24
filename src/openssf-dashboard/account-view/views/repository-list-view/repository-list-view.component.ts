@@ -56,7 +56,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   /**
    * The max number of repositories to show per "page".
    */
-  static readonly RESULTS_PER_PAGE = 5;
+  static readonly RESULTS_PER_PAGE = 30;
 
   readonly LoadingState = LoadingState;
   readonly LayoutView = LayoutView;
