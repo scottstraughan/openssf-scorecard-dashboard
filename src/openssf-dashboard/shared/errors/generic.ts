@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,32 +16,19 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
-
-@Component({
-  selector: 'osd-button',
-  standalone: true,
-  imports: [
-    NgClass
-  ],
-  templateUrl: './button.component.html',
-  styleUrl: './button.component.scss'
-})
-export class ButtonComponent {
-  readonly icon = input<string | undefined>(undefined);
-  readonly label = input<string | undefined>(undefined);
-  readonly disabled = input<boolean>(false);
-  readonly clicked = output();
+export class GenericError extends Error {
+  public title: string | undefined;
 
   /**
-   * Called when a user clicks on the button.
+   * Constructor.
+   * @param title
+   * @param message
    */
-  onClick() {
-    if (this.disabled()) {
-      return ;
-    }
-
-    this.clicked.emit();
+  constructor(
+    title: string,
+    message: string
+  ) {
+    super(message);
+    this.title = title;
   }
 }

@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RepositoryModel } from '../models/repository.model';
-import { BehaviorSubject, forkJoin, Observable, take, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, Observable, take, tap } from 'rxjs';
 import { ScorecardService } from './scorecard.service';
 import { ScorecardModel } from '../models/scorecard.model';
 import { LoadingState } from '../LoadingState';
@@ -149,6 +149,27 @@ export class SelectedAccountService {
   }
 
   /**
+   * Get a repository.
+   * @param repositoryName
+   */
+  getRepository(
+    repositoryName: string
+  ): Observable<RepositoryModel> {
+    return this.repositories$
+      .pipe(
+        map(repositories => {
+          for (const repository of repositories) {
+            if (repository.name === repositoryName) {
+              return repository;
+            }
+          }
+
+          throw new Error('Unable to find the repository with the provided name.');
+        })
+      )
+  }
+
+  /**
    * Fetch all the scorecards for the provided repositories, notifying observers of changes.
    * @param account
    * @param repositories
@@ -164,7 +185,8 @@ export class SelectedAccountService {
       this.updateScorecard(repository, undefined, LoadingState.LOADING);
     }
 
-    let requests = [];
+    const requests = [];
+
     for (const repository of repositories) {
       requests.push(
         this.getScorecard(account, repository, false)

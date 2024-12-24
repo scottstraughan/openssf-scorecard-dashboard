@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,32 +16,15 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { GenericError } from './generic';
 
-@Component({
-  selector: 'osd-button',
-  standalone: true,
-  imports: [
-    NgClass
-  ],
-  templateUrl: './button.component.html',
-  styleUrl: './button.component.scss'
-})
-export class ButtonComponent {
-  readonly icon = input<string | undefined>(undefined);
-  readonly label = input<string | undefined>(undefined);
-  readonly disabled = input<boolean>(false);
-  readonly clicked = output();
-
-  /**
-   * Called when a user clicks on the button.
-   */
-  onClick() {
-    if (this.disabled()) {
-      return ;
-    }
-
-    this.clicked.emit();
+/**
+ * Error used for when there is no scorecard but there should be.
+ */
+export class ScorecardNotFoundError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Scorecard Not Found', message || 'The scorecard was not found for the provided repository.');
   }
 }

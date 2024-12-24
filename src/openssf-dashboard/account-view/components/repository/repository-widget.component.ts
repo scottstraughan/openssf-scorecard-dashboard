@@ -24,11 +24,11 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AccountModel } from '../../../shared/models/account.model';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { PopupService } from '../../../shared/components/popup/popup.service';
-import { ScorecardPopupComponent } from './scorecard-popup/scorecard-popup.component';
 import { ErrorPopupComponent } from '../../../shared/popups/error-popup/error-popup.component';
 import { LoadingState } from '../../../shared/LoadingState';
 import { tap } from 'rxjs';
 import { SelectedAccountService } from '../../../shared/services/selected-account.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'osd-repository-widget',
@@ -55,10 +55,12 @@ export class RepositoryWidgetComponent implements OnInit {
    * Constructor.
    * @param popupService
    * @param selectedAccountService
+   * @param router
    */
   constructor(
     protected popupService: PopupService,
     protected selectedAccountService: SelectedAccountService,
+    protected router: Router
   ) { }
 
   /**
@@ -84,8 +86,8 @@ export class RepositoryWidgetComponent implements OnInit {
    */
   onClick() {
     if (this.scorecard()?.score) {
-      this.popupService.create(
-        ScorecardPopupComponent, this.repository, true);
+      this.router.navigate([`/${this.account().service}/${this.account().account}/${this.repository().name}`])
+        .then();
     } else {
       this.popupService.create(
         ErrorPopupComponent, {

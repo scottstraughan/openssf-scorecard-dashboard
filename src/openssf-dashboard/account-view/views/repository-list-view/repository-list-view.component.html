@@ -1,0 +1,54 @@
+<div class="repositories">
+  @if (repositoryLoadState() == LoadingState.LOAD_SUCCESS) {
+    @if (selectedAccount(); as account) {
+      <div class="header">
+        <div>
+          <osd-input
+              [(value)]="searchString"
+              icon="search"
+              placeholder="type to filter repositories"></osd-input>
+        </div>
+        <div>
+          <osd-button
+              [icon]="getIcon('sort')"
+              [label]="getSortLabel()"
+              (clicked)="onToggleSortMode()"></osd-button>
+          <osd-button
+              [icon]="getIcon('visibility')"
+              (clicked)="onToggleVisibility()"></osd-button>
+          <osd-button
+              [icon]="getIcon('layout')"
+              (clicked)="onToggleLayout()"></osd-button>
+        </div>
+      </div>
+
+      @if (getVisibleRepositories().length > 0) {
+        <div class="container">
+          <div [ngClass]="{'list': layoutView() == LayoutView.LIST, 'grid': layoutView() == LayoutView.GRID}">
+            @for (repository of getVisibleRepositories(); track repository.url) {
+              <osd-repository-widget
+                  [account]="account"
+                  [repository]="repository"></osd-repository-widget>
+            }
+          </div>
+          @if (getVisibleRepositories().length < filteredRepositoriesCount) {
+            <osd-button
+                class="view-more"
+                label="View More Repositories"
+                icon="next_plan"
+                (clicked)="onViewMore()"></osd-button>
+          }
+        </div>
+      } @else {
+        <div class="error-message">
+          <div>
+            <span class="material-symbols-outlined">info</span>
+            <h1>No Repositories Available</h1>
+          </div>
+        </div>
+      }
+    }
+  } @else {
+    <osd-loading></osd-loading>
+  }
+</div>
