@@ -57,13 +57,3 @@ export abstract class BaseRepositoryService {
     apiToken?: string
   ): Observable<RepositoryModel[]>;
 }
-
-/**
- * Error that is thrown when the backend has rate limited the user.
- */
-export class RateLimitError extends Error {}
-
-/**
- * Error that is thrown when the backend has reported an invalid account.
- */
-export class InvalidAccountError extends Error {}

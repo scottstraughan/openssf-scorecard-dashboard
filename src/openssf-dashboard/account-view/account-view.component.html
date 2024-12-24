@@ -1,0 +1,92 @@
+@if (fatalError(); as fatalError) {
+  <div class="panel error-message">
+    <div>
+      <span class="material-symbols-outlined">{{ fatalError.icon }}</span>
+      <h1 [innerHTML]="fatalError.title"></h1>
+      <h2 [innerHTML]="fatalError.message"></h2>
+    </div>
+  </div>
+} @else {
+  <div class="panel overview">
+    @if (accountLoadState() == LoadingState.LOAD_SUCCESS) {
+      @if (selectedAccount(); as account) {
+        <div class="header">
+          @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
+            <osd-score-ring
+                [score]="averageScorecardScore()"
+                (click)="reloadScorecardResults(account)"
+                [thickness]="'10px'"
+                title="Click to re-check all scorecard scores"
+                fontSize="4rem"></osd-score-ring>
+          } @else {
+            <osd-loading></osd-loading>
+          }
+        </div>
+        <div class="details">
+          <h1 [innerHTML]="account.name"></h1>
+          <p [innerHTML]="account.description"></p>
+
+          <div class="stats">
+            <div>
+              <div>
+                <span class="material-symbols-outlined">public</span>
+              </div>
+              <div>Public Repositories</div>
+              <div>
+                <span class="number" [innerHTML]="totalRepositories()">-</span>
+              </div>
+            </div>
+            <div>
+              <div>
+                <span class="material-symbols-outlined">scoreboard</span>
+              </div>
+              <div>Available Scorecards</div>
+              <div>
+              <span class="number">
+                @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
+                  {{ totalRepositoriesWithScorecards() }}
+                } @else {
+                  <osd-loading></osd-loading>
+                }
+              </span>
+              </div>
+            </div>
+            <div>
+              <div>
+                <span class="material-symbols-outlined">group</span>
+              </div>
+              <div>Followers</div>
+              <div>
+                <span class="number" [innerHTML]="account.followers">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <a [href]="account.url" target="_blank" rel="noopener">
+            <osd-button
+                icon="alt_route"
+                label="Visit Repository"></osd-button>
+          </a>
+          <div class="side-by-side">
+            <osd-button
+                icon="delete"
+                label="Remove"
+                (clicked)="onDeleteServiceAccount(account)"></osd-button>
+
+            <osd-button
+                icon="sync"
+                label="Fetch Repos"
+                (clicked)="onFetchRepositories(account)"></osd-button>
+          </div>
+        </div>
+      }
+    } @else {
+      <osd-loading></osd-loading>
+    }
+  </div>
+
+  <div class="panel router-outlet">
+    <router-outlet></router-outlet>
+  </div>
+}
