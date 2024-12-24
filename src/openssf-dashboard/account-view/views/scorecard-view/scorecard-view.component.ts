@@ -161,6 +161,7 @@ export class ScorecardViewComponent implements OnInit {
    * Called when a user clicks the back button.
    */
   onBackClicked() {
-    this.router.navigate(['../']);
+    this.router.navigate(['../'])
+      .then();
   }
 }
