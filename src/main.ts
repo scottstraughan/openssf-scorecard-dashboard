@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { bootstrapApplication } from '@angular/platform-browser';
-§import { appConfig } from './openssf-dashboard/app.config';
+import { appConfig } from './openssf-dashboard/app.config';
 import { AppComponent } from './openssf-dashboard/app.component';
 
 bootstrapApplication(AppComponent, appConfig)
