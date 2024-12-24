@@ -17,8 +17,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssd-dashboard/app.config';
-import { AppComponent } from './openssd-dashboard/app.component';
+§import { appConfig } from './openssf-dashboard/app.config';
+import { AppComponent } from './openssf-dashboard/app.component';
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
