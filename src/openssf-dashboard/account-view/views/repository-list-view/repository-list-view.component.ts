@@ -23,27 +23,22 @@ import {
   OnDestroy,
   OnInit,
   signal,
-  WritableSignal
-} from '@angular/core';
-import { ButtonComponent } from '../shared/components/button/button.component';
-import { RepositoryWidgetComponent } from './components/repository/repository-widget.component';
-import { InputComponent } from '../shared/components/input/input.component';
-import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AccountModel } from '../shared/models/account.model';
-import { LoadingComponent } from '../shared/components/loading/loading.component';
-import { LoadingState } from '../shared/LoadingState';
-import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
-import { RepositoryModel } from '../shared/models/repository.model';
+  WritableSignal } from '@angular/core';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { InputComponent } from '../../../shared/components/input/input.component';
+import { RepositoryWidgetComponent } from '../../components/repository/repository-widget.component';
+import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
+import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { NgClass } from '@angular/common';
-import { Title } from '@angular/platform-browser';
-import { ErrorPopupComponent } from '../shared/popups/error-popup/error-popup.component';
-import { PopupService } from '../shared/components/popup/popup.service';
-import { SelectedAccountService } from '../shared/services/selected-account.service';
-import { AccountService } from '../shared/services/account.service';
+import { AccountModel } from '../../../shared/models/account.model';
+import { RepositoryModel } from '../../../shared/models/repository.model';
+import { LoadingState } from '../../../shared/LoadingState';
+import { Subject, takeUntil, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SelectedAccountService } from '../../../shared/services/selected-account.service';
 
 @Component({
-  selector: 'osd-repository-view',
+  selector: 'osd-repository-list-view',
   standalone: true,
   imports: [
     ButtonComponent,
@@ -53,40 +48,29 @@ import { AccountService } from '../shared/services/account.service';
     LoadingComponent,
     NgClass
   ],
-  templateUrl: './repository-view.component.html',
-  styleUrl: './repository-view.component.scss',
+  templateUrl: './repository-list-view.component.html',
+  styleUrl: './repository-list-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoryViewComponent implements OnInit, OnDestroy {
+export class RepositoryListViewComponent implements OnInit, OnDestroy {
   /**
    * The max number of repositories to show per "page".
    */
-  static readonly RESULTS_PER_PAGE = 40;
+  static readonly RESULTS_PER_PAGE = 5;
 
-  /**
-   * For the UI, a reference to LoadingState.
-   */
   readonly LoadingState = LoadingState;
-
-  /**
-   * For the UI, a reference to LayoutView.
-   */
   readonly LayoutView = LayoutView;
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly selectedAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
   readonly fatalError: WritableSignal<boolean> = signal(false);
 
-  readonly accountLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly repositoryLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly scorecardLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
 
-  readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
-  readonly averageScorecardScore: WritableSignal<number> = signal(0);
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
   readonly layoutVisibility: WritableSignal<LayoutVisibility> = signal(LayoutVisibility.ALL);
   readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
-  readonly layoutVisibleResults: WritableSignal<number> = signal(RepositoryViewComponent.RESULTS_PER_PAGE);
+  readonly layoutVisibleResults: WritableSignal<number> = signal(RepositoryListViewComponent.RESULTS_PER_PAGE);
   readonly searchString: WritableSignal<string> = signal('');
 
   public filteredRepositoriesCount: number = 0;
@@ -94,45 +78,32 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
 
   /**
    * Constructor
+   * @param router
    * @param activatedRoute
    * @param changeDetectorRef
-   * @param router
-   * @param title
-   * @param popupService
    * @param selectedAccountService
-   * @param accountService
    */
   constructor(
+    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected changeDetectorRef: ChangeDetectorRef,
-    protected router: Router,
-    protected title: Title,
-    protected popupService: PopupService,
     protected selectedAccountService: SelectedAccountService,
-    protected accountService: AccountService
   ) { }
 
   /**
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.repositoriesLoadState$
+    this.selectedAccountService.account$
       .pipe(
-        tap(loadState => this.repositoryLoadState.set(loadState)),
+        tap(account => this.selectedAccount.set(account)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.scorecardsLoading$
+    this.selectedAccountService.repositoriesLoadState$
       .pipe(
-        tap(loadState => {
-          this.scorecardLoadState.set(loadState);
-
-          if (loadState == LoadingState.LOAD_SUCCESS) {
-            this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
-            this.totalRepositoriesWithScorecards.set(this.selectedAccountService.countValidScorecards());
-          }
-        }),
+        tap(loadState => this.repositoryLoadState.set(loadState)),
         takeUntil(this.cleanup)
       )
       .subscribe();
@@ -144,53 +115,33 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
         }),
         takeUntil(this.cleanup)
       )
-      .subscribe()
+      .subscribe();
 
-    this.activatedRoute.queryParams.subscribe((params) => {
-      if (params['visible']) {
-        this.layoutVisibility.set(params['visible']);
-      }
-
-      if (params['layout']) {
-        this.layoutView.set(params['layout']);
-      }
-
-      if (params['sort']) {
-        this.setSortMode(params['sort']);
-      }
-    });
-
-    this.activatedRoute.params
+    this.selectedAccountService.scorecardsLoading$
       .pipe(
-        tap((params) => {
-          this.reset();
-
-          this.selectedAccountService.setAccount(params['service'], params['account'])
-            .pipe(
-              tap(account => {
-                this.title.setTitle(account.name + ' - ' + this.title.getTitle());
-                this.selectedAccount.set(account);
-                this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
-              }),
-              catchError((error) => {
-                this.handleErrorThrown(error);
-                this.fatalError.set(true);
-                return of(error);
-              }),
-              takeUntil(this.cleanup)
-            )
-            .subscribe();
+        tap(loaded => {
+          if (loaded == LoadingState.LOAD_SUCCESS) {
+            this.changeDetectorRef.detectChanges();
+          }
         }),
+        takeUntil(this.cleanup)
       )
       .subscribe();
+
+    this.activatedRoute.queryParams.subscribe(params => {
+      this.layoutVisibility.set(params['visible'] ? params['visible'] : LayoutVisibility.ALL);
+      this.layoutView.set(params['layout'] ? params['layout'] : LayoutView.GRID);
+      this.setSortMode(params['sort'] ? params['sort'] : LayoutSortMode.NAME_ASC);
+
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   /**
    * @inheritdoc
    */
   ngOnDestroy() {
-    this.cleanup.next();
-    this.cleanup.complete();
+    this.reset();
   }
 
   /**
@@ -223,19 +174,6 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
 
     this.filteredRepositoriesCount = repositories.length;
     return repositories.slice(0, this.layoutVisibleResults());
-  }
-
-  /**
-   * Reload all the scorecard results.
-   */
-  reloadScorecardResults() {
-    const account = this.selectedAccount();
-
-    if (!account) {
-      return ;
-    }
-
-    this.selectedAccountService.reloadScorecards(account);
   }
 
   /**
@@ -361,55 +299,7 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
    */
   onViewMore() {
     this.layoutVisibleResults.set(
-      this.layoutVisibleResults() + RepositoryViewComponent.RESULTS_PER_PAGE);
-  }
-
-  /**
-   * Called when a user presses the delete service account button.
-   */
-  onDeleteServiceAccount() {
-    const serviceAccount = this.selectedAccount();
-
-    if (!serviceAccount) {
-      return  ;
-    }
-
-    try {
-      // Delete the account
-      this.accountService.delete(serviceAccount);
-
-      // On success, navigate to the root where we will redirect to the correct place
-      this.router.navigate(['/']).then();
-    } catch (e) {
-      this.handleErrorThrown(e);
-    }
-  }
-
-  /**
-   * Called when a user wishes to re-fetch the repositories.
-   */
-  onFetchRepositories() {
-    const account = this.selectedAccount();
-
-    if (!account) {
-      return
-    }
-
-    this.selectedAccountService.getRepositories(account, true);
-  }
-
-  /**
-   * Show an error popup.
-   */
-  private handleErrorThrown(
-    error: any
-  ) {
-    setTimeout(() => {
-      this.popupService.create(
-        ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
-
-      console.error(error);
-    });
+      this.layoutVisibleResults() + RepositoryListViewComponent.RESULTS_PER_PAGE);
   }
 
   /**
@@ -432,16 +322,21 @@ export class RepositoryViewComponent implements OnInit, OnDestroy {
    * Reset the UI.
    */
   private reset() {
+    this.cleanup.next();
+    this.cleanup.complete();
+
     this.fatalError.set(false);
     this.selectedAccount.set(undefined);
     this.selectedAccountRepositories.set([]);
 
-    this.accountLoadState.set(LoadingState.LOADING);
     this.repositoryLoadState.set(LoadingState.LOADING);
-    this.scorecardLoadState.set(LoadingState.LOADING);
 
-    this.totalRepositoriesWithScorecards.set(0);
-    this.averageScorecardScore.set(0);
+    /**
+     * this.layoutView.set(LayoutView.GRID);
+     *     this.layoutVisibility.set(LayoutVisibility.ALL);
+     *     this.layoutSortMode.set(LayoutSortMode.NAME_ASC);
+     *     this.layoutVisibleResults.set(RepositoryListViewComponent.RESULTS_PER_PAGE);
+     */
   }
 
   /**

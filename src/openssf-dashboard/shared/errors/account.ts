@@ -16,17 +16,46 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
+import { GenericError } from './generic';
+
+/**
+ * Error that is thrown when the backend has reported an invalid account.
+ */
+export class InvalidAccountError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Account Not Found', message || 'No account could be found on the repository service.');
+  }
+}
+
 /**
  * Error used for when an account already exists.
  */
-export class DuplicateAccountError extends Error {}
+export class DuplicateAccountError extends GenericError {
+  /**
+   * Constructor.
+   * @param message
+   */
+  constructor(
+    message?: string
+  ) {
+    super('Account Already Exists', message || 'There is already exists for this account.');
+  }
+}
 
 /**
  * Error used when the user has tried to remove all the accounts (requires at least one).
  */
-export class MinimumAccountError extends Error {}
-
-/**
- * Error used for when a service is not supported.
- */
-export class ServiceNotSupportedError extends Error {}
+export class MinimumAccountError extends GenericError {
+  /**
+   * Constructor.
+   * @param message
+   */
+  constructor(
+    message?: string
+  ) {
+    super('Cannot Remove Account', message || 'You must have at least one account to track. ' +
+      'Please add another account if you wish to delete this one.');
+  }
+}

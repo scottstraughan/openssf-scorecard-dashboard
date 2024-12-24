@@ -18,12 +18,13 @@
 
 import { Inject, Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { BehaviorSubject, catchError, Observable, Observer, of, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, Observer, of, take, tap } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { DuplicateAccountError, MinimumAccountError, ServiceNotSupportedError } from '../errors/account';
+import { DuplicateAccountError, MinimumAccountError } from '../errors/account';
 import { Service } from '../enums/service';
+import { ServiceNotSupportedError } from '../errors/service';
 
 @Injectable({
   providedIn: 'root'
@@ -150,8 +151,8 @@ export class AccountService {
       throw new MinimumAccountError();
     }
 
-    this.storageService.remove(AccountService.createRepositoryStorageKey(account));
     this.accounts.delete(AccountService.createAccountMapKey(account.service, account.account));
+    this.storageService.remove(AccountService.createRepositoryStorageKey(account));
     this.setAccounts(Array.from(this.accounts.values()));
   }
 
@@ -179,13 +180,13 @@ export class AccountService {
               take(1),
               catchError(error => {
                 observer.error(error);
-                return throwError(() => error);
+                return of(error);
               })
             )
             .subscribe();
       }
       
-      throw new ServiceNotSupportedError(`The service ${service} is not currently supported, check back soon!`);
+      throw new ServiceNotSupportedError();
     });
   }
 
@@ -203,7 +204,6 @@ export class AccountService {
     }
 
     this.accounts$.next(Array.from(this.accounts.values()));
-
     this.storageService.set(AccountService.STORAGE_KEY, Array.from(this.accounts.values()));
   }
 

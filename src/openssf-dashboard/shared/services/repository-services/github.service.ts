@@ -21,8 +21,10 @@ import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { AccountModel } from '../../models/account.model';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { BaseRepositoryService, InvalidAccountError, RateLimitError } from './base-repository-service';
+import { BaseRepositoryService } from './base-repository-service';
 import { Service } from '../../enums/service';
+import { RateLimitError } from '../../errors/service';
+import { InvalidAccountError } from '../../errors/account';
 
 @Injectable({
   providedIn: 'root'

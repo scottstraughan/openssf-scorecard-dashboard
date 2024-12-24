@@ -22,13 +22,14 @@ import { InputComponent } from '../../shared/components/input/input.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../shared/services/account.service';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, of, take, tap } from 'rxjs';
 import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Service } from '../../shared/enums/service';
 import { DuplicateAccountError } from '../../shared/errors/account';
+import { ErrorPopupService } from '../../shared/services/error-popup.service';
 
 @Component({
   selector: 'osd-add-account-popup',
@@ -59,12 +60,14 @@ export class AddAccountPopupComponent {
    * @param popupReference
    * @param accountService
    * @param popupService
+   * @param errorPopupService
    * @param router
    */
   constructor(
     @Inject('POPUP_DATA') protected popupReference: PopupReference,
     protected accountService: AccountService,
     protected popupService: PopupService,
+    protected errorPopupService: ErrorPopupService,
     protected router: Router
   ) { }
 
@@ -106,6 +109,7 @@ export class AddAccountPopupComponent {
           this.loading.set(false);
           this.router.navigate([`/${account.service}/${account.account}`]).then();
         }),
+        take(1),
         catchError((error) => {
           if (error instanceof DuplicateAccountError) {
             this.router.navigate([`/${this.service()}/${this.accountName()}`]).then();
@@ -113,8 +117,7 @@ export class AddAccountPopupComponent {
             return of();
           }
 
-          this.popupService.create(
-            ErrorPopupComponent, ErrorPopupComponent.handleErrorThrown(error), true);
+          this.errorPopupService.handleError(error);
 
           this.loading.set(false);
           return of();
