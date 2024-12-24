@@ -1,0 +1,48 @@
+@if (fatalError(); as fatalError) {
+  <div class="error-message">
+    <div>
+      <span class="material-symbols-outlined">{{ fatalError.icon }}</span>
+      <h1 [innerHTML]="fatalError.title"></h1>
+      <h2 [innerHTML]="fatalError.message"></h2>
+    </div>
+  </div>
+} @else {
+  @if (loading() == LoadingState.LOAD_SUCCESS) {
+    @if (repository(); as repository) {
+      @if (scorecard(); as scorecard) {
+        <div class="header">
+          <div class="score-color-bg" [style.background-color]="getScoreBackgroundColor()"></div>
+
+          @if (scorecard.score; as score) {
+            <div class="score">
+              <osd-score-ring [score]="score" fontSize="14px"></osd-score-ring>
+            </div>
+          }
+
+          <div class="title">
+            <div>
+              <h1 [innerHTML]="repository.name"></h1>
+              <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
+            </div>
+          </div>
+
+          <div class="actions">
+            <osd-button icon="arrow_back" label="Back" (clicked)="onBackClicked()"></osd-button>
+
+            <a [href]="scorecard.url" target="_blank" rel="noopener">
+              <osd-button icon="link" label="View on scorecard.dev"></osd-button>
+            </a>
+          </div>
+        </div>
+
+        <div class="container">
+          @for (check of repository.scorecard?.checks; track check.name) {
+            <osd-scorecard-check [check]="check"></osd-scorecard-check>
+          }
+        </div>
+      }
+    }
+  } @else {
+    <osd-loading></osd-loading>
+  }
+}

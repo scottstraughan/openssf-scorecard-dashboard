@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,15 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-dashboard/app.config';
-import { AppComponent } from './openssf-dashboard/app.component';
+import { GenericError } from './generic';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+/**
+ * Error used for when there is no scorecard but there should be.
+ */
+export class ScorecardNotFoundError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Scorecard Not Found', message || 'The scorecard was not found for the provided repository.');
+  }
+}

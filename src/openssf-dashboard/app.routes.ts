@@ -16,9 +16,29 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-dashboard/app.config';
-import { AppComponent } from './openssf-dashboard/app.component';
+import { Routes } from '@angular/router';
+import { AccountViewComponent } from './account-view/account-view.component';
+import { HomeViewComponent } from './home-view/home-view.component';
+import { RepositoryListViewComponent } from './account-view/views/repository-list-view/repository-list-view.component';
+import { ScorecardViewComponent } from './account-view/views/scorecard-view/scorecard-view.component';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+export const routes: Routes = [
+  {
+    path: ':service/:account',
+    component: AccountViewComponent,
+    children: [
+      {
+        path: '',
+        component: RepositoryListViewComponent
+      },
+      {
+        path: ':repositoryName',
+        component: ScorecardViewComponent
+      }
+    ]
+  },
+  {
+    path: '**',
+    component: HomeViewComponent
+  },
+];
