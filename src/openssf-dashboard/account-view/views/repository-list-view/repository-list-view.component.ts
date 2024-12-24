@@ -26,7 +26,7 @@ import {
   WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
-import { RepositoryWidgetComponent } from '../../components/repository/repository-widget.component';
+import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { NgClass } from '@angular/common';
@@ -56,7 +56,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   /**
    * The max number of repositories to show per "page".
    */
-  static readonly RESULTS_PER_PAGE = 5;
+  static readonly RESULTS_PER_PAGE = 30;
 
   readonly LoadingState = LoadingState;
   readonly LayoutView = LayoutView;

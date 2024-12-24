@@ -6,9 +6,7 @@
   <div class="accounts">
     <div class="list">
       @for (account of serviceAccounts(); track account.account) {
-        <a [routerLink]="account.service + '/' + account.account"
-           class="item"
-           routerLinkActive="selected">
+        <a [routerLink]="account.service + '/' + account.account" class="item" routerLinkActive="selected">
           <div [style.background-image]="'url(' + account.icon + ')'"></div>
         </a>
       }
@@ -22,6 +20,7 @@
     <div class="button" title="View the about/help" (click)="onAboutClicked()">
       <span class="material-symbols-outlined">help</span>
     </div>
+
     <a class="url" href="https://openssf.org" rel="noopener">openssf.org</a>
   </div>
 </nav>
