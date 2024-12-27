@@ -4,11 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { AccountModel } from '../models/account.model';
 import { ScorecardModel } from '../models/scorecard.model';
 import { RepositoryModel } from '../models/repository.model';
+import { ScorecardCheck } from '../models/scorecard-check.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScorecardService {
+  static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md';
+
   /**
    * Constructor
    * @param httpClient
@@ -30,6 +33,19 @@ export class ScorecardService {
       .pipe(
         tap(scorecard => repository.scorecard = scorecard)
       );
+  }
+
+  getCheckDetails(
+    scorecardCheck: ScorecardCheck
+  ): Observable<ScorecardCheckDetails> {
+    return this.httpClient.get(ScorecardService.CHECK_DETAILS_URL, { responseType: 'text' })
+      .pipe(
+        tap(result => console.log(result)),
+        map(result => <ScorecardCheckDetails> {
+          url: 'hasdasd',
+          details: result
+        })
+      )
   }
 
   /**
@@ -124,3 +140,9 @@ export enum ResultPriority {
   MEDIUM = 'MEDIUM',
   LOW = 'LOW'
 }
+
+export interface ScorecardCheckDetails {
+  url: string
+  details: string
+}
+

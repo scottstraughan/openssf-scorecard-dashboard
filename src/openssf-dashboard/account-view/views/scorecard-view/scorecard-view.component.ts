@@ -26,10 +26,11 @@ import { SelectedAccountService } from '../../../shared/services/selected-accoun
 import { catchError, of, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
-import { ScorecardService } from '../../../shared/services/scorecard.service';
+import { ScorecardCheckDetails, ScorecardService } from '../../../shared/services/scorecard.service';
 import { LoadingState } from '../../../shared/LoadingState';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
+import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
 
 @Component({
   selector: 'osd-scorecard-view',
@@ -53,6 +54,7 @@ export class ScorecardViewComponent implements OnInit {
   readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
   readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
+  readonly scorecardCheckDetails: WritableSignal<ScorecardCheckDetails | undefined> = signal(undefined);
 
   /**
    * Constructor.
@@ -163,5 +165,19 @@ export class ScorecardViewComponent implements OnInit {
   onBackClicked() {
     this.router.navigate(['../'])
       .then();
+  }
+
+  /**
+   * Called when the user clicks on the check.
+   * @param check
+   */
+  onClicked(check: ScorecardCheck) {
+    this.scorecardService.getCheckDetails(check)
+      .pipe(
+        tap(details => {
+          this.scorecardCheckDetails.set(details)
+        })
+      )
+      .subscribe();
   }
 }

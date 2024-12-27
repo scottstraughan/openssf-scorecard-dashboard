@@ -36,8 +36,16 @@
         </div>
 
         <div class="container">
-          @for (check of repository.scorecard?.checks; track check.name) {
-            <osd-scorecard-check [check]="check"></osd-scorecard-check>
+          <div class="scorecard">
+            @for (check of repository.scorecard?.checks; track check.name) {
+              <osd-scorecard-check (click)="onClicked(check)" [check]="check"></osd-scorecard-check>
+            }
+          </div>
+
+          @if (scorecardCheckDetails(); as scorecardCheckDetails) {
+            <div class="details" [innerHTML]="scorecardCheckDetails.details">
+              <osd-loading></osd-loading>
+            </div>
           }
         </div>
       }
