@@ -6,6 +6,8 @@ import { ScorecardModel } from '../models/scorecard.model';
 import { RepositoryModel } from '../models/repository.model';
 import { ScorecardCheck } from '../models/scorecard-check.model';
 import { MarkdownService } from 'ngx-markdown';
+import { ScorecardCheckDetails } from '../models/scorecard-check-details.model';
+import { ResultPriority } from '../enums/scorecard';
 
 @Injectable({
   providedIn: 'root'
@@ -187,19 +189,4 @@ export class ScorecardService {
         return '#F4BD0C';
     }
   }
-}
-
-/**
- * Enum representing priority.
- */
-export enum ResultPriority {
-  CRITICAL = 'critical',
-  HIGH = 'high',
-  MEDIUM = 'medium',
-  LOW = 'low'
-}
-
-export interface ScorecardCheckDetails {
-  details: string
-  check: ScorecardCheck
 }

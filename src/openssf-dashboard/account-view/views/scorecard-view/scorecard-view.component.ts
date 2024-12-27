@@ -26,12 +26,13 @@ import { SelectedAccountService } from '../../../shared/services/selected-accoun
 import { catchError, of, take, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
-import { ScorecardCheckDetails, ScorecardService } from '../../../shared/services/scorecard.service';
+import { ScorecardService } from '../../../shared/services/scorecard.service';
 import { LoadingState } from '../../../shared/LoadingState';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
 import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
 import { FadedBgComponent } from '../../../shared/components/faded-bg/faded-bg.component';
+import { ScorecardCheckDetails } from '../../../shared/models/scorecard-check-details.model';
 
 @Component({
   selector: 'osd-scorecard-view',
