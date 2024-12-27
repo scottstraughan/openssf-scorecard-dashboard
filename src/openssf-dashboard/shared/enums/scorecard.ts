@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,19 +16,12 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ResultPriority } from '../enums/scorecard';
-
 /**
- * Represents a scorecard check item.
+ * Enum representing priority.
  */
-export interface ScorecardCheck {
-  name: string
-  score: number
-  reason: string
-  details: string | undefined
-  priority: ResultPriority
-  documentation: {
-    url: string
-    anchor: string
-  }
+export enum ResultPriority {
+  CRITICAL = 'critical',
+  HIGH = 'high',
+  MEDIUM = 'medium',
+  LOW = 'low'
 }
