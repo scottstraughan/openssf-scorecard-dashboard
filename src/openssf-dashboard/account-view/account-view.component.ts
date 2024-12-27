@@ -18,14 +18,12 @@
 
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
-import { InputComponent } from '../shared/components/input/input.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
 import { catchError, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
-import { NgClass } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../shared/components/popup/popup.service';
 import { SelectedAccountService } from '../shared/services/selected-account.service';
@@ -37,10 +35,8 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
   standalone: true,
   imports: [
     ButtonComponent,
-    InputComponent,
     ScoreRingComponent,
     LoadingComponent,
-    NgClass,
     RouterOutlet
   ],
   templateUrl: './account-view.component.html',

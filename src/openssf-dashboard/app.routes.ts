@@ -16,11 +16,11 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Routes } from '@angular/router';
 import { AccountViewComponent } from './account-view/account-view.component';
 import { HomeViewComponent } from './home-view/home-view.component';
 import { RepositoryListViewComponent } from './account-view/views/repository-list-view/repository-list-view.component';
 import { ScorecardViewComponent } from './account-view/views/scorecard-view/scorecard-view.component';
+import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {

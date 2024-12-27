@@ -1,8 +1,12 @@
 :host {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  container: scorecard-popup / inline-size;
-  height: 100%;
+  gap: 1rem;
+
+  @container account-view-router-outlet (min-width: 750px) {
+    flex-direction: row;
+  }
 
   --color-shocking: #bc2323;
   --color-poor: #ca5f1d;
@@ -10,54 +14,76 @@
   --color-verygood: #9abd76;
   --color-excellent: #548318;
 
-  .header {
-    padding: 1rem;
-    background-color: #efefef;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+  .panel {
     display: flex;
-    gap: 1rem;
     flex-direction: column;
-    box-shadow: var(--default-box-shadow);
+    padding: 0;
 
-    @container scorecard-popup (min-width: 650px) {
-      flex-direction: row;
-    }
-
-    @container scorecard-popup (max-width: 650px) {
-      text-align: center;
-    }
-
-    > div {
+    .header {
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.05);
       display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      gap: .5rem;
+    }
 
-      &.score-color-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: red;
-        opacity: .2;
+    .container {
+      padding: 1rem;
+      flex: 1;
+      overflow: auto;
+    }
+  }
+
+  .scorecard {
+    padding: 0;
+    flex: 1;
+    container: scorecard / inline-size;
+
+    @container account-view-router-outlet (max-width: 750px) {
+      flex: 2;
+    }
+
+    .header {
+      display: flex;
+      gap: 1rem;
+      flex-direction: column;
+      box-shadow: var(--default-box-shadow);
+
+      @container scorecard (min-width: 650px) {
+        flex-direction: row;
       }
 
-      @container scorecard-popup (min-width: 650px) {
-        justify-content: left;
+      @container scorecard (max-width: 650px) {
+        text-align: center;
       }
 
-      &.score {
+      .score,
+      .title,
+      .actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        @container scorecard (min-width: 650px) {
+          justify-content: left;
+        }
+      }
+
+      .score {
         padding-left: .5rem;
 
         osd-score-ring {
           height: 40px;
           width: 40px;
+
+          @container scorecard-popup (max-width: 650px) {
+            height: 60px;
+            width: 60px;
+          }
         }
       }
 
-      &.title {
+      .title {
         flex: 1;
         display: flex;
         align-items: center;
@@ -76,101 +102,41 @@
         }
       }
 
-      &.actions {
+      .actions {
         display: flex;
         gap: .5rem;
       }
     }
+
+    .container {
+      overflow: auto;
+      transition: var(--default-transition);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 100%;
+      background-color: var(--ui-secondary-color);
+      box-shadow: inset -4px 0px 5px 0px rgba(0, 0, 0, .05);
+    }
   }
 
-  .container {
+  .check-details {
+    flex: 1.6;
     overflow: auto;
-    display: flex;
-    flex-direction: row;
-    padding: 1rem;
-    gap: .5rem;
 
-    .scorecard {
-      max-width: 350px;
-      flex: 1;
-      max-height: 100%;
-      overflow: auto;
+    .header {
+      display: flex;
+      gap: .5rem;
+      position: relative;
+
+      * {
+        flex: 1;
+      }
     }
 
-    .details {
-      flex: 1;
-      background-color: red;
-      max-height: 100%;
-      overflow: auto;
+    .container {
+      padding: 1rem 2rem;
     }
-  }
-}
-
-.item {
-  display: flex;
-  gap: 1rem;
-  border: var(--default-border);
-  border-radius: var(--default-border-radius);
-  box-shadow: var(--default-box-shadow);
-  position: relative;
-
-  --ring-size: 60px;
-
-  > div {
-    display: flex;
-    align-items: center;
-    padding: 2rem 2rem 1.5rem 2rem;
-
-    &.details {
-      flex: 1;
-    }
-  }
-
-  h1, p {
-    margin: 0;
-  }
-
-  h1 {
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-
-  p {
-    margin-top: .2rem;
-    opacity: .6;
-  }
-
-  .priority {
-    padding: .4rem .6rem;
-    background-color: red;
-    color: rgba(255, 255, 255, .9);
-    border-radius: 0 0 4px 4px;
-    font-size: .8rem;
-    vertical-align: middle;
-    margin-left: 1rem;
-    position: absolute;
-    top: -1px;
-    left: 1rem;
-
-    &.critical {
-      background-color: #960003;
-    }
-
-    &.high {
-      background-color: #DF2A19;
-    }
-
-    &.medium {
-      background-color: #F7860F;
-    }
-
-    &.low {
-      background-color: #F4BD0C;
-    }
-  }
-
-  osd-score-ring {
-    width: var(--ring-size);
-    height: var(--ring-size);
   }
 }

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ResultPriority } from '../services/scorecard.service';
+import { Component, input } from '@angular/core';
+import { NgClass } from '@angular/common';
 
-/**
- * Represents a scorecard check item.
- */
-export interface ScorecardCheck {
-  name: string
-  score: number
-  reason: string
-  details: string | undefined
-  priority: ResultPriority
-  documentation: {
-    url: string
-    anchor: string
-  }
+@Component({
+  selector: 'osd-faded-bg',
+  standalone: true,
+  imports: [
+    NgClass
+  ],
+  templateUrl: './faded-bg.component.html',
+  styleUrl: './faded-bg.component.scss'
+})
+export class FadedBgComponent {
+  readonly color = input.required<string>();
+  readonly opacity = input<number>(.1);
 }
