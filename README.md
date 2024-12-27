@@ -22,7 +22,8 @@ GitHub, GitLab or others.
 - Ability to filter repositories by keywords
 - Ability to sort repositories by scores, names etc
 - Responsive design that will play nice on mobile
-- Created in 7 days from scratch
+- Ability to view scorecards, issues and how to resolve them
+- Written in a few days from scratch
 
 ## Tech Stack
 
