@@ -26,7 +26,6 @@ import {
   SkipSelf, WritableSignal
 } from '@angular/core';
 import { NgCircleProgressModule } from 'ng-circle-progress';
-import { NgClass, NgIf } from '@angular/common';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
@@ -35,8 +34,6 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   templateUrl: './score-ring.component.html',
   imports: [
     NgCircleProgressModule,
-    NgClass,
-    NgIf
   ],
   styleUrl: './score-ring.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,8 +51,9 @@ export class ScoreRingComponent {
   readonly score = input.required<number>();
   readonly thickness = input<string>('5px');
   readonly fontSize = input<string>('1.5rem');
+  readonly allowReload = input<boolean>(true);
 
-  protected timeout: number | undefined;
+  protected timeout: any | undefined;
 
   @HostBinding('style.--progress')
   percentage: string = '0%';
@@ -93,6 +91,10 @@ export class ScoreRingComponent {
    * Called when a user hovers-enters the score ring with their mouse.
    */
   onMouseEnter() {
+    if (!this.allowReload()) {
+      return ;
+    }
+
     // Set a timer that is invalided if the user hovers-outs
     this.timeout = setTimeout(() => {
       this.hover.set(true);
@@ -103,6 +105,10 @@ export class ScoreRingComponent {
    * Called when a user hovers-out the score ring with their mouse.
    */
   onMouseLeave() {
+    if (!this.allowReload()) {
+      return ;
+    }
+
     this.hover.set(false)
     clearTimeout(this.timeout);
     this.timeout = undefined;

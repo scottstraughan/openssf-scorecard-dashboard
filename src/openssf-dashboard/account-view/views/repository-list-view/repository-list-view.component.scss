@@ -41,6 +41,7 @@
     overflow: auto;
     container: repo-container / inline-size;
     padding: var(--seperation);
+    background-color: var(--ui-secondary-color);
 
     .list {
       display: flex;

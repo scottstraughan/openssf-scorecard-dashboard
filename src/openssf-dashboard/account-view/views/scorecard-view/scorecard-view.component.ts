@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, OnInit, signal, WritableSignal } from '@angular/core';
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CheckComponent } from './components/check/check.component';
@@ -31,17 +31,18 @@ import { LoadingState } from '../../../shared/LoadingState';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
 import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
+import { FadedBgComponent } from '../../../shared/components/faded-bg/faded-bg.component';
 
 @Component({
   selector: 'osd-scorecard-view',
   standalone: true,
   imports: [
-    NgClass,
     ScoreRingComponent,
     ButtonComponent,
     CheckComponent,
     DatePipe,
-    LoadingComponent
+    LoadingComponent,
+    FadedBgComponent
   ],
   templateUrl: './scorecard-view.component.html',
   styleUrl: './scorecard-view.component.scss',
@@ -49,11 +50,15 @@ import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
 })
 export class ScorecardViewComponent implements OnInit {
   protected readonly LoadingState = LoadingState;
+  protected readonly ScoreRingComponent = ScoreRingComponent;
 
   readonly fatalError: WritableSignal<ErrorPopupError | undefined> = signal(undefined);
   readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
   readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
+
+  readonly selectedScorecardCheck: WritableSignal<ScorecardCheck | undefined> = signal(undefined);
+  readonly scorecardCheckDetailsLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly scorecardCheckDetails: WritableSignal<ScorecardCheckDetails | undefined> = signal(undefined);
 
   /**
@@ -147,19 +152,6 @@ export class ScorecardViewComponent implements OnInit {
   }
 
   /**
-   * Get the background color, based on the result score, for the UI.
-   */
-  getScoreBackgroundColor() {
-    const repository = this.repository();
-
-    if (!repository || !repository.scorecard) {
-      return '';
-    }
-
-    return ScoreRingComponent.getColorVariableForScore(repository.scorecard.score);
-  }
-
-  /**
    * Called when a user clicks the back button.
    */
   onBackClicked() {
@@ -172,12 +164,47 @@ export class ScorecardViewComponent implements OnInit {
    * @param check
    */
   onClicked(check: ScorecardCheck) {
+    this.selectedScorecardCheck.set(check);
+    this.scorecardCheckDetailsLoadState.set(LoadingState.LOADING);
+
     this.scorecardService.getCheckDetails(check)
       .pipe(
         tap(details => {
-          this.scorecardCheckDetails.set(details)
-        })
+          this.scorecardCheckDetails.set(details);
+          this.scorecardCheckDetailsLoadState.set(LoadingState.LOAD_SUCCESS);
+        }),
+        take(1)
       )
       .subscribe();
+  }
+
+  /**
+   * Check if a check is selected.
+   * @param check
+   */
+  isSelected(check: ScorecardCheck) {
+    const selectedCheck = this.selectedScorecardCheck();
+
+    if (!selectedCheck) {
+      return false;
+    }
+
+    return selectedCheck.name == check.name;
+  }
+
+  /**
+   * Called when a user wishes to close the scorecard check details.
+   */
+  onCloseDetails() {
+    this.selectedScorecardCheck.set(undefined);
+    this.scorecardCheckDetails.set(undefined);
+  }
+
+  /**
+   * Get the priority color for the UI.
+   * @param scorecardCheckDetails
+   */
+  getPriorityColor(scorecardCheckDetails: ScorecardCheckDetails) {
+    return this.scorecardService.getPriorityColor(scorecardCheckDetails.check.priority);
   }
 }

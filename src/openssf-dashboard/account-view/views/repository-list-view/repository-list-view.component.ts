@@ -27,7 +27,6 @@ import {
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
-import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { NgClass } from '@angular/common';
 import { AccountModel } from '../../../shared/models/account.model';
@@ -44,7 +43,6 @@ import { SelectedAccountService } from '../../../shared/services/selected-accoun
     ButtonComponent,
     RepositoryWidgetComponent,
     InputComponent,
-    ScoreRingComponent,
     LoadingComponent,
     NgClass
   ],

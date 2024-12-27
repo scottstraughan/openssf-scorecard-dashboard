@@ -16,12 +16,14 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, SecurityContext } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideMarkdown } from 'ngx-markdown';
+import { gfmHeadingId } from 'marked-gfm-heading-id';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,6 +31,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch()
     ),
-    provideAnimations()
+    provideAnimations(),
+    provideMarkdown({
+      sanitize: SecurityContext.NONE,
+      markedExtensions: [gfmHeadingId()],
+    })
   ]
 };

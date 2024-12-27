@@ -1,0 +1,16 @@
+:host {
+  position: relative;
+
+  .faded-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  ::ng-deep > *:not(.faded-bg) {
+    position: relative;
+  }
+}

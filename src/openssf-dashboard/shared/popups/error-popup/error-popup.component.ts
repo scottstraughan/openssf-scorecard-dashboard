@@ -18,7 +18,6 @@
 
 import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference } from '../../components/popup/popup.service';
-import { InputComponent } from '../../components/input/input.component';
 import { ButtonComponent } from '../../components/button/button.component';
 import { FormsModule } from '@angular/forms';
 
@@ -28,7 +27,6 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   templateUrl: './error-popup.component.html',
   imports: [
-    InputComponent,
     ButtonComponent,
     FormsModule
   ],
