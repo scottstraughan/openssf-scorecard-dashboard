@@ -1,4 +1,10 @@
 :host {
+  --color-shocking: #bc2323;
+  --color-poor: #ca5f1d;
+  --color-good: #bd9c52;
+  --color-verygood: #9abd76;
+  --color-excellent: #548318;
+
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -7,12 +13,6 @@
   @container account-view-router-outlet (min-width: 750px) {
     flex-direction: row;
   }
-
-  --color-shocking: #bc2323;
-  --color-poor: #ca5f1d;
-  --color-good: #bd9c52;
-  --color-verygood: #9abd76;
-  --color-excellent: #548318;
 
   .panel {
     display: flex;
