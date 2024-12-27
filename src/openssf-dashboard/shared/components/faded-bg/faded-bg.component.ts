@@ -17,14 +17,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Component, input } from '@angular/core';
-import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'osd-faded-bg',
   standalone: true,
-  imports: [
-    NgClass
-  ],
+  imports: [],
   templateUrl: './faded-bg.component.html',
   styleUrl: './faded-bg.component.scss'
 })
