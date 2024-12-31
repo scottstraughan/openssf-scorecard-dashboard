@@ -26,7 +26,7 @@ import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { ErrorPopupComponent } from '../../../shared/popups/error-popup/error-popup.component';
 import { LoadingState } from '../../../shared/LoadingState';
-import { tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 import { Router } from '@angular/router';
 
@@ -68,10 +68,17 @@ export class RepositoryWidgetComponent implements OnInit {
    */
   ngOnInit(): void {
     this.selectedAccountService.getScorecardRequestByRepository(this.repository())
-      .pipe(tap(scorecardRequest => {
-        this.scorecard.set(scorecardRequest.scorecard);
-        this.loading.set(scorecardRequest.loadState);
-      }))
+      .pipe(
+        tap(scorecardRequest => {
+          this.scorecard.set(scorecardRequest.scorecard);
+          this.loading.set(scorecardRequest.loadState);
+        }),
+        catchError(error => {
+          this.scorecard.set(undefined);
+          this.loading.set(LoadingState.LOAD_SUCCESS);
+          return of(error);
+        })
+      )
       .subscribe();
   }
 
