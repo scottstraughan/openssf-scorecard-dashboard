@@ -137,6 +137,12 @@
 
     .container {
       padding: 1rem 2rem;
+
+      ::ng-deep {
+        a {
+          font-weight: bold;
+        }
+      }
     }
   }
 }

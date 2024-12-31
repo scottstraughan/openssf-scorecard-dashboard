@@ -59,3 +59,18 @@ export class MinimumAccountError extends GenericError {
       'Please add another account if you wish to delete this one.');
   }
 }
+
+/**
+ * Error used when a repository has not been found.
+ */
+export class RepositoryNotFoundError extends GenericError {
+  /**
+   * Constructor.
+   * @param message
+   */
+  constructor(
+    message?: string
+  ) {
+    super('Repository Not Found', message || 'The requested repository could not be found in the account.');
+  }
+}

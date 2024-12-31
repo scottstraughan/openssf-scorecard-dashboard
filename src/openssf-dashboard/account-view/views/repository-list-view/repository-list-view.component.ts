@@ -34,7 +34,7 @@ import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/LoadingState';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SelectedAccountService } from '../../../shared/services/selected-account.service';
+import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 
 @Component({
   selector: 'osd-repository-list-view',
@@ -85,28 +85,28 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected changeDetectorRef: ChangeDetectorRef,
-    protected selectedAccountService: SelectedAccountService,
+    protected selectedAccountService: SelectedAccountStateService,
   ) { }
 
   /**
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.account$
+    this.selectedAccountService.observeAccount()
       .pipe(
         tap(account => this.selectedAccount.set(account)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.repositoriesLoadState$
+    this.selectedAccountService.observeRepositoriesLoadState()
       .pipe(
         tap(loadState => this.repositoryLoadState.set(loadState)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.repositories$
+    this.selectedAccountService.observeRepositories()
       .pipe(
         tap(repositories => {
           this.selectedAccountRepositories.set(repositories);
@@ -115,7 +115,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.selectedAccountService.scorecardsLoading$
+    this.selectedAccountService.observeScorecardsLoadState()
       .pipe(
         tap(loaded => {
           if (loaded == LoadingState.LOAD_SUCCESS) {
@@ -328,13 +328,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.selectedAccountRepositories.set([]);
 
     this.repositoryLoadState.set(LoadingState.LOADING);
-
-    /**
-     * this.layoutView.set(LayoutView.GRID);
-     *     this.layoutVisibility.set(LayoutVisibility.ALL);
-     *     this.layoutSortMode.set(LayoutSortMode.NAME_ASC);
-     *     this.layoutVisibleResults.set(RepositoryListViewComponent.RESULTS_PER_PAGE);
-     */
   }
 
   /**

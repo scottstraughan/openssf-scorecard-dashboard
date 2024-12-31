@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { PopupService } from '../components/popup/popup.service';
 import { ErrorPopupComponent } from '../popups/error-popup/error-popup.component';
 import { DuplicateAccountError, InvalidAccountError } from '../errors/account';
-import { ScorecardNotFoundError } from '../errors/scorecard';
+import { CheckNotFoundError, ScorecardNotFoundError } from '../errors/scorecard';
 import { RateLimitError, ServiceNotSupportedError } from '../errors/service';
 import { GenericError } from '../errors/generic';
 
@@ -92,6 +92,8 @@ export class ErrorPopupService {
     } else if (error instanceof DuplicateAccountError) {
       icon = 'person_search';
     } else if (error instanceof ScorecardNotFoundError) {
+      icon = 'scoreboard';
+    } else if (error instanceof CheckNotFoundError) {
       icon = 'scoreboard';
     }
 
