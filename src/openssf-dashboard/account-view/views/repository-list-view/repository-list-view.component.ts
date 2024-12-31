@@ -129,7 +129,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams.subscribe(params => {
       this.layoutVisibility.set(params['visible'] ? params['visible'] : LayoutVisibility.ALL);
       this.layoutView.set(params['layout'] ? params['layout'] : LayoutView.GRID);
-      this.setSortMode(params['sort'] ? params['sort'] : LayoutSortMode.NAME_ASC);
+      this.setSortMode(params['sort'] ? params['sort'] : LayoutSortMode.NAME_ASC, false);
 
       this.changeDetectorRef.detectChanges();
     });
@@ -210,15 +210,19 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   /**
    * Set the sort mode.
    * @param sortMode
+   * @param redirect
    */
   setSortMode(
-    sortMode: LayoutSortMode
+    sortMode: LayoutSortMode,
+    redirect: boolean = true
   ) {
     this.layoutSortMode.set(sortMode);
 
-    this.navigateWithQueryParams({
-      'sort': sortMode
-    });
+    if (redirect) {
+      this.navigateWithQueryParams({
+        'sort': sortMode
+      });
+    }
   }
 
   /**
