@@ -37,6 +37,7 @@ import { AccountModel } from '../../../shared/models/account.model';
 import { GenericError } from '../../../shared/errors/generic';
 import { ScorecardNotFoundError } from '../../../shared/errors/scorecard';
 import { InvalidAccountError } from '../../../shared/errors/account';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'osd-scorecard-view',
@@ -77,6 +78,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
    * @param activatedRoute
    * @param scorecardService
    * @param errorPopupService
+   * @param title
    */
   constructor(
     protected router: Router,
@@ -84,7 +86,8 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     protected selectedAccountService: SelectedAccountStateService,
     protected activatedRoute: ActivatedRoute,
     protected scorecardService: ScorecardService,
-    protected errorPopupService: ErrorPopupService
+    protected errorPopupService: ErrorPopupService,
+    protected title: Title
   ) { }
 
   /**
@@ -114,6 +117,8 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
                   .pipe(
                     tap(repository => {
                       this.repository.set(repository);
+
+                      this.title.setTitle(`${repository.name} - ${account.name} - OpenSSF Dashboard`);
 
                       this.scorecardService.getScorecard(account, repository)
                         .pipe(
