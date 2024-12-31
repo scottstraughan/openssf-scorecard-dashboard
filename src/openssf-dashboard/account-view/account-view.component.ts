@@ -113,7 +113,8 @@ export class AccountViewComponent implements OnInit, OnDestroy {
           this.accountSubscription = this.selectedAccountService.setAccount(params['service'], params['account'])
             .pipe(
               tap(account => {
-                this.title.setTitle(account.name + ' - ' + this.title.getTitle());
+                this.title.setTitle(`${account.name} - OpenSSF Dashboard`);
+
                 this.selectedAccount.set(account);
                 this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
               }),
