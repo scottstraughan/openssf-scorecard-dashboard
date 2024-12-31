@@ -8,6 +8,7 @@ import { ScorecardCheck } from '../models/scorecard-check.model';
 import { MarkdownService } from 'ngx-markdown';
 import { ScorecardCheckDetails } from '../models/scorecard-check-details.model';
 import { ResultPriority } from '../enums/scorecard';
+import { CheckNotFoundError } from '../errors/scorecard';
 
 @Injectable({
   providedIn: 'root'
@@ -40,13 +41,17 @@ export class ScorecardService {
       );
   }
 
+  /**
+   * Fetch information about the scorecard check from the OpenSSF github markdown file.
+   * @param scorecardCheck
+   */
   getCheckDetails(
     scorecardCheck: ScorecardCheck
   ): Observable<ScorecardCheckDetails> {
     return this.httpClient.get(ScorecardService.CHECK_DETAILS_URL, { responseType: 'text' })
       .pipe(
         map(result => this.markdownService.parse(result).toString()),
-        map((result: string) => {
+        map(result => {
           const regex = /(<h2.*?>.*?<\/h2>)/gim;
           const target = `<h2 id="${scorecardCheck.documentation.anchor}">`;
           const segments = result.split(regex);
@@ -57,13 +62,34 @@ export class ScorecardService {
             }
           }
 
-          throw new Error('UNABLE TO PARSE SEGMENT');
+          throw new Error('Unable to correctly parse check information.');
         }),
         map(result => <ScorecardCheckDetails> {
           details: result,
           check: scorecardCheck
         })
       )
+  }
+
+  /**
+   * Get a scorecard check by its name.
+   * @param checkName
+   * @param scorecard
+   * @throws CheckNotFoundError
+   */
+  getCheckByName(
+    checkName: string,
+    scorecard: ScorecardModel
+  ): ScorecardCheck {
+    checkName = checkName.toLowerCase();
+
+    for (const check of scorecard.checks) {
+      if (check.name.toLowerCase() == checkName) {
+        return check;
+      }
+    }
+
+    throw new CheckNotFoundError();
   }
 
   /**

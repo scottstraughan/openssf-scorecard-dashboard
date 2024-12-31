@@ -26,7 +26,7 @@ import { LoadingState } from '../shared/LoadingState';
 import { catchError, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../shared/components/popup/popup.service';
-import { SelectedAccountService } from '../shared/services/selected-account.service';
+import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
 import { AccountService } from '../shared/services/account.service';
 import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-popup.service';
 
@@ -75,7 +75,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     protected title: Title,
     protected activatedRoute: ActivatedRoute,
     protected popupService: PopupService,
-    protected selectedAccountService: SelectedAccountService,
+    protected selectedAccountService: SelectedAccountStateService,
     protected accountService: AccountService,
     protected errorPopupService: ErrorPopupService
   ) { }
@@ -84,14 +84,14 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.repositories$
+    this.selectedAccountService.observeRepositories()
       .pipe(
         tap(repositories => this.totalRepositories.set(repositories.length)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.scorecardsLoading$
+    this.selectedAccountService.observeScorecardsLoadState()
       .pipe(
         tap(loadState => {
           this.scorecardLoadState.set(loadState);

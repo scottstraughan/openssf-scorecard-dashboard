@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { RepositoryModel } from '../models/repository.model';
-import { BehaviorSubject, forkJoin, map, Observable, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, map, Observable, of, take, tap } from 'rxjs';
 import { ScorecardService } from './scorecard.service';
 import { ScorecardModel } from '../models/scorecard.model';
 import { LoadingState } from '../LoadingState';
@@ -26,17 +26,37 @@ import { Injectable } from '@angular/core';
 import { AccountService } from './account.service';
 import { ScorecardRequest } from '../models/scorecard-request.model';
 import { Service } from '../enums/service';
+import { RepositoryNotFoundError } from '../errors/account';
+import { ScorecardNotFoundError } from '../errors/scorecard';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SelectedAccountService {
-  readonly account$: BehaviorSubject<AccountModel | undefined> = new BehaviorSubject<AccountModel | undefined>(undefined);
-  readonly repositories$: BehaviorSubject<RepositoryModel[]> = new BehaviorSubject<RepositoryModel[]>([]);
-  readonly scorecardsRequests$: BehaviorSubject<ScorecardRequest[]> = new BehaviorSubject<ScorecardRequest[]>([]);
-  readonly accountLoadState$: BehaviorSubject<LoadingState> = new BehaviorSubject<LoadingState>(LoadingState.LOADING);
-  readonly repositoriesLoadState$: BehaviorSubject<LoadingState> = new BehaviorSubject<LoadingState>(LoadingState.LOADING);
-  readonly scorecardsLoading$: BehaviorSubject<LoadingState> = new BehaviorSubject<LoadingState>(LoadingState.LOADING);
+export class SelectedAccountStateService {
+  /**
+   * The selected account.
+   */
+  private account$: BehaviorSubject<AccountModel | undefined> = new BehaviorSubject<AccountModel | undefined>(undefined);
+
+  /**
+   * The repositories of the selected account.
+   */
+  private repositories$: BehaviorSubject<RepositoryModel[]> = new BehaviorSubject<RepositoryModel[]>([]);
+
+  /**
+   * Load state for repositories.
+   */
+  private repositoriesLoadState$: BehaviorSubject<LoadingState> = new BehaviorSubject<LoadingState>(LoadingState.LOADING);
+
+  /**
+   * Load state for scorecards.
+   */
+  private scorecardsLoadState$: BehaviorSubject<LoadingState> = new BehaviorSubject<LoadingState>(LoadingState.LOADING);
+
+  /**
+   * A list of scorecard requests. If this list is non-zero, it means at least one scorecard is loading.
+   */
+  private scorecardsRequests$: BehaviorSubject<ScorecardRequest[]> = new BehaviorSubject<ScorecardRequest[]>([]);
 
   /**
    * Map to track the scorecard requests.
@@ -55,6 +75,55 @@ export class SelectedAccountService {
   ) { }
 
   /**
+   * Observe changes to the account model.
+   */
+  observeAccount(): Observable<AccountModel | undefined> {
+    return this.account$.asObservable();
+  }
+
+  /**
+   * Observe changes to the current account repositories.
+   */
+  observeRepositories(): Observable<RepositoryModel[]> {
+    return this.repositories$.asObservable();
+  }
+
+  /**
+   * Observe changes to the repositories load state.
+   */
+  observeRepositoriesLoadState(): Observable<LoadingState> {
+    return this.repositoriesLoadState$.asObservable();
+  }
+
+  /**
+   * Observe changes to the scorecard load states.
+   */
+  observeScorecardsLoadState(): Observable<LoadingState> {
+    return this.scorecardsLoadState$.asObservable();
+  }
+
+  /**
+   * Get a specific scorecard
+   * @param repository
+   */
+  getScorecardRequestByRepository(
+    repository: RepositoryModel
+  ): Observable<ScorecardRequest> {
+    return this.scorecardsRequests$
+      .pipe(
+        map(scorecardRequests => {
+          for (const scorecardRequest of scorecardRequests) {
+            if (scorecardRequest.repository.url == repository.url) {
+              return scorecardRequest;
+            }
+          }
+
+          throw new ScorecardNotFoundError();
+        })
+      );
+  }
+
+  /**
    * Select a specific account, updating and loading all the associated information.
    * @param service
    * @param accountName
@@ -65,14 +134,11 @@ export class SelectedAccountService {
   ): Observable<AccountModel> {
     this.reset();
 
-    this.accountLoadState$.next(LoadingState.LOADING);
-
     return this.accountService.getAccount(service, accountName)
       .pipe(
         tap(account => {
           this.account$.next(account);
           this.getRepositories(account);
-          this.accountLoadState$.next(LoadingState.LOAD_SUCCESS);
         })
       );
   }
@@ -151,6 +217,7 @@ export class SelectedAccountService {
   /**
    * Get a repository.
    * @param repositoryName
+   * @throws RepositoryNotFoundError
    */
   getRepository(
     repositoryName: string
@@ -164,7 +231,7 @@ export class SelectedAccountService {
             }
           }
 
-          throw new Error('Unable to find the repository with the provided name.');
+          throw new RepositoryNotFoundError();
         })
       )
   }
@@ -179,7 +246,7 @@ export class SelectedAccountService {
     account: AccountModel,
     repositories: RepositoryModel[]
   ): Observable<(ScorecardModel | undefined)[]> {
-    this.scorecardsLoading$.next(LoadingState.LOADING);
+    this.scorecardsLoadState$.next(LoadingState.LOADING);
 
     for (const repository of repositories) {
       this.updateScorecard(repository, undefined, LoadingState.LOADING);
@@ -194,7 +261,7 @@ export class SelectedAccountService {
     }
 
     return forkJoin(requests)
-      .pipe(tap(() => this.scorecardsLoading$.next(LoadingState.LOAD_SUCCESS)));
+      .pipe(tap(() => this.scorecardsLoadState$.next(LoadingState.LOAD_SUCCESS)));
   }
 
   /**
@@ -210,7 +277,7 @@ export class SelectedAccountService {
     updateGlobalLoadState: boolean = true
   ): Observable<ScorecardModel | undefined> {
     if (updateGlobalLoadState) {
-      this.scorecardsLoading$.next(LoadingState.LOADING);
+      this.scorecardsLoadState$.next(LoadingState.LOADING);
     }
 
     this.updateScorecard(repository, undefined, LoadingState.LOADING);
@@ -221,8 +288,17 @@ export class SelectedAccountService {
           this.updateScorecard(repository, scorecard, LoadingState.LOAD_SUCCESS);
 
           if (updateGlobalLoadState) {
-            this.scorecardsLoading$.next(LoadingState.LOAD_SUCCESS);
+            this.scorecardsLoadState$.next(LoadingState.LOAD_SUCCESS);
           }
+        }),
+        catchError(error => {
+          this.updateScorecard(repository, undefined, LoadingState.LOAD_SUCCESS);
+
+          if (updateGlobalLoadState) {
+            this.scorecardsLoadState$.next(LoadingState.LOAD_SUCCESS);
+          }
+
+          return of(error)
         })
       )
   }
