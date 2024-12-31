@@ -1,96 +1,57 @@
 :host {
   --ring-size: 60px;
 
-  display: block;
-  container: check-container / inline-size;
-
-  a {
+  osd-faded-bg {
     display: flex;
-    flex-direction: column-reverse;
-    border: var(--default-border);
+    gap: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    container: check-container / inline-size;
     border-radius: var(--default-border-radius);
     box-shadow: var(--default-box-shadow);
     transition: var(--default-transition);
-    position: relative;
+    border-left: solid 8px transparent;
+    background-color: rgba(255, 255, 255, .5);
+    overflow: hidden;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    @container check-container (min-width: 430px) {
-      flex-direction: row;
-      gap: 1rem;
-    }
-
-    .details,
-    .score {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-
-      @container check-container (min-width: 450px) {
-        padding: 1.8rem;
-      }
-
-      @container check-container (max-width: 430px) {
-        justify-content: center;
-        text-align: center;
-      }
+      background-color: var(--ui-primary-color);
     }
 
     .details {
       flex: 1;
-    }
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
 
-    .priority {
-      padding: .4rem 1rem;
-      background-color: red;
-      color: rgba(255, 255, 255, .9);
-      border-radius: 0 0 4px 4px;
-      font-size: .7rem;
-      display: inline-block;
-      vertical-align: middle;
-
-      @container check-container (min-width: 450px) {
-        position: absolute;
-        left: 2rem;
-        top: -1px;
+      * {
+        padding: 0;
+        margin: 0;
+        display: block;
       }
 
-      &.critical {
-        background-color: #960003;
+      h1 {
+        font-size: 1.1rem;
       }
 
-      &.high {
-        background-color: #DF2A19;
+      .priority {
+        font-size: .8rem;
+        opacity: .6;
       }
 
-      &.medium {
-        background-color: #F7860F;
-      }
-
-      &.low {
-        background-color: #F4BD0C;
+      p {
+        opacity: .8;
       }
     }
 
-    h1, p {
-      margin: 0;
-    }
+    .score {
+      display: flex;
+      align-items: center;
 
-    h1 {
-      font-size: 1.1rem;
-      font-weight: 500;
-    }
-
-    p {
-      margin-top: .3rem;
-      opacity: .5;
-    }
-
-    osd-score-ring {
-      width: var(--ring-size);
-      height: var(--ring-size);
+      osd-score-ring {
+        width: 50px;
+        height: 50px;
+      }
     }
   }
 }

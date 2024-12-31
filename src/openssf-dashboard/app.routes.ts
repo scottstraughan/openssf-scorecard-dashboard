@@ -34,6 +34,10 @@ export const routes: Routes = [
       {
         path: ':repositoryName',
         component: ScorecardViewComponent
+      },
+      {
+        path: ':repositoryName/:checkName',
+        component: ScorecardViewComponent
       }
     ]
   },
@@ -41,4 +45,4 @@ export const routes: Routes = [
     path: '**',
     component: HomeViewComponent
   },
-];
+]

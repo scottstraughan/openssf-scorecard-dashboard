@@ -16,47 +16,63 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, OnInit, signal, WritableSignal } from '@angular/core';
-import { DatePipe, NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { DatePipe, Location } from '@angular/common';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CheckComponent } from './components/check/check.component';
 import { RepositoryModel } from '../../../shared/models/repository.model';
-import { SelectedAccountService } from '../../../shared/services/selected-account.service';
-import { catchError, of, take, tap } from 'rxjs';
+import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
+import { catchError, of, Subject, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { ScorecardService } from '../../../shared/services/scorecard.service';
 import { LoadingState } from '../../../shared/LoadingState';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
+import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
+import { FadedBgComponent } from '../../../shared/components/faded-bg/faded-bg.component';
+import { ScorecardCheckDetails } from '../../../shared/models/scorecard-check-details.model';
+import { AccountModel } from '../../../shared/models/account.model';
+import { GenericError } from '../../../shared/errors/generic';
+import { ScorecardNotFoundError } from '../../../shared/errors/scorecard';
+import { InvalidAccountError } from '../../../shared/errors/account';
 
 @Component({
   selector: 'osd-scorecard-view',
   standalone: true,
   imports: [
-    NgClass,
     ScoreRingComponent,
     ButtonComponent,
     CheckComponent,
     DatePipe,
-    LoadingComponent
+    LoadingComponent,
+    FadedBgComponent
   ],
   templateUrl: './scorecard-view.component.html',
   styleUrl: './scorecard-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScorecardViewComponent implements OnInit {
+export class ScorecardViewComponent implements OnInit, OnDestroy {
   protected readonly LoadingState = LoadingState;
+  protected readonly ScoreRingComponent = ScoreRingComponent;
+
+  protected account: AccountModel | undefined;
+  protected cleanup = new Subject<void>();
 
   readonly fatalError: WritableSignal<ErrorPopupError | undefined> = signal(undefined);
   readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
   readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
 
+  readonly selectedScorecardCheck: WritableSignal<ScorecardCheck | undefined> = signal(undefined);
+  readonly scorecardCheckDetailsLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly scorecardCheckDetails: WritableSignal<ScorecardCheckDetails | undefined> = signal(undefined);
+
   /**
    * Constructor.
    * @param router
+   * @param location
    * @param selectedAccountService
    * @param activatedRoute
    * @param scorecardService
@@ -64,7 +80,8 @@ export class ScorecardViewComponent implements OnInit {
    */
   constructor(
     protected router: Router,
-    protected selectedAccountService: SelectedAccountService,
+    protected location: Location,
+    protected selectedAccountService: SelectedAccountStateService,
     protected activatedRoute: ActivatedRoute,
     protected scorecardService: ScorecardService,
     protected errorPopupService: ErrorPopupService
@@ -74,15 +91,23 @@ export class ScorecardViewComponent implements OnInit {
    * @inheritdoc
    */
   ngOnInit(): void {
+    this.selectedAccountService.observeScorecardsLoadState()
+      .pipe(
+        tap(loadState => this.loading.set(loadState)),
+        takeUntil(this.cleanup)
+      )
+      .subscribe();
+
     this.activatedRoute.params
       .pipe(
         tap(params => {
-          this.selectedAccountService.account$
+          this.selectedAccountService.observeAccount()
             .pipe(
               tap(account => {
+                this.account = account
+
                 if (!account) {
-                  this.handleFatalError('Account Not Found', 'The requested account was not found.')
-                  return;
+                  return this.handleError(new InvalidAccountError())
                 }
 
                 this.selectedAccountService.getRepository(params['repositoryName'])
@@ -93,27 +118,31 @@ export class ScorecardViewComponent implements OnInit {
                       this.scorecardService.getScorecard(account, repository)
                         .pipe(
                           tap(scorecard => {
+                            this.loading.set(LoadingState.LOAD_SUCCESS);
+                            this.scorecard.set(scorecard);
+
                             if (!scorecard) {
-                              this.handleFatalError(
-                                'Scorecard Not Found',
-                                'There was a problem loading the scorecard associated with this repository.')
-                            } else {
-                              this.loading.set(LoadingState.LOAD_SUCCESS);
-                              this.scorecard.set(scorecard);
+                              throw new ScorecardNotFoundError();
+                            }
+
+                            if (params['checkName']) {
+                              try {
+                                this.setSelectedCheck(
+                                  this.scorecardService.getCheckByName(params['checkName'], scorecard));
+                              } catch (error: any) {
+                                return this.handleError(error, false);
+                              }
                             }
                           }),
                           take(1)
                         )
                         .subscribe();
                     }),
-                    take(1),
                     catchError(error => {
-                      this.handleFatalError(
-                        'Repository Not Found',
-                        'The requested repository was not found.')
-
-                      return of(error);
+                      this.handleError(error, true);
+                      return of();
                     }),
+                    take(1)
                   )
                   .subscribe();
               }),
@@ -126,35 +155,10 @@ export class ScorecardViewComponent implements OnInit {
   }
 
   /**
-   * Handle a fatal error.
-   * @param title
-   * @param message
-   * @param icon
+   * @inheritdoc
    */
-  handleFatalError(
-    title: string,
-    message: string,
-    icon: string = 'error'
-  ) {
-    this.fatalError.set({title, message, icon});
-
-    this.errorPopupService.showPopup(title, message, icon);
-
-    this.router.navigate([`../`])
-      .then();
-  }
-
-  /**
-   * Get the background color, based on the result score, for the UI.
-   */
-  getScoreBackgroundColor() {
-    const repository = this.repository();
-
-    if (!repository || !repository.scorecard) {
-      return '';
-    }
-
-    return ScoreRingComponent.getColorVariableForScore(repository.scorecard.score);
+  ngOnDestroy(): void {
+    this.cleanup.complete();
   }
 
   /**
@@ -163,5 +167,105 @@ export class ScorecardViewComponent implements OnInit {
   onBackClicked() {
     this.router.navigate(['../'])
       .then();
+  }
+
+  /**
+   * Called when a user wishes to close the scorecard check details.
+   */
+  onCloseDetails() {
+    this.selectedScorecardCheck.set(undefined);
+    this.scorecardCheckDetails.set(undefined);
+  }
+
+  /**
+   * Called when the user clicks on the check.
+   * @param check
+   */
+  onClicked(
+    check: ScorecardCheck
+  ) {
+    this.setSelectedCheck(check);
+  }
+
+  /**
+   * Check if a check is selected.
+   * @param check
+   */
+  isSelected(
+    check: ScorecardCheck
+  ) {
+    return this.selectedScorecardCheck()?.name == check.name;
+  }
+
+  /**
+   * Get the priority color for the UI.
+   * @param scorecardCheckDetails
+   */
+  getPriorityColor(
+    scorecardCheckDetails: ScorecardCheckDetails
+  ) {
+    return this.scorecardService.getPriorityColor(scorecardCheckDetails.check.priority);
+  }
+
+  /**
+   * Handle an error.
+   * @param error
+   * @param fatal
+   * @private
+   */
+  private handleError(
+    error: GenericError,
+    fatal: boolean = true
+  ) {
+    this.errorPopupService.handleError(error);
+
+    if (fatal) {
+      this.fatalError.set(this.errorPopupService.convertError(error));
+
+      this.router.navigate([`../`])
+        .then();
+    }
+  }
+
+  /**
+   * Set the currently selected check, showing the information panel.
+   * @param check
+   */
+  private setSelectedCheck(
+    check: ScorecardCheck | undefined
+  ) {
+    if (!check) {
+      return;
+    }
+
+    const account = this.account;
+    const repository = this.repository();
+
+    if (!account || !repository) {
+      return ;
+    }
+
+    const urlTree = this.router.createUrlTree([
+      account.service,
+      account.account,
+      repository.name,
+      check.name
+    ]);
+
+    this.selectedScorecardCheck.set(check);
+    this.scorecardCheckDetailsLoadState.set(LoadingState.LOADING);
+
+    this.scorecardService.getCheckDetails(check)
+      .pipe(
+        tap(details => {
+          this.scorecardCheckDetails.set(details);
+          this.scorecardCheckDetailsLoadState.set(LoadingState.LOAD_SUCCESS);
+
+          // Update the URL
+          this.location.replaceState(this.router.serializeUrl(urlTree))
+        }),
+        take(1)
+      )
+      .subscribe();
   }
 }

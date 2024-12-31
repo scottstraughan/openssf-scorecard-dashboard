@@ -1,17 +1,20 @@
 @if (check(); as check) {
-  <a [href]="check.documentation.url" target="_blank" rel="noopener">
-    <div class="priority"
-         [ngClass]="check.priority.toString().toLowerCase()">{{ check.priority }}</div>
+  <osd-faded-bg
+      [color]="getPriorityColor(check, false)"
+      [ngClass]="[check.priority, selected() ? 'selected' : '']"
+      [style.border-left-color]="getPriorityColor(check)">
 
+    <!-- Details for the check -->
     <div class="details">
-      <div>
-        <h1 [innerHTML]="check.name"></h1>
-        <p [innerHTML]="check.reason"></p>
-      </div>
+      <div class="priority">{{ check.priority }}</div>
+      <h1 [innerHTML]="check.name"></h1>
+      <p [innerHTML]="check.reason"></p>
     </div>
 
+    <!-- Score ring -->
     <div class="score">
-      <osd-score-ring [score]="check.score"></osd-score-ring>
+      <osd-score-ring [allowReload]="false" [score]="check.score"></osd-score-ring>
     </div>
-  </a>
+
+  </osd-faded-bg>
 }

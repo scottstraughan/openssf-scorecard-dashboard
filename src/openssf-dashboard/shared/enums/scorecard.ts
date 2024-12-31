@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,25 +16,12 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ApplicationConfig, SecurityContext } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
-import { routes } from './app.routes';
-import { provideHttpClient, withFetch } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideMarkdown } from 'ngx-markdown';
-import { gfmHeadingId } from 'marked-gfm-heading-id';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient(
-      withFetch()
-    ),
-    provideAnimations(),
-    provideMarkdown({
-      sanitize: SecurityContext.NONE,
-      markedExtensions: [gfmHeadingId()],
-    })
-  ]
-};
+/**
+ * Enum representing priority.
+ */
+export enum ResultPriority {
+  CRITICAL = 'critical',
+  HIGH = 'high',
+  MEDIUM = 'medium',
+  LOW = 'low'
+}

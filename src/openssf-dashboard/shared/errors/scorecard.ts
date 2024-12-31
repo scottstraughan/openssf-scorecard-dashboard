@@ -28,3 +28,14 @@ export class ScorecardNotFoundError extends GenericError {
     super('Scorecard Not Found', message || 'The scorecard was not found for the provided repository.');
   }
 }
+
+/**
+ * Error used for when there is no scorecard check but there should be.
+ */
+export class CheckNotFoundError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Scorecard Check Not Found', message || 'The scorecard check was not found in the scorecard.');
+  }
+}

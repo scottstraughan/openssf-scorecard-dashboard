@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ResultPriority } from '../services/scorecard.service';
+import { ResultPriority } from '../enums/scorecard';
 
 /**
  * Represents a scorecard check item.
@@ -29,5 +29,6 @@ export interface ScorecardCheck {
   priority: ResultPriority
   documentation: {
     url: string
+    anchor: string
   }
 }

@@ -16,22 +16,20 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
+import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ScoreRingComponent } from '../../../../../shared/components/score-ring/score-ring.component';
-import { DatePipe, JsonPipe, NgClass } from '@angular/common';
-import { LoadingComponent } from '../../../../../shared/components/loading/loading.component';
-
 import { ScorecardCheck } from '../../../../../shared/models/scorecard-check.model';
+import { FadedBgComponent } from '../../../../../shared/components/faded-bg/faded-bg.component';
+import { ScorecardService } from '../../../../../shared/services/scorecard.service';
 
 @Component({
   selector: 'osd-scorecard-check',
   standalone: true,
   imports: [
     ScoreRingComponent,
-    DatePipe,
-    LoadingComponent,
-    JsonPipe,
-    NgClass
+    NgClass,
+    FadedBgComponent
   ],
   templateUrl: './check.component.html',
   styleUrl: './check.component.scss',
@@ -39,4 +37,29 @@ import { ScorecardCheck } from '../../../../../shared/models/scorecard-check.mod
 })
 export class CheckComponent {
   readonly check = input.required<ScorecardCheck>();
+  readonly selected = input<boolean>();
+
+  /**
+   * Constructor.
+   * @param scorecardService
+   */
+  constructor(
+    protected scorecardService: ScorecardService
+  ) { }
+
+  /**
+   * Get priority color.
+   * @param check
+   * @param showOnlyOnSelected
+   */
+  getPriorityColor(
+    check: ScorecardCheck,
+    showOnlyOnSelected: boolean = true
+  ) {
+    if (showOnlyOnSelected || this.selected()) {
+      return this.scorecardService.getPriorityColor(check.priority);
+    }
+
+    return '';
+  }
 }

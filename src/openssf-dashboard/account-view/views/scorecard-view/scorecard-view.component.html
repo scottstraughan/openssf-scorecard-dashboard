@@ -1,5 +1,5 @@
 @if (fatalError(); as fatalError) {
-  <div class="error-message">
+  <div class="panel error-message">
     <div>
       <span class="material-symbols-outlined">{{ fatalError.icon }}</span>
       <h1 [innerHTML]="fatalError.title"></h1>
@@ -10,36 +10,65 @@
   @if (loading() == LoadingState.LOAD_SUCCESS) {
     @if (repository(); as repository) {
       @if (scorecard(); as scorecard) {
-        <div class="header">
-          <div class="score-color-bg" [style.background-color]="getScoreBackgroundColor()"></div>
+        <div class="panel scorecard">
 
-          @if (scorecard.score; as score) {
-            <div class="score">
-              <osd-score-ring [score]="score" fontSize="14px"></osd-score-ring>
+          <osd-faded-bg
+              class="header"
+              [opacity]=".2"
+              [color]="ScoreRingComponent.getColorVariableForScore(scorecard.score || 0)">
+            @if (scorecard.score; as score) {
+              <div class="score">
+                <osd-score-ring [score]="score" fontSize="14px"></osd-score-ring>
+              </div>
+            }
+
+            <div class="title">
+              <div>
+                <h1 [innerHTML]="repository.name"></h1>
+                <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
+              </div>
             </div>
-          }
 
-          <div class="title">
-            <div>
-              <h1 [innerHTML]="repository.name"></h1>
-              <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
+            <div class="actions">
+              <osd-button icon="arrow_back" label="Back" (clicked)="onBackClicked()"></osd-button>
+              <a [href]="scorecard.url" target="_blank" rel="noopener">
+                <osd-button icon="link" label="scorecard.dev"></osd-button>
+              </a>
             </div>
-          </div>
+          </osd-faded-bg>
 
-          <div class="actions">
-            <osd-button icon="arrow_back" label="Back" (clicked)="onBackClicked()"></osd-button>
-
-            <a [href]="scorecard.url" target="_blank" rel="noopener">
-              <osd-button icon="link" label="View on scorecard.dev"></osd-button>
-            </a>
+          <div class="container">
+            @for (check of repository.scorecard?.checks; track check.name) {
+              <osd-scorecard-check
+                  [selected]="isSelected(check)"
+                  (click)="onClicked(check)"
+                  [check]="check"></osd-scorecard-check>
+            }
           </div>
         </div>
 
-        <div class="container">
-          @for (check of repository.scorecard?.checks; track check.name) {
-            <osd-scorecard-check [check]="check"></osd-scorecard-check>
-          }
-        </div>
+        @if (selectedScorecardCheck()) {
+          <div class="panel check-details">
+            @if (scorecardCheckDetailsLoadState() == LoadingState.LOAD_SUCCESS) {
+              @if (scorecardCheckDetails(); as scorecardCheckDetails) {
+                <div class="panel check-details">
+                  <osd-faded-bg class="header" [color]="getPriorityColor(scorecardCheckDetails)">
+                    <osd-button icon="close" label="Close" (click)="onCloseDetails()"></osd-button>
+                    <a [href]="scorecardCheckDetails.check.documentation.url" target="_blank" rel="noopener">
+                      <osd-button icon="link" label="View on GitHub.com"></osd-button>
+                    </a>
+                  </osd-faded-bg>
+
+                  <div class="container" [innerHTML]="scorecardCheckDetails.details">
+                    <osd-loading></osd-loading>
+                  </div>
+                </div>
+              }
+            } @else {
+              <osd-loading></osd-loading>
+            }
+          </div>
+        }
       }
     }
   } @else {
