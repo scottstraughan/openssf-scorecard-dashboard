@@ -18,17 +18,15 @@
 
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../shared/components/button/button.component';
-import { InputComponent } from '../shared/components/input/input.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/LoadingState';
 import { catchError, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
-import { NgClass } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../shared/components/popup/popup.service';
-import { SelectedAccountService } from '../shared/services/selected-account.service';
+import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
 import { AccountService } from '../shared/services/account.service';
 import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-popup.service';
 
@@ -37,10 +35,8 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
   standalone: true,
   imports: [
     ButtonComponent,
-    InputComponent,
     ScoreRingComponent,
     LoadingComponent,
-    NgClass,
     RouterOutlet
   ],
   templateUrl: './account-view.component.html',
@@ -79,7 +75,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     protected title: Title,
     protected activatedRoute: ActivatedRoute,
     protected popupService: PopupService,
-    protected selectedAccountService: SelectedAccountService,
+    protected selectedAccountService: SelectedAccountStateService,
     protected accountService: AccountService,
     protected errorPopupService: ErrorPopupService
   ) { }
@@ -88,14 +84,14 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.repositories$
+    this.selectedAccountService.observeRepositories()
       .pipe(
         tap(repositories => this.totalRepositories.set(repositories.length)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.scorecardsLoading$
+    this.selectedAccountService.observeScorecardsLoadState()
       .pipe(
         tap(loadState => {
           this.scorecardLoadState.set(loadState);
