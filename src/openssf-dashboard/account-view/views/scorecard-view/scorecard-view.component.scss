@@ -47,13 +47,11 @@
       gap: 1rem;
       flex-direction: column;
       box-shadow: var(--default-box-shadow);
+      text-align: center;
 
       @container scorecard (min-width: 650px) {
         flex-direction: row;
-      }
-
-      @container scorecard (max-width: 650px) {
-        text-align: center;
+        text-align: left;
       }
 
       .score,
@@ -75,11 +73,6 @@
         osd-score-ring {
           height: 40px;
           width: 40px;
-
-          @container scorecard-popup (max-width: 650px) {
-            height: 60px;
-            width: 60px;
-          }
         }
       }
 

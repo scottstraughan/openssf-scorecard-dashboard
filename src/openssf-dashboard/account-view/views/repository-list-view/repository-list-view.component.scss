@@ -28,10 +28,9 @@
     --seperation: 1rem;
 
     flex: 1;
-    overflow: auto;
     container: repo-container / inline-size;
     padding: var(--seperation);
-    background-color: var(--ui-secondary-color);
+    overflow: scroll;
 
     .list {
       display: flex;
