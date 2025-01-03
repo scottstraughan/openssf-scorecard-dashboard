@@ -49,8 +49,6 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 export class ScoreRingComponent {
   readonly hoverDelay: number = 350;
   readonly score = input.required<number>();
-  readonly thickness = input<string>('5px');
-  readonly fontSize = input<string>('1.5rem');
   readonly allowReload = input<boolean>(true);
 
   protected timeout: any | undefined;
@@ -58,8 +56,8 @@ export class ScoreRingComponent {
   @HostBinding('style.--progress')
   percentage: string = '0%';
 
-  @HostBinding('style.--thickness')
-  thicknessBinding: string = '5px';
+  @HostBinding('style.--cursor')
+  cursor: string = 'default';
 
   hover: WritableSignal<boolean> = signal(false);
 
@@ -71,7 +69,10 @@ export class ScoreRingComponent {
   ) {
     effect(() => {
       this.percentage = Math.round(this.score() * 10) + '%';
-      this.thicknessBinding = this.thickness();
+
+      if (this.allowReload()) {
+        this.cursor = 'pointer';
+      }
 
       this.cdRef.detectChanges();
     });
