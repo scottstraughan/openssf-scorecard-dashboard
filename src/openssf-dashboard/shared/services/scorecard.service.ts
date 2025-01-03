@@ -14,6 +14,9 @@ import { CheckNotFoundError } from '../errors/scorecard';
   providedIn: 'root'
 })
 export class ScorecardService {
+  /**
+   * This URL is linked to the OpenSSF GitHub that contains information on scorecard checks.
+   */
   static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md';
 
   /**
@@ -42,7 +45,7 @@ export class ScorecardService {
   }
 
   /**
-   * Fetch information about the scorecard check from the OpenSSF github markdown file.
+   * Fetch information about the scorecard check from the OpenSSF GitHub markdown file.
    * @param scorecardCheck
    */
   getCheckDetails(
@@ -90,6 +93,25 @@ export class ScorecardService {
     }
 
     throw new CheckNotFoundError();
+  }
+
+  /**
+   * Get the priority color of a result.
+   * @param resultPriority
+   */
+  getPriorityColor(
+    resultPriority: ResultPriority
+  ): string {
+    switch (resultPriority) {
+      case ResultPriority.CRITICAL:
+        return '#960003';
+      case ResultPriority.HIGH:
+        return '#DF2A19';
+      case ResultPriority.MEDIUM:
+        return '#F7860F';
+      case ResultPriority.LOW:
+        return '#F4BD0C';
+    }
   }
 
   /**
@@ -199,20 +221,5 @@ export class ScorecardService {
     }
 
     return ResultPriority.MEDIUM;
-  }
-
-  getPriorityColor(
-    resultPriority: ResultPriority
-  ): string {
-    switch (resultPriority) {
-      case ResultPriority.CRITICAL:
-        return '#960003';
-      case ResultPriority.HIGH:
-        return '#DF2A19';
-      case ResultPriority.MEDIUM:
-        return '#F7860F';
-      case ResultPriority.LOW:
-        return '#F4BD0C';
-    }
   }
 }

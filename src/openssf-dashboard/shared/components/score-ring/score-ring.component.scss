@@ -4,9 +4,11 @@
   position: relative;
   display: block;
   container: score-container / inline-size;
+  cursor: var(--cursor);
+  user-select: none;
 
   --progress: 50%;
-  --thickness: 5px;
+  --thickness: 6cqw;
   --color: blue;
 
   .base,
