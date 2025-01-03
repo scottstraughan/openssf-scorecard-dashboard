@@ -8,7 +8,8 @@
       @for (account of serviceAccounts(); track account.account) {
         <a [routerLink]="[account.service + '/' + account.account]"
            routerLinkActive="selected"
-           class="item">
+           class="item"
+           title="View the {{ account.name }} account">
           <div [style.background-image]="'url(' + account.icon + ')'"></div>
         </a>
       }
@@ -22,8 +23,6 @@
     <div class="button" title="View the about/help" (click)="onAboutClicked()">
       <span class="material-symbols-outlined">help</span>
     </div>
-
-    <a class="url" href="https://openssf.org" rel="noopener">openssf.org</a>
   </div>
 </nav>
 
