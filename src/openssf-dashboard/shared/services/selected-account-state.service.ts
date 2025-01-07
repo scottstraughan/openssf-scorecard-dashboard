@@ -205,7 +205,7 @@ export class SelectedAccountStateService {
           this.repositories$.next(repositories);
           this.repositoriesLoadState$.next(LoadingState.LOAD_SUCCESS);
 
-          this.getScorecards(account, repositories)
+          this.getScorecards(account, repositories, reload)
             .pipe(take(1))
             .subscribe();
         }),
@@ -258,8 +258,7 @@ export class SelectedAccountStateService {
 
     for (const repository of repositories) {
       requests.push(
-        this.getScorecard(account, repository, false, forceReload)
-      );
+        this.getScorecard(account, repository, false, forceReload));
     }
 
     return forkJoin(requests)
