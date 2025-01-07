@@ -5,8 +5,8 @@
 
   <div class="accounts">
     <div class="list">
-      @for (account of serviceAccounts(); track account.account) {
-        <a [routerLink]="[account.service + '/' + account.account]"
+      @for (account of serviceAccounts(); track account.tag) {
+        <a [routerLink]="[account.service + '/' + account.tag]"
            routerLinkActive="selected"
            class="item"
            title="View the {{ account.name }} account">

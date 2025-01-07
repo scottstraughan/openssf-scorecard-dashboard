@@ -16,21 +16,23 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { BehaviorSubject, catchError, Observable, Observer, of, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, Observable, Observer, of, take, tap, } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
-import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { DuplicateAccountError, MinimumAccountError } from '../errors/account';
+import { MinimumAccountError } from '../errors/account';
 import { Service } from '../enums/service';
 import { ServiceNotSupportedError } from '../errors/service';
+import { TransientStorage } from './transient-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  static readonly STORAGE_KEY = 'osf-accounts';
+  /**
+   * Default accounts, for when nothing is stored.
+   */
   static readonly DEFAULT_ACCOUNTS: any[] = [
     {
       service: Service.GITHUB,
@@ -38,31 +40,49 @@ export class AccountService {
     }
   ];
 
-  readonly accounts$: BehaviorSubject<AccountModel[]> = new BehaviorSubject<AccountModel[]>([]);
+  /**
+   * Storage timeout for accounts.
+   */
+  static readonly STORAGE_ACCOUNT_TIMEOUT_IN_DAYS = 30;
+
+  /**
+   * Storage timeout for account repositories.
+   */
+  static readonly STORAGE_REPOSITORIES_TIMEOUT_IN_DAYS = 14;
+
+  /**
+   * Accounts observable.
+   */
+  private accounts$: BehaviorSubject<AccountModel[]> = new BehaviorSubject<AccountModel[]>([]);
+
+  /**
+   * Internal accounts map.
+   * @private
+   */
   private accounts: Map<string, AccountModel> = new Map();
 
   /**
    * Constructor
-   * @param storageService
+   * @param transientStorage
    * @param githubAccountService
    */
   constructor(
-    @Inject(LOCAL_STORAGE) private storageService: StorageService,
+    private transientStorage: TransientStorage,
     private githubAccountService: GithubService
   ) {
-    if (this.storageService.has(AccountService.STORAGE_KEY)) {
-      try {
-        this.setAccounts(this.storageService.get(AccountService.STORAGE_KEY));
-      } catch (error) { }
-    }
+    this.initializeAccounts()
+      .pipe(
+        tap(() => this.notifyObservers()),
+        take(1),
+      )
+      .subscribe();
+  }
 
-    if (this.accounts.size == 0) {
-      for (const defaultAccount of AccountService.DEFAULT_ACCOUNTS) {
-        this.add(defaultAccount.service, defaultAccount.account)
-          .pipe(take(1))
-          .subscribe();
-      }
-    }
+  /**
+   * Get the accounts observable.
+   */
+  observeAccounts(): Observable<AccountModel[]> {
+    return this.accounts$.asObservable();
   }
 
   /**
@@ -82,7 +102,10 @@ export class AccountService {
       return of(existingAccount);
     }
 
-    return this.add(service, accountName, apiToken);
+    return this.add(service, accountName, apiToken)
+      .pipe(
+        tap(account => console.log(account))
+      );
   }
 
   /**
@@ -97,10 +120,10 @@ export class AccountService {
     const storageKey = AccountService.createRepositoryStorageKey(account);
 
     if (reload) {
-      this.storageService.remove(storageKey);
+      this.transientStorage.remove(storageKey);
     }
 
-    const repositories = this.storageService.get(storageKey);
+    const repositories = this.transientStorage.get<RepositoryModel[]>(storageKey);
 
     if (repositories) {
       return of(repositories);
@@ -110,7 +133,8 @@ export class AccountService {
       case Service.GITHUB:
         return this.githubAccountService.getRepositories(account)
           .pipe(
-            tap(repositories => this.storageService.set(storageKey, repositories))
+            tap(repositories => this.transientStorage.set<RepositoryModel[]>(
+              storageKey, repositories, AccountService.STORAGE_REPOSITORIES_TIMEOUT_IN_DAYS))
           );
     }
 
@@ -118,7 +142,7 @@ export class AccountService {
   }
 
   /**
-   * Add a new account.
+   * Add a new account. If the account exists, it will just return it. If it doesn't exist, it will fetch it.
    * @param service
    * @param accountName
    * @param apiToken
@@ -128,16 +152,12 @@ export class AccountService {
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
-    return this.fetchAccount(service, accountName, apiToken)
-      .pipe(
-        tap(account => {
-          if (this.accounts.has(AccountService.createAccountMapKey(service, accountName))) {
-            throw new DuplicateAccountError();
-          }
+    if (this.accounts.has(AccountService.createAccountMapKey(service, accountName))) {
+      return this.getAccount(service, accountName, apiToken);
+    }
 
-          this.setAccounts([account]);
-        })
-      )
+    return this.fetchAccount(service, accountName, apiToken)
+      .pipe(tap(account => this.setAccounts([account])));
   }
 
   /**
@@ -151,9 +171,38 @@ export class AccountService {
       throw new MinimumAccountError();
     }
 
-    this.accounts.delete(AccountService.createAccountMapKey(account.service, account.account));
-    this.storageService.remove(AccountService.createRepositoryStorageKey(account));
+    this.accounts.delete(AccountService.createAccountMapKey(account.service, account.tag));
+    this.transientStorage.remove(AccountService.createRepositoryStorageKey(account));
     this.setAccounts(Array.from(this.accounts.values()));
+  }
+
+  /**
+   * Initialize the accounts, will notify observers once initialization is completed.
+   */
+  private initializeAccounts(): Observable<any> {
+    const cached = this.transientStorage.get<AccountModel[]>('accounts');
+
+    if (Array.isArray(cached) && cached.length > 0) {
+      this.setAccounts(cached, false);
+      return of(undefined);
+    }
+
+    const defaultAccountsObservables = AccountService.DEFAULT_ACCOUNTS.map(
+      defaultAccount => this.add(defaultAccount.service, defaultAccount.account)
+        .pipe(catchError(() => of()))); // Skip any errors
+
+    return forkJoin(defaultAccountsObservables)
+      .pipe(tap(accounts => {
+        this.setAccounts(accounts, false);
+      }));
+  }
+
+  /**
+   * Notify any observers to changes to the account list.
+   * @private
+   */
+  private notifyObservers() {
+    this.accounts$.next(Array.from(this.accounts.values()));
   }
 
   /**
@@ -193,18 +242,24 @@ export class AccountService {
   /**
    * Set the accounts, notifying any observers of changes.
    * @param accounts
+   * @param notifySubscribers
    * @private
    */
   private setAccounts(
-    accounts: AccountModel[]
+    accounts: AccountModel[],
+    notifySubscribers: boolean = true
   ) {
     for (const account of accounts) {
       this.accounts.set(
-        AccountService.createAccountMapKey(account.service, account.account), account);
+        AccountService.createAccountMapKey(account.service, account.tag), account);
     }
 
-    this.accounts$.next(Array.from(this.accounts.values()));
-    this.storageService.set(AccountService.STORAGE_KEY, Array.from(this.accounts.values()));
+    if (notifySubscribers) {
+      this.notifyObservers();
+    }
+
+    this.transientStorage.set<AccountModel[]>(
+      'accounts', Array.from(this.accounts.values()), AccountService.STORAGE_ACCOUNT_TIMEOUT_IN_DAYS);
   }
 
   /**
@@ -228,7 +283,7 @@ export class AccountService {
   private static createRepositoryStorageKey(
     account: AccountModel
   ): string {
-    return 'osf-repositories-' + account.service + '-' + account.account;
+    return 'osf-repositories-' + account.service + '-' + account.tag;
   }
 }
 

@@ -154,11 +154,11 @@ export class SelectedAccountStateService {
     repository?: RepositoryModel
   ) {
     if (repository) {
-      return this.getScorecard(account, repository)
+      return this.getScorecard(account, repository, true, true)
         .subscribe();
     }
 
-    return this.getScorecards(account, this.repositories$.getValue())
+    return this.getScorecards(account, this.repositories$.getValue(), true)
       .subscribe();
   }
 
@@ -240,11 +240,13 @@ export class SelectedAccountStateService {
    * Fetch all the scorecards for the provided repositories, notifying observers of changes.
    * @param account
    * @param repositories
+   * @param forceReload
    * @private
    */
   private getScorecards(
     account: AccountModel,
-    repositories: RepositoryModel[]
+    repositories: RepositoryModel[],
+    forceReload: boolean = false
   ): Observable<(ScorecardModel | undefined)[]> {
     this.scorecardsLoadState$.next(LoadingState.LOADING);
 
@@ -256,12 +258,14 @@ export class SelectedAccountStateService {
 
     for (const repository of repositories) {
       requests.push(
-        this.getScorecard(account, repository, false)
+        this.getScorecard(account, repository, false, forceReload)
       );
     }
 
     return forkJoin(requests)
-      .pipe(tap(() => this.scorecardsLoadState$.next(LoadingState.LOAD_SUCCESS)));
+      .pipe(
+        tap(() => this.scorecardsLoadState$.next(LoadingState.LOAD_SUCCESS))
+      );
   }
 
   /**
@@ -269,12 +273,14 @@ export class SelectedAccountStateService {
    * @param account
    * @param repository
    * @param updateGlobalLoadState
+   * @param forceReload
    * @private
    */
   private getScorecard(
     account: AccountModel,
     repository: RepositoryModel,
-    updateGlobalLoadState: boolean = true
+    updateGlobalLoadState: boolean = true,
+    forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
     if (updateGlobalLoadState) {
       this.scorecardsLoadState$.next(LoadingState.LOADING);
@@ -282,7 +288,7 @@ export class SelectedAccountStateService {
 
     this.updateScorecard(repository, undefined, LoadingState.LOADING);
 
-    return this.scorecardService.getScorecard(account, repository)
+    return this.scorecardService.getScorecard(account, repository, forceReload)
       .pipe(
         tap(scorecard => {
           this.updateScorecard(repository, scorecard, LoadingState.LOAD_SUCCESS);

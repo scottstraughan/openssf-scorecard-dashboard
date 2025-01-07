@@ -23,7 +23,7 @@ import { Service } from '../enums/service';
  */
 export interface AccountModel {
   service: Service
-  account: string
+  tag: string
   name: string
   icon: string
   description: string
