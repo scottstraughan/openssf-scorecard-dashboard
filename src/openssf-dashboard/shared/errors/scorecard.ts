@@ -39,3 +39,14 @@ export class CheckNotFoundError extends GenericError {
     super('Scorecard Check Not Found', message || 'The scorecard check was not found in the scorecard.');
   }
 }
+
+/**
+ * Error used for when there is no scorecard check but there should be.
+ */
+export class UnableToParseCheckDetailsSegment extends GenericError {
+  constructor(
+    message: string
+  ) {
+    super('Unable to Parse Check Segment Details', message);
+  }
+}

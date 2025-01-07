@@ -75,7 +75,7 @@ export class ErrorPopupService {
   convertError(
     error: any
   ): ErrorPopupError {
-    let title = 'Generic Error';
+    let title = 'A Wee Problem!';
     let icon = 'report';
     const message = error.message;
 

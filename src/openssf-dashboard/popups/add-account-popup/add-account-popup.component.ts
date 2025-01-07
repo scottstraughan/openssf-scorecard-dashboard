@@ -107,7 +107,7 @@ export class AddAccountPopupComponent {
         tap((account) => {
           this.popupReference.close();
           this.loading.set(false);
-          this.router.navigate([`/${account.service}/${account.account}`]).then();
+          this.router.navigate([`/${account.service}/${account.tag}`]).then();
         }),
         take(1),
         catchError((error) => {
