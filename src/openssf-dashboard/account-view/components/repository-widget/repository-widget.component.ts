@@ -87,7 +87,7 @@ export class RepositoryWidgetComponent implements OnInit {
    */
   onClick() {
     if (this.scorecard()?.score) {
-      this.router.navigate([`/${this.account().service}/${this.account().account}/${this.repository().name}`])
+      this.router.navigate([`/${this.account().service}/${this.account().tag}/${this.repository().name}`])
         .then();
     } else {
       this.popupService.create(

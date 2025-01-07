@@ -44,10 +44,12 @@ export class GithubService extends BaseRepositoryService {
         map((accountResult: any) => {
           return {
             service: Service.GITHUB,
-            account: accountResult['login'],
+            tag: accountResult['login'],
             name: accountResult['name'] ? accountResult['name'] : accountName,
             icon: accountResult['avatar_url'],
-            description: accountResult['description'] ?? 'This account does not have a description.',
+            description: accountResult['description']
+              ?? accountResult['bio']
+              ?? 'This account does not have a description.',
             averageScore: 0,
             totalRepositories: accountResult['public_repos'],
             repositoriesWithScorecards: 0,
@@ -68,7 +70,7 @@ export class GithubService extends BaseRepositoryService {
     account: AccountModel,
     apiToken?: string
   ): Observable<RepositoryModel[]> {
-    return this.getAllRepositories(account.account, apiToken);
+    return this.getAllRepositories(account.tag, apiToken);
   }
 
   /**
@@ -105,13 +107,8 @@ export class GithubService extends BaseRepositoryService {
           exhausted = repositoriesResult.length < GithubService.RESULTS_PER_PAGE;
           return repositories;
         }),
-        switchMap(repositories => {
-          if (exhausted) {
-            return of(repositories);
-          }
-
-          return this.getAllRepositories(accountName, apiToken, page + 1, repositories);
-        }),
+        switchMap(repositories =>
+          exhausted ? of(repositories) : this.getAllRepositories(accountName, apiToken, page + 1, repositories)),
         catchError(error =>
           throwError(() => this.throwDecentError(error)))
       );

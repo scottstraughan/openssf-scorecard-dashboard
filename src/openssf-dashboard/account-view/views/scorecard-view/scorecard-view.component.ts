@@ -252,7 +252,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
     const urlTree = this.router.createUrlTree([
       account.service,
-      account.account,
+      account.tag,
       repository.name,
       check.name
     ]);

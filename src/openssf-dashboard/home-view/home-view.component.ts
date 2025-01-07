@@ -16,10 +16,11 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { AccountService } from '../shared/services/account.service';
 import { Router } from '@angular/router';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'osd-home-view',
@@ -31,22 +32,43 @@ import { LoadingComponent } from '../shared/components/loading/loading.component
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeViewComponent {
+export class HomeViewComponent implements OnInit, OnDestroy {
+  /**
+   * Holds a reference to the account subscription to ensure we can close it.
+   */
+  private accountSubscription$ : Subscription | undefined;
+
   /**
    * Constructor.
    * @param serviceStoreService
    * @param router
    */
   constructor(
-    protected serviceStoreService: AccountService,
-    protected router: Router
-  ) {
-    this.serviceStoreService.accounts$
-      .subscribe((accounts) => {
-        const firstAccount = accounts[0];
+    private serviceStoreService: AccountService,
+    private router: Router
+  ) { }
 
-        this.router.navigate([`/${firstAccount.service}/${firstAccount.account}`])
-          .then();
+  /**
+   * @inheritDoc
+   */
+  ngOnInit() {
+    this.accountSubscription$ = this.serviceStoreService.observeAccounts()
+      .subscribe((accounts) => {
+        this.accountSubscription$?.unsubscribe();
+
+        if (accounts.length > 0) {
+          const firstAccount = accounts[0];
+
+          this.router.navigate([`/${firstAccount.service}/${firstAccount.tag}`])
+            .then();
+        }
       });
+  }
+
+  /**
+   * @inheritDoc
+   */
+  ngOnDestroy(): void {
+    this.accountSubscription$?.unsubscribe();
   }
 }
