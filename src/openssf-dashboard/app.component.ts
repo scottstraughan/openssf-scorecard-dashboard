@@ -54,7 +54,7 @@ export class AppComponent {
     protected popupService: PopupService
   ) {
     this.serviceAccounts = toSignal(
-      this.serviceStoreService.accounts$, { initialValue: [] });
+      this.serviceStoreService.observeAccounts(), { initialValue: [] });
   }
 
   /**

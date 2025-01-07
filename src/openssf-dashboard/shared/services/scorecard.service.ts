@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AccountModel } from '../models/account.model';
 import { ScorecardModel } from '../models/scorecard.model';
@@ -8,7 +8,8 @@ import { ScorecardCheck } from '../models/scorecard-check.model';
 import { MarkdownService } from 'ngx-markdown';
 import { ScorecardCheckDetails } from '../models/scorecard-check-details.model';
 import { ResultPriority } from '../enums/scorecard';
-import { CheckNotFoundError } from '../errors/scorecard';
+import { CheckNotFoundError, ScorecardNotFoundError, UnableToParseCheckDetailsSegment } from '../errors/scorecard';
+import { TransientStorage } from './transient-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,28 +18,37 @@ export class ScorecardService {
   /**
    * This URL is linked to the OpenSSF GitHub that contains information on scorecard checks.
    */
-  static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md';
+  static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md'
+
+  /**
+   * Timeout for the storage cache.
+   */
+  static readonly STORAGE_TIMEOUT_IN_DAYS = 7;
 
   /**
    * Constructor
    * @param httpClient
    * @param markdownService
+   * @param transientStorage
    */
   constructor(
     private httpClient: HttpClient,
-    private markdownService: MarkdownService
+    private markdownService: MarkdownService,
+    private transientStorage: TransientStorage,
   ) { }
 
   /**
    * Get a single scorecard for a provided repository.
    * @param account
    * @param repository
+   * @param forceReload
    */
   getScorecard(
     account: AccountModel,
     repository: RepositoryModel,
+    forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
-    return this.fetchScorecard(account, repository)
+    return this.fetchScorecard(account, repository, forceReload)
       .pipe(
         tap(scorecard => repository.scorecard = scorecard)
       );
@@ -53,7 +63,9 @@ export class ScorecardService {
   ): Observable<ScorecardCheckDetails> {
     return this.httpClient.get(ScorecardService.CHECK_DETAILS_URL, { responseType: 'text' })
       .pipe(
+        // Parse the markdown file from GitHub
         map(result => this.markdownService.parse(result).toString()),
+        // Extract the relevant segment by searching for the specific H2 with id
         map(result => {
           const regex = /(<h2.*?>.*?<\/h2>)/gim;
           const target = `<h2 id="${scorecardCheck.documentation.anchor}">`;
@@ -65,8 +77,9 @@ export class ScorecardService {
             }
           }
 
-          throw new Error('Unable to correctly parse check information.');
+          throw new UnableToParseCheckDetailsSegment('Unable to locate specific H2 in markdown.');
         }),
+        // Convert the result into a wrapped foarmt
         map(result => <ScorecardCheckDetails> {
           details: result,
           check: scorecardCheck
@@ -118,13 +131,26 @@ export class ScorecardService {
    * Fetch a scorecard from the OpenSSF API.
    * @param account
    * @param repository
+   * @param forceReload
    * @protected
    */
   private fetchScorecard(
     account: AccountModel,
     repository: RepositoryModel,
+    forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
-    const url = `https://api.securityscorecards.dev/projects/github.com/${account.account}/${repository.name}`;
+    const url = `https://api.securityscorecards.dev/projects/github.com/${account.tag}/${repository.name}`;
+    const storageKey = `${account.service}-${account.tag}-${repository.name}`.toLowerCase();
+
+    if (forceReload) {
+      this.transientStorage.remove(storageKey);
+    }
+
+    // Verify any existing storage/cache of the scorecard and return if it valid
+    if (this.transientStorage.has(storageKey)) {
+      const cached = this.transientStorage.get<ScorecardModel | undefined>(storageKey);
+      return cached ? of(cached) : throwError(() => new ScorecardNotFoundError());
+    }
 
     return this.httpClient.get(url, { responseType: 'json' })
       .pipe(
@@ -148,7 +174,16 @@ export class ScorecardService {
 
           return scorecard
         }),
+        // Store the scorecard to the storage service cache
+        tap(scorecard => {
+          this.transientStorage.set<ScorecardModel>(
+            storageKey, scorecard, ScorecardService.STORAGE_TIMEOUT_IN_DAYS);
+        }),
+        // Store even an invalid scorecard to avoid hitting the service too much
         catchError(() => {
+          this.transientStorage.set<undefined>(
+            storageKey, undefined, ScorecardService.STORAGE_TIMEOUT_IN_DAYS);
+
           return of(undefined);
         })
       );
@@ -159,7 +194,9 @@ export class ScorecardService {
    * @param priority
    * @private
    */
-  private static getPriorityWeight(priority: ResultPriority): number {
+  private static getPriorityWeight(
+    priority: ResultPriority
+  ): number {
     switch (priority) {
       case ResultPriority.CRITICAL:
         return 4

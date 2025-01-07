@@ -24,7 +24,7 @@ import { ScorecardViewComponent } from './account-view/views/scorecard-view/scor
 
 export const routes: Routes = [
   {
-    path: ':service/:account',
+    path: ':serviceTag/:accountTag',
     component: AccountViewComponent,
     children: [
       {
