@@ -16,14 +16,8 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-  signal,
-  WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, OnInit, signal, WritableSignal
+} from '@angular/core';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
@@ -33,8 +27,9 @@ import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/LoadingState';
 import { Subject, takeUntil, tap } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
+import { TransientStorage } from '../../../shared/services/transient-storage.service';
 
 @Component({
   selector: 'osd-repository-list-view',
@@ -80,13 +75,22 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    * @param activatedRoute
    * @param changeDetectorRef
    * @param selectedAccountService
+   * @param transientStorage
    */
   constructor(
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected changeDetectorRef: ChangeDetectorRef,
     protected selectedAccountService: SelectedAccountStateService,
-  ) { }
+    protected transientStorage: TransientStorage
+  ) {
+    effect(() => {
+      // Save changes to the ui settings to the storage
+      this.transientStorage.set('ui-layout', this.layoutView());
+      this.transientStorage.set('ui-visible', this.layoutVisibility());
+      this.transientStorage.set('ui-sort', this.layoutSortMode());
+    })
+  }
 
   /**
    * @inheritdoc
@@ -127,12 +131,27 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.activatedRoute.queryParams.subscribe(params => {
-      this.layoutVisibility.set(params['visible'] ? params['visible'] : LayoutVisibility.ALL);
-      this.layoutView.set(params['layout'] ? params['layout'] : LayoutView.GRID);
-      this.setSortMode(params['sort'] ? params['sort'] : LayoutSortMode.NAME_ASC, false);
+      this.layoutView.set(this.getStorageValue('layout', params, this.layoutView()));
+      this.layoutVisibility.set(this.getStorageValue('visible', params, this.layoutVisibility()));
+      this.setSortMode(this.getStorageValue('sort', params, this.layoutSortMode()));
 
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  /**
+   * Get a storage value, falling back.
+   * @param key
+   * @param params
+   * @param fallback
+   */
+  getStorageValue<T>(key: string, params: Params, fallback: any): T {
+    if (params[key]) {
+      return params[key];
+    }
+
+    const value = this.transientStorage.get<T>(`ui-${key}`);
+    return value ?? fallback;
   }
 
   /**
@@ -245,13 +264,13 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       if (this.layoutView() == LayoutView.GRID) {
         return 'grid_view';
       } else if (this.layoutView() == LayoutView.LIST) {
-        return 'view_list';
+        return 'list';
       }
     } else if (element == 'visibility') {
       if (this.layoutVisibility() == LayoutVisibility.ALL) {
-        return 'visibility';
+        return 'tune';
       } else {
-        return 'visibility_off';
+        return 'tune';
       }
     }
 
