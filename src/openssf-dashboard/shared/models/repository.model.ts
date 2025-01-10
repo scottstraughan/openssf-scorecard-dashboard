@@ -27,5 +27,6 @@ export interface RepositoryModel {
   lastUpdated: Date
   stars: number
   description: string
+  archived: boolean
   scorecard?: ScorecardModel
 }

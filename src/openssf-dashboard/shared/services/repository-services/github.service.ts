@@ -100,7 +100,8 @@ export class GithubService extends BaseRepositoryService {
               url: repository['url'],
               lastUpdated: new Date(repository['updated_at']),
               stars: repository['stargazers_count'],
-              description: repository['description'] ?? 'This repository has no description available.'
+              description: repository['description'] ?? 'This repository has no description available.',
+              archived: repository['archived']
             });
           }
 

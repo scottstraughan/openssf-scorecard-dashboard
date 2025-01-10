@@ -13,9 +13,21 @@
               [icon]="getIcon('sort')"
               [label]="getSortLabel()"
               (clicked)="onToggleSortMode()"></osd-button>
-          <osd-button
-              [icon]="getIcon('visibility')"
-              (clicked)="onToggleVisibility()"></osd-button>
+          <osd-multi-toggle-button
+              [items]="[{
+                id: LayoutVisibility.HIDE_NO_SCORECARD_REPOS,
+                name: 'Hide Repositories Missing Scorecards',
+                icon: 'score',
+                active: hideNoScorecardRepos()
+              },
+              {
+                id: LayoutVisibility.HIDE_ARCHIVED_REPOS,
+                name: 'Hide Locked/Read-Only Repositories',
+                icon: 'lock',
+                active: hideArchivedRepos()
+              }]"
+            (itemChange)="onVisibleItemsChanged($event)"
+          ></osd-multi-toggle-button>
           <osd-button
               [icon]="getIcon('layout')"
               (clicked)="onToggleLayout()"></osd-button>
