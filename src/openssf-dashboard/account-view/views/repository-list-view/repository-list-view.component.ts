@@ -22,7 +22,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { NgClass } from '@angular/common';
+import { Location, NgClass } from '@angular/common';
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/LoadingState';
@@ -30,6 +30,10 @@ import { Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 import { TransientStorage } from '../../../shared/services/transient-storage.service';
+import {
+  MultiToggleButtonComponent,
+  ToggleButtonItem
+} from '../../../shared/components/multi-toggle-button/multi-toggle-button.component';
 
 @Component({
   selector: 'osd-repository-list-view',
@@ -39,7 +43,8 @@ import { TransientStorage } from '../../../shared/services/transient-storage.ser
     RepositoryWidgetComponent,
     InputComponent,
     LoadingComponent,
-    NgClass
+    NgClass,
+    MultiToggleButtonComponent
   ],
   templateUrl: './repository-list-view.component.html',
   styleUrl: './repository-list-view.component.scss',
@@ -53,6 +58,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   readonly LoadingState = LoadingState;
   readonly LayoutView = LayoutView;
+  readonly LayoutVisibility = LayoutVisibility;
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly selectedAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
@@ -61,10 +67,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   readonly repositoryLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
 
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
-  readonly layoutVisibility: WritableSignal<LayoutVisibility> = signal(LayoutVisibility.ALL);
   readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
   readonly layoutVisibleResults: WritableSignal<number> = signal(RepositoryListViewComponent.RESULTS_PER_PAGE);
   readonly searchString: WritableSignal<string> = signal('');
+
+  readonly hideNoScorecardRepos: WritableSignal<boolean> = signal(false);
+  readonly hideArchivedRepos: WritableSignal<boolean> = signal(false);
 
   public filteredRepositoriesCount: number = 0;
   private cleanup = new Subject<void>();
@@ -79,6 +87,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    */
   constructor(
     protected router: Router,
+    protected location: Location,
     protected activatedRoute: ActivatedRoute,
     protected changeDetectorRef: ChangeDetectorRef,
     protected selectedAccountService: SelectedAccountStateService,
@@ -86,10 +95,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   ) {
     effect(() => {
       // Save changes to the ui settings to the storage
-      this.transientStorage.set('ui-layout', this.layoutView());
-      this.transientStorage.set('ui-visible', this.layoutVisibility());
-      this.transientStorage.set('ui-sort', this.layoutSortMode());
-    })
+      console.log('Saving changes to storage...');
+      this.setStorageValue('layout', this.layoutView());
+      this.setStorageValue('sort', this.layoutSortMode());
+      this.setStorageValue('hide-nsr', this.hideNoScorecardRepos());
+      this.setStorageValue('hide-ar', this.hideArchivedRepos());
+    });
   }
 
   /**
@@ -131,27 +142,22 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.activatedRoute.queryParams.subscribe(params => {
-      this.layoutView.set(this.getStorageValue('layout', params, this.layoutView()));
-      this.layoutVisibility.set(this.getStorageValue('visible', params, this.layoutVisibility()));
-      this.setSortMode(this.getStorageValue('sort', params, this.layoutSortMode()));
+      if (Object.keys(params).length == 0) {
+        this.navigateWithQueryParams({
+          'layout': this.getStorageValue('layout'),
+          'sort': this.getStorageValue('sort'),
+          'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
+          'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
+        });
+      }
+
+      this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
+      this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
+      this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
+      this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
 
       this.changeDetectorRef.detectChanges();
     });
-  }
-
-  /**
-   * Get a storage value, falling back.
-   * @param key
-   * @param params
-   * @param fallback
-   */
-  getStorageValue<T>(key: string, params: Params, fallback: any): T {
-    if (params[key]) {
-      return params[key];
-    }
-
-    const value = this.transientStorage.get<T>(`ui-${key}`);
-    return value ?? fallback;
   }
 
   /**
@@ -162,15 +168,30 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get a param value, casting some value to a proper type (all params are strings or arrays).
+   * @param params
+   * @param key
+   */
+  getParamValue(
+    params: Params,
+    key: string
+  ) {
+    const value = params[key];
+
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+
+    return value;
+  }
+
+  /**
    * Get a list of repositories after the results have had the sort filters applied.
    */
   getVisibleRepositories(): RepositoryModel[] {
     let repositories: RepositoryModel[] = this.getFilteredRepositories();
-
-    if (this.layoutVisibility() == LayoutVisibility.SCORECARDS) {
-      repositories = repositories.filter(
-        (repo) => repo.scorecard?.score !== undefined);
-    }
 
     repositories.sort((a, b) => {
       const aScore = a.scorecard?.score !== undefined ? a.scorecard.score : 0;
@@ -206,75 +227,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.navigateWithQueryParams({
       'layout': this.layoutView()
     });
-  }
-
-  /**
-   * Called when a user presses the toggle visibility button.
-   */
-  onToggleVisibility() {
-    switch (this.layoutVisibility()) {
-      case LayoutVisibility.ALL:
-        this.layoutVisibility.set(LayoutVisibility.SCORECARDS);
-        break;
-      case LayoutVisibility.SCORECARDS:
-        this.layoutVisibility.set(LayoutVisibility.ALL);
-        break;
-    }
-
-    this.navigateWithQueryParams({
-      'visible': this.layoutVisibility()
-    });
-  }
-
-  /**
-   * Set the sort mode.
-   * @param sortMode
-   * @param redirect
-   */
-  setSortMode(
-    sortMode: LayoutSortMode,
-    redirect: boolean = true
-  ) {
-    this.layoutSortMode.set(sortMode);
-
-    if (redirect) {
-      this.navigateWithQueryParams({
-        'sort': sortMode
-      });
-    }
-  }
-
-  /**
-   * Get a UI icon for a give element.
-   * @param element
-   */
-  getIcon(
-    element: string
-  ) {
-    if (element == 'sort') {
-      switch (this.layoutSortMode()) {
-        case LayoutSortMode.NAME_DESC:
-        case LayoutSortMode.SCORE_ASC:
-          return 'arrow_upward';
-        case LayoutSortMode.NAME_ASC:
-        case LayoutSortMode.SCORE_DESC:
-          return 'arrow_downward';
-      }
-    } else if (element == 'layout') {
-      if (this.layoutView() == LayoutView.GRID) {
-        return 'grid_view';
-      } else if (this.layoutView() == LayoutView.LIST) {
-        return 'list';
-      }
-    } else if (element == 'visibility') {
-      if (this.layoutVisibility() == LayoutVisibility.ALL) {
-        return 'tune';
-      } else {
-        return 'tune';
-      }
-    }
-
-    return 'mood';
   }
 
   /**
@@ -324,6 +276,95 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Called when the view filters have changed.
+   * @param changedItem
+   */
+  onVisibleItemsChanged(
+    changedItem: ToggleButtonItem
+  ) {
+    if (changedItem.id == LayoutVisibility.HIDE_NO_SCORECARD_REPOS) {
+      this.hideNoScorecardRepos.set(changedItem.active);
+
+      this.navigateWithQueryParams({
+        'hide-nsr': changedItem.active ? true : undefined
+      });
+    } else if (changedItem.id == LayoutVisibility.HIDE_ARCHIVED_REPOS) {
+      this.hideArchivedRepos.set(changedItem.active);
+
+      this.navigateWithQueryParams({
+        'hide-ar': changedItem.active ? true : undefined
+      });
+    }
+  }
+
+  /**
+   * Get a UI icon for a give element.
+   * @param element
+   */
+  getIcon(
+    element: string
+  ) {
+    if (element == 'sort') {
+      switch (this.layoutSortMode()) {
+        case LayoutSortMode.NAME_DESC:
+        case LayoutSortMode.SCORE_ASC:
+          return 'arrow_upward';
+        case LayoutSortMode.NAME_ASC:
+        case LayoutSortMode.SCORE_DESC:
+          return 'arrow_downward';
+      }
+    } else if (element == 'layout') {
+      if (this.layoutView() == LayoutView.GRID) {
+        return 'grid_view';
+      } else if (this.layoutView() == LayoutView.LIST) {
+        return 'list';
+      }
+    }
+
+    return 'mood';
+  }
+
+  /**
+   * Set the sort mode.
+   * @param sortMode
+   * @param redirect
+   */
+  private setSortMode(
+    sortMode: LayoutSortMode,
+    redirect: boolean = true
+  ) {
+    this.layoutSortMode.set(sortMode);
+
+    if (redirect) {
+      this.navigateWithQueryParams({
+        'sort': sortMode
+      });
+    }
+  }
+
+  /**
+   * Set a storage value to the transient storage for the UI.
+   * @param key
+   * @param value
+   */
+  private setStorageValue(
+    key: string,
+    value: any
+  ) {
+    this.transientStorage.set(`ui-${key}`, value);
+  }
+
+  /**
+   * Get a storage value, falling back.
+   * @param key
+   */
+  private getStorageValue<T>(
+    key: string
+  ) {
+    return this.transientStorage.get<T>(`ui-${key}`);
+  }
+
+  /**
    * Get a list of repositories after the results have been filtered.
    */
   private getFilteredRepositories(): RepositoryModel[] {
@@ -331,26 +372,22 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
     const searchString = this.searchString();
 
+    if (this.hideNoScorecardRepos()) {
+      repositories = repositories.filter(
+        (repo) => repo.scorecard?.score !== undefined);
+    }
+
+    if (this.hideArchivedRepos()) {
+      repositories = repositories.filter(
+        (repo) => !repo.archived);
+    }
+
     if (searchString.length > 0) {
       repositories = repositories.filter((repo) =>
         JSON.stringify(repo).toLowerCase().includes(searchString));
     }
 
     return repositories;
-  }
-
-  /**
-   * Reset the UI.
-   */
-  private reset() {
-    this.cleanup.next();
-    this.cleanup.complete();
-
-    this.fatalError.set(false);
-    this.selectedAccount.set(undefined);
-    this.selectedAccountRepositories.set([]);
-
-    this.repositoryLoadState.set(LoadingState.LOADING);
   }
 
   /**
@@ -367,30 +404,41 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge'
     }).then();
   }
+
+  /**
+   * Reset the UI.
+   */
+  private reset() {
+    this.cleanup.next();
+    this.cleanup.complete();
+
+    this.fatalError.set(false);
+    this.selectedAccount.set(undefined);
+    this.selectedAccountRepositories.set([]);
+
+    this.repositoryLoadState.set(LoadingState.LOADING);
+  }
 }
 
 /**
  * Enum for layout views.
  */
 enum LayoutView {
-  GRID = 'GRID',
-  LIST = 'LIST'
+  GRID = 'grid',
+  LIST = 'list'
 }
 
 /**
  * Enum for layout sort modes.
  */
 enum LayoutSortMode {
-  NAME_ASC = 'NAME_ASC',
-  NAME_DESC = 'NAME_DESC',
-  SCORE_ASC = 'SCORE_ASC',
-  SCORE_DESC = 'SCORE_DESC',
+  NAME_ASC = 'name-asc',
+  NAME_DESC = 'name-desc',
+  SCORE_ASC = 'score-asc',
+  SCORE_DESC = 'score-desc',
 }
 
-/**
- * Enum for layout visibility.
- */
 enum LayoutVisibility {
-  ALL = 'ALL',
-  SCORECARDS = 'WITH_SCORECARDS'
+  HIDE_NO_SCORECARD_REPOS,
+  HIDE_ARCHIVED_REPOS
 }

@@ -32,6 +32,7 @@ export class ButtonComponent {
   readonly icon = input<string | undefined>(undefined);
   readonly label = input<string | undefined>(undefined);
   readonly disabled = input<boolean>(false);
+  readonly active = input<boolean>(false);
   readonly clicked = output();
 
   /**
