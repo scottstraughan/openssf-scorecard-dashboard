@@ -64,8 +64,12 @@ export class TransientStorage {
   set<T>(
     key: string,
     value: T,
-    timeoutInDays: number
+    timeoutInDays?: number
   ) {
+    if (!timeoutInDays) {
+      timeoutInDays = 365;
+    }
+
     const expires = new Date();
     expires.setDate(expires.getDate() + timeoutInDays);
 
