@@ -1,0 +1,49 @@
+.container {
+  position: relative;
+  background-color: green;
+
+  .options {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: var(--default-border-radius);
+    box-shadow: var(--default-box-shadow);
+    background-color: var(--ui-primary-color);
+    padding: .3rem;
+    width: 300px;
+    z-index: 99999;
+    user-select: none;
+
+    > div {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: var(--default-border-radius);
+      transition: var(--default-transition);
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, .05);
+      }
+
+      > div {
+        display: flex;
+        align-items: center;
+      }
+
+      .name {
+        flex: 1;
+      }
+
+      .state {
+        .active {
+          color: green;
+        }
+
+        .not-active {
+          color: grey;
+        }
+      }
+    }
+  }
+}
