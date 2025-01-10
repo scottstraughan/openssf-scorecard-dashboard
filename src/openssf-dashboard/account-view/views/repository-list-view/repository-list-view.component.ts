@@ -445,6 +445,9 @@ enum LayoutSortMode {
   SCORE_DESC = 'score-desc',
 }
 
+/**
+ * Visibility of the repos.
+ */
 enum LayoutVisibility {
   HIDE_NO_SCORECARD_REPOS,
   HIDE_ARCHIVED_REPOS
