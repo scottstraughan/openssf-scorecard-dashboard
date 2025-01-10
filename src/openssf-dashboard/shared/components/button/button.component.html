@@ -1,4 +1,4 @@
-<div (click)="onClick()" [ngClass]="{disabled: disabled()}">
+<div (click)="onClick()" [ngClass]="{ disabled: disabled(), active: active() }">
   @if (icon(); as icon) {
     <div class="icon">
       <span class="material-symbols-outlined">{{ icon }}</span>
