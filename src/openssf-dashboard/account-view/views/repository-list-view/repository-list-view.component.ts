@@ -16,13 +16,21 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnDestroy, OnInit, signal, WritableSignal
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  OnDestroy,
+  OnInit,
+  signal,
+  WritableSignal
 } from '@angular/core';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { Location, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/LoadingState';
@@ -87,7 +95,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    */
   constructor(
     protected router: Router,
-    protected location: Location,
     protected activatedRoute: ActivatedRoute,
     protected changeDetectorRef: ChangeDetectorRef,
     protected selectedAccountService: SelectedAccountStateService,
