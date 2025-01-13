@@ -16,8 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, HostListener, input, model, output, signal, WritableSignal } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { Component, HostListener, model, output, signal, WritableSignal } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
 
 @Component({
