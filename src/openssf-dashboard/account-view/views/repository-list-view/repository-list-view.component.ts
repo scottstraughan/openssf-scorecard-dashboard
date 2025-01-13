@@ -30,7 +30,6 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { NgClass } from '@angular/common';
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/LoadingState';
@@ -51,7 +50,6 @@ import {
     RepositoryWidgetComponent,
     InputComponent,
     LoadingComponent,
-    NgClass,
     MultiToggleButtonComponent
   ],
   templateUrl: './repository-list-view.component.html',

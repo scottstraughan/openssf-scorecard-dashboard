@@ -36,7 +36,9 @@
 
       @if (getVisibleRepositories().length > 0) {
         <div class="container">
-          <div [ngClass]="{'list': layoutView() == LayoutView.LIST, 'grid': layoutView() == LayoutView.GRID}">
+          <div
+              [class.list]="layoutView() == LayoutView.LIST"
+              [class.grid]="layoutView() == LayoutView.GRID">
             @for (repository of getVisibleRepositories(); track repository.url) {
               <osd-repository-widget
                   [account]="account"

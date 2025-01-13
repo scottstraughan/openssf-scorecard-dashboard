@@ -11,14 +11,13 @@
     @if (repository(); as repository) {
       @if (scorecard(); as scorecard) {
         <div class="panel scorecard">
-
           <osd-faded-bg
               class="header"
               [opacity]=".2"
               [color]="ScoreRingComponent.getColorVariableForScore(scorecard.score || 0)">
             @if (scorecard.score; as score) {
               <div class="score">
-                <osd-score-ring [score]="score" fontSize="14px"></osd-score-ring>
+                <osd-score-ring [score]="score"></osd-score-ring>
               </div>
             }
 

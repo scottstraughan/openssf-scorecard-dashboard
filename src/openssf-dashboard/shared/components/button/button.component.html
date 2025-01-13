@@ -1,10 +1,15 @@
-<div (click)="onClick()" [ngClass]="{ disabled: disabled(), active: active() }">
+<div
+    (click)="onClick()"
+    [class.disabled]="disabled()"
+    [class.active]="active()">
+  <!-- Button Icon -->
   @if (icon(); as icon) {
     <div class="icon">
-      <span class="material-symbols-outlined">{{ icon }}</span>
+      <span class="material-symbols-outlined" [innerHTML]="icon"></span>
     </div>
   }
 
+  <!-- Button Label -->
   @if (label(); as label) {
     <div class="content" [innerHTML]="label"></div>
   }
