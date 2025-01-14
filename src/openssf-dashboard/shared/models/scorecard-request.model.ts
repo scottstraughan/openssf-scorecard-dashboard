@@ -18,7 +18,7 @@
 
 import { RepositoryModel } from './repository.model';
 import { ScorecardModel } from './scorecard.model';
-import { LoadingState } from '../LoadingState';
+import { LoadingState } from '../loading-state';
 
 /**
  * Represents an account.

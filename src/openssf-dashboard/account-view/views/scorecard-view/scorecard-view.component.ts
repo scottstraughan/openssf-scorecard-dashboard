@@ -27,7 +27,6 @@ import { catchError, of, Subject, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { ScorecardService } from '../../../shared/services/scorecard.service';
-import { LoadingState } from '../../../shared/LoadingState';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
 import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';

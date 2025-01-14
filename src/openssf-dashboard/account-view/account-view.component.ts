@@ -22,8 +22,8 @@ import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.c
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
-import { LoadingState } from '../shared/LoadingState';
-import { catchError, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
+import { LoadingState } from '../shared/loading-state';
+import { catchError, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../shared/components/popup/popup.service';
 import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
