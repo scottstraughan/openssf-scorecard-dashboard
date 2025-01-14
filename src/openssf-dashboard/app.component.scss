@@ -133,6 +133,17 @@ $switch-layout-breakpoint: 1000px;
         padding: 0 1rem;
       }
 
+      .dark-mode {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        osd-switch {
+          width: 55px;
+          height: 25px;
+        }
+      }
+
       .button {
         display: flex;
         align-items: center;

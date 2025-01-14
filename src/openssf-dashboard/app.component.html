@@ -20,9 +20,12 @@
   </div>
 
   <div class="settings">
-    <div class="button" (click)="onToggleDarkMode()">
-      <span class="material-symbols-outlined" [innerHTML]="darkMode() ? 'dark_mode' : 'light_mode'"></span>
+    <div class="dark-mode">
+      <osd-switch
+          [active]="darkMode() == true"
+          (activeChange)="onToggleDarkMode($event)"></osd-switch>
     </div>
+
     <div class="button" title="View the about/help" (click)="onAboutClicked()">
       <span class="material-symbols-outlined">help</span>
     </div>
