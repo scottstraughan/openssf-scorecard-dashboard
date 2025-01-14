@@ -26,14 +26,13 @@ import {
   signal,
   WritableSignal
 } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { LinkButtonComponent } from '../../../shared/components/link-button/link-button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { NgClass } from '@angular/common';
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
-import { LoadingState } from '../../../shared/LoadingState';
+import { LoadingState } from '../../../shared/loading-state';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
@@ -47,11 +46,10 @@ import {
   selector: 'osd-repository-list-view',
   standalone: true,
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
     RepositoryWidgetComponent,
     InputComponent,
     LoadingComponent,
-    NgClass,
     MultiToggleButtonComponent
   ],
   templateUrl: './repository-list-view.component.html',
@@ -102,7 +100,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   ) {
     effect(() => {
       // Save changes to the ui settings to the storage
-      console.log('Saving changes to storage...');
       this.setStorageValue('layout', this.layoutView());
       this.setStorageValue('sort', this.layoutSortMode());
       this.setStorageValue('hide-nsr', this.hideNoScorecardRepos());

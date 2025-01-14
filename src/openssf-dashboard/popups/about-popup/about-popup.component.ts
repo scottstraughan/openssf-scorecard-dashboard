@@ -18,7 +18,7 @@
 
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { PopupReference } from '../../shared/components/popup/popup.service';
-import { ButtonComponent } from '../../shared/components/button/button.component';
+import { LinkButtonComponent } from '../../shared/components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -26,7 +26,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   templateUrl: './about-popup.component.html',
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
     FormsModule
   ],
   styleUrls: [

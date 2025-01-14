@@ -64,18 +64,17 @@
           </div>
 
           <div class="actions">
-            <osd-button
+            <osd-link-button
                 icon="alt_route"
-                label="Visit Repository"></osd-button>
-            <osd-button
-                icon="delete"
-                label="Remove"
-                (clicked)="onDeleteServiceAccount(account)"></osd-button>
-
-            <osd-button
+                label="Visit Repository"></osd-link-button>
+            <osd-link-button
                 icon="sync"
                 label="Fetch Repos"
-                (clicked)="onFetchRepositories(account)"></osd-button>
+                (click)="onFetchRepositories(account)"></osd-link-button>
+            <osd-link-button
+                icon="delete"
+                label="Remove"
+                (click)="onDeleteServiceAccount(account)"></osd-link-button>
           </div>
         }
       } @else {

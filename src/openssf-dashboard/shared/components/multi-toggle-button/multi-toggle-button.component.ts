@@ -16,18 +16,18 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, HostListener, input, model, output, signal, WritableSignal } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { ButtonComponent } from '../button/button.component';
+import { ChangeDetectionStrategy, Component, HostListener, model, output, signal, WritableSignal } from '@angular/core';
+import { LinkButtonComponent } from '../link-button/link-button.component';
 
 @Component({
   selector: 'osd-multi-toggle-button',
   standalone: true,
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
   ],
   templateUrl: './multi-toggle-button.component.html',
-  styleUrl: './multi-toggle-button.component.scss'
+  styleUrl: './multi-toggle-button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultiToggleButtonComponent {
   readonly items = model<ToggleButtonItem[]>([]);

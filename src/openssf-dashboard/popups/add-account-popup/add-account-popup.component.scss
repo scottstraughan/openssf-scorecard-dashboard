@@ -36,7 +36,7 @@
 
     .tabs {
       display: flex;
-      background-color: #efefef;
+      background-color: var(--ui-secondary-color);
 
       > div {
         padding: 2rem;
@@ -93,7 +93,7 @@
     }
 
     .actions {
-      background-color: #efefef;
+      background-color: var(--ui-secondary-color);
       padding: 1rem;
       display: flex;
       gap: .5rem;
@@ -106,5 +106,15 @@
         height: 58px;
       }
     }
+  }
+}
+
+/**
+ * Specific styling for when dark mode is enabled.
+ */
+:host-context(.dark-mode) {
+  .github-icon,
+  .gitlab-icon {
+    filter: brightness(0) invert(1);
   }
 }

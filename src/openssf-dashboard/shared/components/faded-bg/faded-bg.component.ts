@@ -16,14 +16,15 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'osd-faded-bg',
   standalone: true,
   imports: [],
   templateUrl: './faded-bg.component.html',
-  styleUrl: './faded-bg.component.scss'
+  styleUrl: './faded-bg.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FadedBgComponent {
   readonly color = input.required<string>();

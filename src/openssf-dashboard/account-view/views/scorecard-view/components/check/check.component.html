@@ -1,7 +1,7 @@
 @if (check(); as check) {
   <osd-faded-bg
       [color]="getPriorityColor(check, false)"
-      [ngClass]="[check.priority, selected() ? 'selected' : '']"
+      [class.selected]="selected()"
       [style.border-left-color]="getPriorityColor(check)">
 
     <!-- Details for the check -->
@@ -15,6 +15,5 @@
     <div class="score">
       <osd-score-ring [allowReload]="false" [score]="check.score"></osd-score-ring>
     </div>
-
   </osd-faded-bg>
 }

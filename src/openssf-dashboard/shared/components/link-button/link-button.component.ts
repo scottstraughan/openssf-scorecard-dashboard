@@ -16,33 +16,35 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
-  selector: 'osd-button',
+  selector: 'osd-link-button',
   standalone: true,
-  imports: [
-    NgClass
-  ],
-  templateUrl: './button.component.html',
-  styleUrl: './button.component.scss'
+  imports: [],
+  templateUrl: './link-button.component.html',
+  styleUrl: './link-button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ButtonComponent {
+export class LinkButtonComponent {
   readonly icon = input<string | undefined>(undefined);
   readonly label = input<string | undefined>(undefined);
+
+  readonly href = input<string | undefined>(undefined);
+  readonly target = input<string | undefined>(undefined);
+  readonly rel = input<string | undefined>(undefined);
+
   readonly disabled = input<boolean>(false);
   readonly active = input<boolean>(false);
-  readonly clicked = output();
 
   /**
-   * Called when a user clicks on the button.
+   * Called when a user clicks the component.
+   * @param $event
    */
-  onClick() {
+  onClick($event: MouseEvent) {
     if (this.disabled()) {
+      $event.stopPropagation();
       return ;
     }
-
-    this.clicked.emit();
   }
 }
