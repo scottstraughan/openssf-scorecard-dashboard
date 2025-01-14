@@ -9,10 +9,10 @@
               placeholder="type to filter repositories"></osd-input>
         </div>
         <div>
-          <osd-button
+          <osd-link-button
               [icon]="getIcon('sort')"
               [label]="getSortLabel()"
-              (clicked)="onToggleSortMode()"></osd-button>
+              (click)="onToggleSortMode()"></osd-link-button>
           <osd-multi-toggle-button
               [items]="[{
                 id: LayoutVisibility.HIDE_NO_SCORECARD_REPOS,
@@ -28,9 +28,9 @@
               }]"
             (itemChange)="onVisibleItemsChanged($event)"
           ></osd-multi-toggle-button>
-          <osd-button
+          <osd-link-button
               [icon]="getIcon('layout')"
-              (clicked)="onToggleLayout()"></osd-button>
+              (click)="onToggleLayout()"></osd-link-button>
         </div>
       </div>
 
@@ -46,11 +46,11 @@
             }
           </div>
           @if (getVisibleRepositories().length < filteredRepositoriesCount) {
-            <osd-button
+            <osd-link-button
                 class="view-more"
                 label="View More Repositories"
                 icon="next_plan"
-                (clicked)="onViewMore()"></osd-button>
+                (click)="onViewMore()"></osd-link-button>
           }
         </div>
       } @else {

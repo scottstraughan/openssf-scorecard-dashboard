@@ -26,7 +26,7 @@ import {
   signal,
   WritableSignal
 } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { LinkButtonComponent } from '../../../shared/components/link-button/link-button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { RepositoryWidgetComponent } from '../../components/repository-widget/repository-widget.component';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
@@ -46,7 +46,7 @@ import {
   selector: 'osd-repository-list-view',
   standalone: true,
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
     RepositoryWidgetComponent,
     InputComponent,
     LoadingComponent,

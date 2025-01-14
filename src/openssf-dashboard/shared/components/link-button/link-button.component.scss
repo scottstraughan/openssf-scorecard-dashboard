@@ -2,24 +2,25 @@
   display: block;
   user-select: none;
 
-  > div {
+  > a {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: .5rem;
     height: 100%;
-    border: rgba(0, 0, 0, .2) 1px solid;
     padding: 1rem;
     border-radius: 6px;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .05);
     opacity: .7;
-    transition: var(--default-transition);
     cursor: pointer;
+    border: var(--default-border);
+    box-shadow: var(--osd-component-shadow-unfocused);
+    transition: var(--default-transition);
+    background-color: var(--osd-component-bg-color-unfocused);
 
     &.active,
     &:not(.disabled):hover {
       opacity: 1;
-      background-color: rgba(255, 255, 255, .5);
+      background-color: var(--osd-component-bg-color-focused);
       box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .1);
     }
 
@@ -27,6 +28,7 @@
       cursor: not-allowed;
       pointer-events: none;
       opacity: .5;
+      background-color: red;
     }
 
     .icon {

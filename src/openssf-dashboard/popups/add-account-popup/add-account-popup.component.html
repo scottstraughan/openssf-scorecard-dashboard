@@ -39,20 +39,20 @@
 
   <div class="actions">
     <div>
-      <osd-button
-          (clicked)="onCloseClicked()"
+      <osd-link-button
+          (click)="onCloseClicked()"
           icon="close"
-          label="Cancel"></osd-button>
+          label="Cancel"></osd-link-button>
     </div>
     <div>
       @if (loading()) {
         <osd-loading></osd-loading>
       } @else {
-        <osd-button
+        <osd-link-button
             icon="add_circle"
             label="Add Account"
             [disabled]="!isServiceFormsValid() || loading()"
-            (clicked)="onAdd()"></osd-button>
+            (click)="onAdd()"></osd-link-button>
       }
     </div>
   </div>

@@ -29,10 +29,28 @@
             </div>
 
             <div class="actions">
-              <osd-button icon="arrow_back" label="Back" (clicked)="onBackClicked()"></osd-button>
-              <a [href]="scorecard.url" target="_blank" rel="noopener">
-                <osd-button icon="link" label="scorecard.dev"></osd-button>
-              </a>
+              <osd-link-button
+                  icon="arrow_back"
+                  label="Back"
+                  title="Go back to the repository list"
+                  (click)="onBackClicked()"></osd-link-button>
+              <osd-link-button
+                  icon="scoreboard"
+                  label="scorecard.dev"
+                  target="_blank"
+                  title="View this repositories scorecard result on scorecard.dev"
+                  [href]="scorecard.url"></osd-link-button>
+              <osd-link-button
+                  icon="security"
+                  label="Security"
+                  target="_blank"
+                  title="View the repository security guidelines"
+                  [href]="repository.url + '/security'"></osd-link-button>
+              <osd-link-button
+                  icon="editor_choice"
+                  label="Score Badge"
+                  title="Generate an embeddable OpenSSF Score badge for this repository"
+                  (click)="onGenerateBadge(repository)"></osd-link-button>
             </div>
           </osd-faded-bg>
 

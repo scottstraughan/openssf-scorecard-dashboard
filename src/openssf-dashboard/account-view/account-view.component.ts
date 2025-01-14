@@ -17,7 +17,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
-import { ButtonComponent } from '../shared/components/button/button.component';
+import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
@@ -34,7 +34,7 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
   selector: 'osd-account-view',
   standalone: true,
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
     ScoreRingComponent,
     LoadingComponent,
     RouterOutlet
