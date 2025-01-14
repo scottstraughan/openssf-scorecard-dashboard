@@ -100,7 +100,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   ) {
     effect(() => {
       // Save changes to the ui settings to the storage
-      console.log('Saving changes to storage...');
       this.setStorageValue('layout', this.layoutView());
       this.setStorageValue('sort', this.layoutSortMode());
       this.setStorageValue('hide-nsr', this.hideNoScorecardRepos());
