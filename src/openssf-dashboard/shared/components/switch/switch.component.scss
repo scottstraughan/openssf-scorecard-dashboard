@@ -2,16 +2,17 @@
   --osd-switch-internal-padding: 2px;
   --osd-switch-nipple-color: var(--hint-color);
   --osd-switch-icon-color: var(--inverted-text-color);
-  --osd-box-shadow-unfocused: var(--osd-component-shadow-unfocused);
-  --osd-box-shadow-focused: var(--osd-component-shadow-focused);
-  --osd-transition: var(--default-transition);
-  --osd-nipple-height: 30px;
+  --osd-switch-box-shadow-unfocused: var(--osd-component-shadow-unfocused);
+  --osd-switch-box-shadow-focused: var(--osd-component-shadow-focused);
+  --osd-switch-transition: var(--default-transition);
+  --osd-switch-nipple-height: 30px;
+  --osd-switch-bg-color: var(--osd-component-bg-color-inverted);
 
   display: flex;
   width: 100%;
-  height: var(--osd-nipple-height);
-  border-radius: var(--osd-nipple-height);
-  background-color: var(--osd-component-bg-color-inverted);
+  height: var(--osd-switch-nipple-height);
+  border-radius: var(--osd-switch-nipple-height);
+  background-color: var(--osd-switch-bg-color);
   color: var(--osd-switch-icon-color);
   box-shadow: var(--osd-component-shadow-unfocused);
   position: relative;
@@ -19,10 +20,10 @@
   overflow: hidden;
   cursor: pointer;
   user-select: none;
-  transition: var(--osd-transition);
+  transition: var(--osd-switch-transition);
 
   &:hover {
-    box-shadow: var(--osd-box-shadow-focused);
+    box-shadow: var(--osd-switch-box-shadow-focused);
   }
 
   .state,
@@ -47,6 +48,6 @@
     width: 50%;
     height: calc(100% - var(--osd-switch-internal-padding) - var(--osd-switch-internal-padding));
     background-color: var(--osd-switch-nipple-color);
-    border-radius: var(--osd-nipple-height);
+    border-radius: var(--osd-switch-nipple-height);
   }
 }

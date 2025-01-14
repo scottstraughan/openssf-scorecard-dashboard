@@ -1,5 +1,5 @@
-@use 'fonts';
-@import 'themes';
+@use 'fonts' as *;
+@use 'themes' as *;
 
 html, body {
   height: 100%;
@@ -47,7 +47,7 @@ html, body {
 }
 
 body {
-  background-color: var(--ui-tertiary-color);
+  background-color: var(--ui-quaternary-color);
   color: var(--text-color);
   font-family: 'Roboto', Arial, serif;
   margin: 0;

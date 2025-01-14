@@ -139,6 +139,14 @@ $switch-layout-breakpoint: 1000px;
         justify-content: center;
 
         osd-switch {
+          --osd-switch-bg-color: rgba(0, 0, 0, .3);
+
+          :host-context(.dark-mode) {
+            .dark-mode osd-switch {
+              --osd-switch-bg-color: rgba(255, 255, 255, .2) !important;
+            }
+          }
+
           width: 55px;
           height: 25px;
         }

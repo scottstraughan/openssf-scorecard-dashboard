@@ -1,7 +1,10 @@
 :host {
   display: flex;
   flex-direction: column;
-  width: 450px;
+
+  @media screen and (min-width: 800px) {
+    width: 450px;
+  }
 
   .header {
     background-color: var(--hint-color);

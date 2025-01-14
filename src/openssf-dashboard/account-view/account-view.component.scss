@@ -49,6 +49,7 @@
 
         .score {
           display: flex;
+          position: relative;
 
           osd-score-ring,
           osd-loading {

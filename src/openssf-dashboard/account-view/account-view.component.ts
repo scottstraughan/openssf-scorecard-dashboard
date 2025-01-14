@@ -37,7 +37,7 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
     LinkButtonComponent,
     ScoreRingComponent,
     LoadingComponent,
-    RouterOutlet
+    RouterOutlet,
   ],
   templateUrl: './account-view.component.html',
   styleUrl: './account-view.component.scss',
