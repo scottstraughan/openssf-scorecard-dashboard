@@ -100,6 +100,10 @@ export class AddAccountPopupComponent {
    * Called when a user clicks to add a new account to inspect.
    */
   onAdd() {
+    if (!this.isServiceFormsValid()) {
+      return ;
+    }
+
     this.loading.set(true);
 
     this.accountService.add(this.service(), this.accountName(), this.apiToken())
