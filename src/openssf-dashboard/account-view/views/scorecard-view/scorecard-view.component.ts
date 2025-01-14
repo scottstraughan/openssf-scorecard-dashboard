@@ -19,11 +19,11 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { DatePipe, Location } from '@angular/common';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { LinkButtonComponent } from '../../../shared/components/link-button/link-button.component';
 import { CheckComponent } from './components/check/check.component';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
-import { catchError, of, Subject, take, takeUntil, tap } from 'rxjs';
+import { catchError, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { ScorecardService } from '../../../shared/services/scorecard.service';
@@ -37,13 +37,16 @@ import { GenericError } from '../../../shared/errors/generic';
 import { ScorecardNotFoundError } from '../../../shared/errors/scorecard';
 import { InvalidAccountError } from '../../../shared/errors/account';
 import { Title } from '@angular/platform-browser';
+import { PopupService } from '../../../shared/components/popup/popup.service';
+import { EmbedBadgePopupComponent } from './popups/embed-badge/embed-badge-popup.component';
+import { LoadingState } from '../../../shared/loading-state';
 
 @Component({
   selector: 'osd-scorecard-view',
   standalone: true,
   imports: [
     ScoreRingComponent,
-    ButtonComponent,
+    LinkButtonComponent,
     CheckComponent,
     DatePipe,
     LoadingComponent,
@@ -77,6 +80,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
    * @param activatedRoute
    * @param scorecardService
    * @param errorPopupService
+   * @param popupService
    * @param title
    */
   constructor(
@@ -86,6 +90,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     protected activatedRoute: ActivatedRoute,
     protected scorecardService: ScorecardService,
     protected errorPopupService: ErrorPopupService,
+    protected popupService: PopupService,
     protected title: Title
   ) { }
 
@@ -103,57 +108,38 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     this.activatedRoute.params
       .pipe(
         tap(params => {
+          // Watch changes to the selected account
           this.selectedAccountService.observeAccount()
             .pipe(
-              tap(account => {
-                this.account = account
-
+              tap(account =>
+                this.account = account),
+              map(account => {
                 if (!account) {
-                  return this.handleError(new InvalidAccountError())
+                  throw new InvalidAccountError();
                 }
 
+                return account;
+              }),
+              switchMap(account =>
                 this.selectedAccountService.getRepository(params['repositoryName'])
                   .pipe(
-                    tap(repository => {
-                      this.repository.set(repository);
-
-                      this.title.setTitle(`${repository.name} - ${account.name} - OpenSSF Dashboard`);
-
+                    tap(repository =>
+                      this.setRepository(account, repository)),
+                    switchMap(repository =>
                       this.scorecardService.getScorecard(account, repository)
-                        .pipe(
-                          tap(scorecard => {
-                            this.loading.set(LoadingState.LOAD_SUCCESS);
-                            this.scorecard.set(scorecard);
-
-                            if (!scorecard) {
-                              throw new ScorecardNotFoundError();
-                            }
-
-                            if (params['checkName']) {
-                              try {
-                                this.setSelectedCheck(
-                                  this.scorecardService.getCheckByName(params['checkName'], scorecard));
-                              } catch (error: any) {
-                                return this.handleError(error, false);
-                              }
-                            }
-                          }),
-                          take(1)
-                        )
-                        .subscribe();
-                    }),
-                    catchError(error => {
-                      this.handleError(error, true);
-                      return of();
-                    }),
-                    take(1)
+                        .pipe(tap(scorecard => this.setScorecard(scorecard, params['checkName'])))
+                    )
                   )
-                  .subscribe();
+              ),
+              catchError(error => {
+                this.handleError(error, true);
+                return of(error);
               }),
               take(1)
             )
             .subscribe();
-        })
+        }),
+        takeUntil(this.cleanup)
       )
       .subscribe();
   }
@@ -176,9 +162,14 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
   /**
    * Called when a user wishes to close the scorecard check details.
    */
-  onCloseDetails() {
+  onCloseDetails(
+    repository: RepositoryModel
+  ) {
     this.selectedScorecardCheck.set(undefined);
     this.scorecardCheckDetails.set(undefined);
+
+    this.router.navigate([`../${repository.name}`], { relativeTo: this.activatedRoute })
+      .then()
   }
 
   /**
@@ -209,6 +200,54 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     scorecardCheckDetails: ScorecardCheckDetails
   ) {
     return this.scorecardService.getPriorityColor(scorecardCheckDetails.check.priority);
+  }
+
+  /**
+   * Called when a user clicks on the generate badge button.
+   */
+  onGenerateBadge(repository: RepositoryModel) {
+    this.popupService.create(EmbedBadgePopupComponent, repository, true);
+  }
+
+  /**
+   * Set the selected repository.
+   * @param account
+   * @param repository
+   * @private
+   */
+  private setRepository(
+    account: AccountModel,
+    repository: RepositoryModel
+  ) {
+    this.repository.set(repository);
+    this.title.setTitle(`${repository.name} - ${account.name} - OpenSSF Dashboard`);
+  }
+
+  /**
+   * Set the selected scorecard.
+   * @param scorecard
+   * @param selectedCheckName
+   * @private
+   */
+  private setScorecard(
+    scorecard: ScorecardModel | undefined,
+    selectedCheckName: string | undefined
+  ) {
+    this.loading.set(LoadingState.LOAD_SUCCESS);
+    this.scorecard.set(scorecard);
+
+    if (!scorecard) {
+      throw new ScorecardNotFoundError();
+    }
+
+    if (selectedCheckName) {
+      try {
+        this.setSelectedCheck(
+          this.scorecardService.getCheckByName(selectedCheckName, scorecard));
+      } catch (error: any) {
+        return this.handleError(error, false);
+      }
+    }
   }
 
   /**
