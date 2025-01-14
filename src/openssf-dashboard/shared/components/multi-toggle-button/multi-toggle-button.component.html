@@ -1,7 +1,7 @@
-<osd-button
+<osd-link-button
     icon="tune"
     (click)="onButtonClicked($event)"
-    [active]="optionsVisible()"></osd-button>
+    [active]="optionsVisible()"></osd-link-button>
 
 @if (optionsVisible()) {
   <div class="container">
