@@ -1,10 +1,12 @@
-:host {
+body {
   --color-shocking: #bc2323;
   --color-poor: #ca5f1d;
   --color-good: #bd9c52;
   --color-verygood: #9abd76;
   --color-excellent: #548318;
+}
 
+:host {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -44,14 +46,25 @@
 
     .header {
       display: flex;
-      gap: 1rem;
       flex-direction: column;
+      gap: 1rem;
       box-shadow: var(--default-box-shadow);
-      text-align: center;
 
-      @container scorecard (min-width: 650px) {
+      @container scorecard (min-width: 930px) {
         flex-direction: row;
-        text-align: left;
+      }
+
+      @container scorecard (max-width: 930px) {
+        osd-link-button ::ng-deep .content {
+          display: none;
+        }
+      }
+
+      .score-and-title {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        flex: 1;
       }
 
       .score,
@@ -59,10 +72,9 @@
       .actions {
         display: flex;
         align-items: center;
-        justify-content: center;
         position: relative;
 
-        @container scorecard (min-width: 650px) {
+        @container scorecard (min-width: 930px) {
           justify-content: left;
         }
       }
@@ -98,6 +110,12 @@
       .actions {
         display: flex;
         gap: .5rem;
+
+        @container scorecard (max-width: 930px) {
+          & > * {
+            flex: 1;
+          }
+        }
       }
     }
 

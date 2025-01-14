@@ -1,4 +1,5 @@
 @use 'fonts';
+@import 'themes';
 
 html, body {
   height: 100%;
@@ -7,8 +8,12 @@ html, body {
   --default-transition: .2s all;
   --default-border-radius: 7px;
   --default-border-radius-large: 10px;
-  --default-box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, .14);
-  --default-border: #ccc 1px solid;
+
+  --inverted-text-color: #fff;
+
+  --ui-primary-color: #fff;
+  --ui-secondary-color: #fafafa;
+  --ui-tertiary-color: #ebebeb;
 
   --hint-color: #23064c;
   --color-shocking: #bc2323;
@@ -20,14 +25,30 @@ html, body {
   --default-mobile-width: 1000px;
   --icon-size: 58px;
 
-  --inverted-text-color: #fff;
+  --default-border: var(--border-color) 1px solid;
+  --default-box-shadow: 2px 2px 5px 0 var(--box-shadow-color);
+  --slight-box-shadow: 2px 2px 3px 0 var(--box-shadow-color);
 
-  --ui-primary-color: #fff;
-  --ui-secondary-color: #fafafa;
+  @include light-mode
+}
+
+.light-mode {
+  @include light-mode
+}
+
+.dark-mode {
+  @include dark-mode
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @include dark-mode
+  }
 }
 
 body {
-  background-color: #ebebeb;
+  background-color: var(--ui-tertiary-color);
+  color: var(--text-color);
   font-family: 'Roboto', Arial, serif;
   margin: 0;
 }
@@ -47,7 +68,7 @@ input {
 }
 
 .panel {
-  background-color: white;
+  background-color: var(--ui-secondary-color);
   border-radius: var(--default-border-radius-large);
   box-shadow: var(--default-box-shadow);
   overflow: hidden;
