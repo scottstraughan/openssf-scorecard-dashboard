@@ -17,13 +17,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
-import { ButtonComponent } from '../shared/components/button/button.component';
+import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
-import { LoadingState } from '../shared/LoadingState';
-import { catchError, of, Subject, Subscription, take, takeUntil, tap } from 'rxjs';
+import { LoadingState } from '../shared/loading-state';
+import { catchError, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../shared/components/popup/popup.service';
 import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
@@ -34,10 +34,10 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
   selector: 'osd-account-view',
   standalone: true,
   imports: [
-    ButtonComponent,
+    LinkButtonComponent,
     ScoreRingComponent,
     LoadingComponent,
-    RouterOutlet
+    RouterOutlet,
   ],
   templateUrl: './account-view.component.html',
   styleUrl: './account-view.component.scss',
@@ -58,7 +58,6 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   readonly averageScorecardScore: WritableSignal<number> = signal(0);
 
   private cleanup = new Subject<void>();
-  private accountSubscription: Subscription | undefined;
 
   /**
    * Constructor.
@@ -107,10 +106,9 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
     this.activatedRoute.params
       .pipe(
-        tap((params) => {
-          this.reset();
-
-          this.accountSubscription = this.selectedAccountService.setAccount(params['serviceTag'], params['accountTag'])
+        tap(() => this.reset()),
+        switchMap(params => {
+          return this.selectedAccountService.setAccount(params['serviceTag'], params['accountTag'])
             .pipe(
               tap(account => {
                 this.title.setTitle(`${account.name} - OpenSSF Dashboard`);
@@ -122,11 +120,10 @@ export class AccountViewComponent implements OnInit, OnDestroy {
                 this.errorPopupService.handleError(error);
                 this.fatalError.set(this.errorPopupService.convertError(error));
                 return of(error);
-              }),
-              take(1)
+              })
             )
-            .subscribe();
         }),
+        takeUntil(this.cleanup)
       )
       .subscribe();
   }
@@ -181,7 +178,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * Reset the UI.
    */
   private reset() {
-    this.accountSubscription?.unsubscribe();
+    this.cleanup.complete();
 
     this.fatalError.set(undefined);
     this.selectedAccount.set(undefined);

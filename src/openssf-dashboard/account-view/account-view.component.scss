@@ -49,6 +49,7 @@
 
         .score {
           display: flex;
+          position: relative;
 
           osd-score-ring,
           osd-loading {
@@ -122,10 +123,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: #ccc 1px solid;
             border-radius: 4px;
             padding: .5rem;
             font-size: .9rem;
+            border: var(--default-border);
             box-shadow: var(--default-box-shadow);
 
             osd-loading {

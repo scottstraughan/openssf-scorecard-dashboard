@@ -8,10 +8,10 @@
 <div class="container">
   <div class="tabs">
     <div class="selected">
-      <img ngSrc="./assets/images/icons/github.png" alt="GitHub" height="209" width="800" />
+      <img class="github-icon" ngSrc="./assets/images/icons/github.png" alt="GitHub" height="209" width="800" />
     </div>
     <div class="gitlab" (click)="onGitlabClicked()">
-      <img ngSrc="./assets/images/icons/gitlab.svg" alt="GitLab" height="16" width="16" />
+      <img class="gitlab-icon" ngSrc="./assets/images/icons/gitlab.svg" alt="GitLab" height="16" width="16" />
     </div>
   </div>
 
@@ -39,20 +39,20 @@
 
   <div class="actions">
     <div>
-      <osd-button
-          (clicked)="onCloseClicked()"
+      <osd-link-button
+          (click)="onCloseClicked()"
           icon="close"
-          label="Cancel"></osd-button>
+          label="Cancel"></osd-link-button>
     </div>
     <div>
       @if (loading()) {
         <osd-loading></osd-loading>
       } @else {
-        <osd-button
+        <osd-link-button
             icon="add_circle"
             label="Add Account"
             [disabled]="!isServiceFormsValid() || loading()"
-            (clicked)="onAdd()"></osd-button>
+            (click)="onAdd()"></osd-link-button>
       }
     </div>
   </div>

@@ -19,7 +19,7 @@
 import { ChangeDetectionStrategy, Component, HostListener, Inject, signal, WritableSignal } from '@angular/core';
 import { PopupReference, PopupService } from '../../shared/components/popup/popup.service';
 import { InputComponent } from '../../shared/components/input/input.component';
-import { ButtonComponent } from '../../shared/components/button/button.component';
+import { LinkButtonComponent } from '../../shared/components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../shared/services/account.service';
 import { catchError, of, take, tap } from 'rxjs';
@@ -37,7 +37,7 @@ import { ErrorPopupService } from '../../shared/services/error-popup.service';
   templateUrl: './add-account-popup.component.html',
   imports: [
     InputComponent,
-    ButtonComponent,
+    LinkButtonComponent,
     FormsModule,
     LoadingComponent,
     NgOptimizedImage
@@ -100,6 +100,10 @@ export class AddAccountPopupComponent {
    * Called when a user clicks to add a new account to inspect.
    */
   onAdd() {
+    if (!this.isServiceFormsValid()) {
+      return ;
+    }
+
     this.loading.set(true);
 
     this.accountService.add(this.service(), this.accountName(), this.apiToken())

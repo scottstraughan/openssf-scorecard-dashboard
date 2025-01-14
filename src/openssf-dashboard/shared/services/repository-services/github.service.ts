@@ -97,7 +97,7 @@ export class GithubService extends BaseRepositoryService {
           for (const repository of repositoriesResult) {
             repositories.push({
               name: repository['name'],
-              url: repository['url'],
+              url: repository['html_url'],
               lastUpdated: new Date(repository['updated_at']),
               stars: repository['stargazers_count'],
               description: repository['description'] ?? 'This repository has no description available.',

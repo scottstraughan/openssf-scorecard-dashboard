@@ -16,7 +16,6 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ScoreRingComponent } from '../../../../../shared/components/score-ring/score-ring.component';
 import { ScorecardCheck } from '../../../../../shared/models/scorecard-check.model';
@@ -28,7 +27,6 @@ import { ScorecardService } from '../../../../../shared/services/scorecard.servi
   standalone: true,
   imports: [
     ScoreRingComponent,
-    NgClass,
     FadedBgComponent
   ],
   templateUrl: './check.component.html',

@@ -1,7 +1,10 @@
 :host {
   display: flex;
   flex-direction: column;
-  width: 450px;
+
+  @media screen and (min-width: 800px) {
+    width: 450px;
+  }
 
   .header {
     background-color: var(--hint-color);
@@ -15,6 +18,12 @@
     h1 {
       margin: 1rem 0 0 0;
     }
+
+    p {
+      font-size: 1rem;
+      margin: .5rem 0 0 0;
+      opacity: .7;
+    }
   }
 
   .body {
@@ -23,7 +32,7 @@
   }
 
   .actions {
-    background-color: #efefef;
+    background-color: var(--ui-secondary-color);
     padding: 1rem;
   }
 }

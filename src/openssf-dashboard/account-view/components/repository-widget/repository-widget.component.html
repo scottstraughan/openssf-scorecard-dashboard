@@ -1,5 +1,11 @@
 @if (repository(); as repository) {
   <div class="overview" (click)="onClick()">
+    @if (repository.archived) {
+      <div class="notice">
+        <span class="material-symbols-outlined">lock</span> Archived
+      </div>
+    }
+
     <div class="details">
       <h1 [innerHTML]="repository.name"></h1>
       <p [innerHTML]="repository.description"></p>

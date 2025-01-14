@@ -1,0 +1,19 @@
+<a
+    (click)="onClick($event)"
+    [attr.href]="href()"
+    [attr.target]="target()"
+    [attr.rel]="rel()"
+    [class.disabled]="disabled()"
+    [class.active]="active()">
+  <!-- Button Icon -->
+  @if (icon(); as icon) {
+    <div class="icon">
+      <span class="material-symbols-outlined" [innerHTML]="icon"></span>
+    </div>
+  }
+
+  <!-- Button Label -->
+  @if (label(); as label) {
+    <div class="content" [innerHTML]="label"></div>
+  }
+</a>

@@ -1,0 +1,9 @@
+<div class="state">
+  <span class="material-symbols-outlined" [innerHTML]="iconActive()"></span>
+</div>
+
+<div class="state">
+  <span class="material-symbols-outlined" [innerHTML]="iconInactive()"></span>
+</div>
+
+<div [@activate]="active() ? 'active' : 'inactive'" class="nipple"></div>

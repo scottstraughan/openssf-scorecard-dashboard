@@ -1,5 +1,11 @@
 :host {
-  --ring-size: 60px;
+  --osd-check-ring-size: 50px;
+  --osd-check-border-radius: var(--default-border-radius);
+  --osd-check-box-shadow: var(--default-box-shadow);
+  --osd-check-transition: var(--default-transition);
+  --osd-check-background-color-focused: var(--ui-primary-color);
+  --osd-check-background-color-unfocused: var(--ui-primary-color);
+  --osd-check-score-border-left-width: 8px;
 
   osd-faded-bg {
     display: flex;
@@ -7,15 +13,15 @@
     padding: 1rem;
     cursor: pointer;
     container: check-container / inline-size;
-    border-radius: var(--default-border-radius);
-    box-shadow: var(--default-box-shadow);
-    transition: var(--default-transition);
-    border-left: solid 8px transparent;
-    background-color: rgba(255, 255, 255, .5);
+    border-radius: var(--osd-check-border-radius);
+    box-shadow: var(--osd-check-box-shadow);
+    transition: var(--osd-check-transition);
+    background-color: var(--osd-check-background-color-unfocused);
+    border-left: solid var(--osd-check-score-border-left-width) transparent;
     overflow: hidden;
 
     &:hover {
-      background-color: var(--ui-primary-color);
+      background-color: var(--osd-check-background-color-focused);
     }
 
     .details {
@@ -49,8 +55,8 @@
       align-items: center;
 
       osd-score-ring {
-        width: 50px;
-        height: 50px;
+        width: var(--osd-check-ring-size);
+        height: var(--osd-check-ring-size);
       }
     }
   }

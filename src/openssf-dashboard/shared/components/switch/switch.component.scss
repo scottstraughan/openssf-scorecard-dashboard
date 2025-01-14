@@ -1,0 +1,53 @@
+:host {
+  --osd-switch-internal-padding: 2px;
+  --osd-switch-nipple-color: var(--hint-color);
+  --osd-switch-icon-color: var(--inverted-text-color);
+  --osd-switch-box-shadow-unfocused: var(--osd-component-shadow-unfocused);
+  --osd-switch-box-shadow-focused: var(--osd-component-shadow-focused);
+  --osd-switch-transition: var(--default-transition);
+  --osd-switch-nipple-height: 30px;
+  --osd-switch-bg-color: var(--osd-component-bg-color-inverted);
+
+  display: flex;
+  width: 100%;
+  height: var(--osd-switch-nipple-height);
+  border-radius: var(--osd-switch-nipple-height);
+  background-color: var(--osd-switch-bg-color);
+  color: var(--osd-switch-icon-color);
+  box-shadow: var(--osd-component-shadow-unfocused);
+  position: relative;
+  padding: var(--osd-switch-internal-padding);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: var(--osd-switch-transition);
+
+  &:hover {
+    box-shadow: var(--osd-switch-box-shadow-focused);
+  }
+
+  .state,
+  .nipple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .state {
+    flex: 1;
+    container: state-container / inline-size;
+
+    span {
+      font-size: 1.8cqh;
+    }
+  }
+
+  .nipple {
+    position: absolute;
+    top: var(--osd-switch-internal-padding);
+    width: 50%;
+    height: calc(100% - var(--osd-switch-internal-padding) - var(--osd-switch-internal-padding));
+    background-color: var(--osd-switch-nipple-color);
+    border-radius: var(--osd-switch-nipple-height);
+  }
+}

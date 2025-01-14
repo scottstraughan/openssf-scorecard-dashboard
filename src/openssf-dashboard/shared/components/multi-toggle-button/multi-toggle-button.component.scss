@@ -1,47 +1,60 @@
-.container {
-  position: relative;
-  background-color: green;
+:host {
+  --osd-multi-toggle-button-active-color: green;
+  --osd-multi-toggle-button-inactive-color: grey;
+  --osd-multi-toggle-button-border-radius: var(--default-border-radius);
+  --osd-multi-toggle-button-box-shadow-unfocused: var(--default-box-shadow);
+  --osd-multi-toggle-button-transition: var(--default-transition);
+  --osd-multi-toggle-button-spacing: 1rem;
 
-  .options {
-    position: absolute;
-    top: 0;
-    right: 0;
-    border-radius: var(--default-border-radius);
-    box-shadow: var(--default-box-shadow);
-    background-color: var(--ui-primary-color);
-    padding: .3rem;
-    width: 300px;
-    z-index: 99999;
-    user-select: none;
+  --osd-multi-toggle-button-options-bg-color: var(--ui-primary-color);
+  --osd-multi-toggle-button-options-width: 300px;
+  --osd-multi-toggle-button-options-padding: .3rem;
 
-    > div {
-      display: flex;
-      gap: 1rem;
-      padding: 1rem;
-      border-radius: var(--default-border-radius);
-      transition: var(--default-transition);
-      cursor: pointer;
+  .container {
+    position: relative;
+    background-color: var(--osd-multi-toggle-button-active-color);
 
-      &:hover {
-        background-color: rgba(0, 0, 0, .05);
-      }
+    .options {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-radius: var(--osd-multi-toggle-button-border-radius);
+      box-shadow: var(--osd-multi-toggle-button-box-shadow-unfocused);
+      background-color: var(--osd-multi-toggle-button-options-bg-color);
+      padding: var(--osd-multi-toggle-button-options-padding);
+      width: var(--osd-multi-toggle-button-options-width);
+      z-index: 99999;
+      user-select: none;
 
       > div {
         display: flex;
-        align-items: center;
-      }
+        gap: var(--osd-multi-toggle-button-spacing);
+        padding: var(--osd-multi-toggle-button-spacing);
+        border-radius: var(--osd-multi-toggle-button-border-radius);
+        transition: var(--osd-multi-toggle-button-transition);
+        cursor: pointer;
 
-      .name {
-        flex: 1;
-      }
-
-      .state {
-        .active {
-          color: green;
+        &:hover {
+          background-color: rgba(0, 0, 0, .05);
         }
 
-        .not-active {
-          color: grey;
+        > div {
+          display: flex;
+          align-items: center;
+        }
+
+        .name {
+          flex: 1;
+        }
+
+        .state {
+          .active {
+            color: var(--osd-multi-toggle-button-active-color);
+          }
+
+          .not-active {
+            color: var(--osd-multi-toggle-button-inactive-color);
+          }
         }
       }
     }
