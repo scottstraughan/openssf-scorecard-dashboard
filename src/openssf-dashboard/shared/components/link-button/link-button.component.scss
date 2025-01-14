@@ -1,4 +1,12 @@
 :host {
+  --osd-link-button-default-border: var(--default-border);
+  --osd-link-button-box-shadow-unfocused: var(--osd-component-shadow-unfocused);
+  --osd-link-button-transition: var(--default-transition);
+  --osd-link-button-bg-color-unfocused: var(--osd-component-bg-color-unfocused);
+  --osd-link-button-bg-color-focused: var(--osd-component-bg-color-focused);
+  --osd-link-button-box-shadow-focused: var(--osd-component-shadow-focused);
+  --osd-link-button-disabled-color: red;
+
   display: block;
   user-select: none;
 
@@ -12,23 +20,23 @@
     border-radius: 6px;
     opacity: .7;
     cursor: pointer;
-    border: var(--default-border);
-    box-shadow: var(--osd-component-shadow-unfocused);
-    transition: var(--default-transition);
-    background-color: var(--osd-component-bg-color-unfocused);
+    border: var(--osd-link-button-default-border);
+    box-shadow: var(--osd-link-button-box-shadow-unfocused);
+    transition: var(--osd-link-button-transition);
+    background-color: var(--osd-link-button-bg-color-unfocused);
 
     &.active,
     &:not(.disabled):hover {
       opacity: 1;
-      background-color: var(--osd-component-bg-color-focused);
-      box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .1);
+      background-color: var(--osd-link-button-bg-color-focused);
+      box-shadow: var(--osd-link-button-box-shadow-focused);
     }
 
     &.disabled {
       cursor: not-allowed;
       pointer-events: none;
       opacity: .5;
-      background-color: red;
+      background-color: var(--osd-link-button-disabled-color);
     }
 
     .icon {
