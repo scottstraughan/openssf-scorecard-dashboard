@@ -102,10 +102,7 @@ export class AccountService {
       return of(existingAccount);
     }
 
-    return this.add(service, accountName, apiToken)
-      .pipe(
-        tap(account => console.log(account))
-      );
+    return this.add(service, accountName, apiToken);
   }
 
   /**
