@@ -16,7 +16,16 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Component, signal, Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  Inject,
+  Renderer2,
+  signal,
+  Signal,
+  WritableSignal
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AccountModel } from './shared/models/account.model';
 import { NgOptimizedImage } from '@angular/common';
@@ -36,7 +45,8 @@ import { AboutPopupComponent } from './popups/about-popup/about-popup.component'
     NgOptimizedImage
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   /**

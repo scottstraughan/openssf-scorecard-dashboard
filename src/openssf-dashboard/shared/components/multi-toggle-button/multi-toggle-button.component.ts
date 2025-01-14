@@ -26,7 +26,8 @@ import { LinkButtonComponent } from '../link-button/link-button.component';
     LinkButtonComponent,
   ],
   templateUrl: './multi-toggle-button.component.html',
-  styleUrl: './multi-toggle-button.component.scss'
+  styleUrl: './multi-toggle-button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultiToggleButtonComponent {
   readonly items = model<ToggleButtonItem[]>([]);

@@ -18,7 +18,7 @@
 
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
-  AfterViewInit,
+  AfterViewInit, ChangeDetectionStrategy,
   Component, HostListener,
   Inject,
   Injector,
@@ -36,7 +36,8 @@ import { filter, Subscription } from 'rxjs';
     CommonModule
   ],
   templateUrl: './popup.component.html',
-  styleUrl: './popup.component.scss'
+  styleUrl: './popup.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PopupComponent implements AfterViewInit {
   /**
