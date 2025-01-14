@@ -32,7 +32,7 @@ import { RepositoryWidgetComponent } from '../../components/repository-widget/re
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
-import { LoadingState } from '../../../shared/LoadingState';
+import { LoadingState } from '../../../shared/loading-state';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';

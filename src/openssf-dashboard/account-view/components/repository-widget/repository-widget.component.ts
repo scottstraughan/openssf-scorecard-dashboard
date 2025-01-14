@@ -25,7 +25,7 @@ import { AccountModel } from '../../../shared/models/account.model';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { ErrorPopupComponent } from '../../../shared/popups/error-popup/error-popup.component';
-import { LoadingState } from '../../../shared/LoadingState';
+import { LoadingState } from '../../../shared/loading-state';
 import { catchError, of, tap } from 'rxjs';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 import { Router } from '@angular/router';

@@ -20,7 +20,7 @@ import { RepositoryModel } from '../models/repository.model';
 import { BehaviorSubject, catchError, forkJoin, map, Observable, of, take, tap } from 'rxjs';
 import { ScorecardService } from './scorecard.service';
 import { ScorecardModel } from '../models/scorecard.model';
-import { LoadingState } from '../LoadingState';
+import { LoadingState } from '../loading-state';
 import { AccountModel } from '../models/account.model';
 import { Injectable } from '@angular/core';
 import { AccountService } from './account.service';
