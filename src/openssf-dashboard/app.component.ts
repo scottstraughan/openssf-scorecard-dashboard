@@ -36,6 +36,7 @@ import { AddAccountPopupComponent } from './popups/add-account-popup/add-account
 import { AboutPopupComponent } from './popups/about-popup/about-popup.component';
 import { DarkModeService } from './shared/services/dark-mode.service';
 import { tap } from 'rxjs';
+import { SwitchComponent } from './shared/components/switch/switch.component';
 
 @Component({
   selector: 'osd-root',
@@ -44,7 +45,8 @@ import { tap } from 'rxjs';
     RouterOutlet,
     RouterLinkActive,
     RouterLink,
-    NgOptimizedImage
+    NgOptimizedImage,
+    SwitchComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -107,7 +109,7 @@ export class AppComponent {
   /**
    * Toggle the dark mode.
    */
-  onToggleDarkMode() {
+  onToggleDarkMode($event: boolean) {
     this.darkModeService.toggleDarkModeEnabled();
   }
 }
