@@ -102,8 +102,8 @@ $switch-layout-breakpoint: 1000px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: rgba(255, 255, 255, .2);
-          border: rgba(0, 0, 0, .3) 1px solid;
+          background-color: transparent;
+          border: var(--default-border);
           transition: var(--default-transition);
           box-shadow: var(--default-box-shadow);
 
@@ -112,7 +112,7 @@ $switch-layout-breakpoint: 1000px;
           }
 
           &:hover {
-            background-color: rgba(255, 255, 255, .6);
+            background-color: var(--ui-primary-color);
 
             span {
               opacity: 1;

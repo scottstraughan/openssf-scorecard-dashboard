@@ -10,8 +10,8 @@
     border-radius: var(--default-border-radius);
     box-shadow: var(--default-box-shadow);
     transition: var(--default-transition);
+    background-color: var(--ui-primary-color);
     border-left: solid 8px transparent;
-    background-color: rgba(255, 255, 255, .5);
     overflow: hidden;
 
     &:hover {

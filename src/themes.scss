@@ -1,0 +1,36 @@
+/**
+ * Dark Mode Theme
+ */
+@mixin dark-mode {
+  --text-color: #efefef;
+  --border-color: rgba(255, 255, 255, .1);
+  --box-shadow-color: rgba(0, 0, 0, .3);
+
+  --osd-component-bg-color-focused: rgba(0, 0, 0, .2);
+  --osd-component-shadow-unfocused: 2px 2px 3px 0 rgba(0, 0, 0, .05);
+  --osd-component-shadow-focused: 2px 2px 3px 0 rgba(0, 0, 0, .1);
+
+  --ui-primary-color: #1a1d29;
+  --ui-secondary-color: #13161e;
+  --ui-tertiary-color: #0e1016;
+  --ui-quaternary-color: #03040b;
+}
+
+/**
+ * Light Mode Theme
+ */
+@mixin light-mode {
+  --text-color: #111;
+  --border-color: #ccc;
+  --box-shadow-color: rgba(0, 0, 0, .14);
+
+  --osd-component-bg-color-unfocused: transparent;
+  --osd-component-bg-color-focused: rgba(255, 255, 255, .5);
+  --osd-component-shadow-unfocused: 2px 2px 3px 0 rgba(0, 0, 0, .05);
+  --osd-component-shadow-focused: 2px 2px 3px 0 rgba(0, 0, 0, .1);
+
+  --ui-primary-color: #fff;
+  --ui-secondary-color: #fafafa;
+  --ui-tertiary-color: #f1f1f1;
+  --ui-quaternary-color: #ebebeb;
+}

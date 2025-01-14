@@ -20,6 +20,9 @@
   </div>
 
   <div class="settings">
+    <div class="button" (click)="onToggleDarkMode()">
+      <span class="material-symbols-outlined" [innerHTML]="darkMode() ? 'dark_mode' : 'light_mode'"></span>
+    </div>
     <div class="button" title="View the about/help" (click)="onAboutClicked()">
       <span class="material-symbols-outlined">help</span>
     </div>

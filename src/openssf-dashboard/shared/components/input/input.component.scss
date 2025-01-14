@@ -2,16 +2,17 @@
   display: flex;
   align-items: center;
   gap: .5rem;
-  border: rgba(0, 0, 0, .2) 1px solid;
   border-radius: 6px;
-  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .05);
   opacity: .7;
+  border: var(--default-border);
+  box-shadow: var(--osd-component-shadow-unfocused);
   transition: var(--default-transition);
+  background-color: var(--osd-component-bg-color-unfocused);
 
   &:hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, .5);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .1);
+    background-color: var(--osd-component-bg-color-focused);
+    box-shadow: var(--osd-component-shadow-focused);
   }
   > * {
     padding: 1rem;
@@ -29,9 +30,10 @@
   .icon {
     display: flex;
     align-items: center;
-    border-right: rgba(0, 0, 0, .2) 1px solid;
-    background-color: rgba(0, 0, 0, .02);
+    border-right: var(--default-border);
+    background-color: var(--osd-component-bg-color-focused);
     cursor: default;
     height: 100%;
+    user-select: none;
   }
 }

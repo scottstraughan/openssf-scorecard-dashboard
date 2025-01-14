@@ -1,7 +1,7 @@
 @if (fatalError(); as fatalError) {
   <div class="panel error-message">
     <div>
-      <span class="material-symbols-outlined">{{ fatalError.icon }}</span>
+      <span class="material-symbols-outlined" [innerHTML]="fatalError.icon"></span>
       <h1 [innerHTML]="fatalError.title"></h1>
       <h2 [innerHTML]="fatalError.message"></h2>
     </div>
@@ -15,19 +15,24 @@
               class="header"
               [opacity]=".2"
               [color]="ScoreRingComponent.getColorVariableForScore(scorecard.score || 0)">
-            @if (scorecard.score; as score) {
-              <div class="score">
-                <osd-score-ring [score]="score"></osd-score-ring>
-              </div>
-            }
 
-            <div class="title">
-              <div>
-                <h1 [innerHTML]="repository.name"></h1>
-                <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
+            <div class="score-and-title">
+              <!-- Score ring for repo -->
+              @if (scorecard.score; as score) {
+                <div class="score">
+                  <osd-score-ring [score]="score"></osd-score-ring>
+                </div>
+              }
+              <!-- Titling for repo -->
+              <div class="title">
+                <div>
+                  <h1 [innerHTML]="repository.name"></h1>
+                  <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
+                </div>
               </div>
             </div>
 
+            <!-- Action buttons for repo -->
             <div class="actions">
               <osd-link-button
                   icon="arrow_back"
@@ -70,10 +75,15 @@
               @if (scorecardCheckDetails(); as scorecardCheckDetails) {
                 <div class="panel check-details">
                   <osd-faded-bg class="header" [color]="getPriorityColor(scorecardCheckDetails)">
-                    <osd-button icon="close" label="Close" (click)="onCloseDetails()"></osd-button>
-                    <a [href]="scorecardCheckDetails.check.documentation.url" target="_blank" rel="noopener">
-                      <osd-button icon="link" label="View on GitHub.com"></osd-button>
-                    </a>
+                    <osd-link-button
+                        icon="close"
+                        label="Close"
+                        (click)="onCloseDetails(repository)"></osd-link-button>
+                    <osd-link-button
+                        icon="link"
+                        label="View on GitHub.com"
+                        target="_blank"
+                        [href]="scorecardCheckDetails.check.documentation.url"></osd-link-button>
                   </osd-faded-bg>
 
                   <div class="container" [innerHTML]="scorecardCheckDetails.details">
