@@ -18,6 +18,7 @@
 
 import { ChangeDetectionStrategy, Component, HostListener, input, model } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-switch',
@@ -25,6 +26,9 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   templateUrl: './switch.component.html',
   styleUrl: './switch.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    IconComponent
+  ],
   animations: [
     trigger('activate', [
       state(
@@ -45,8 +49,8 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 })
 export class SwitchComponent {
   readonly active = model.required<boolean>();
-  readonly iconActive = input<string>('light_mode');
-  readonly iconInactive = input<string>('dark_mode');
+  readonly iconActive = input.required<string>();
+  readonly iconInactive = input.required<string>();
 
   /**
    * Called when a user clicks anywhere on the component.

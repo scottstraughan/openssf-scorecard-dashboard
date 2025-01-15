@@ -37,6 +37,7 @@ import { AboutPopupComponent } from './popups/about-popup/about-popup.component'
 import { DarkModeService } from './shared/services/dark-mode.service';
 import { tap } from 'rxjs';
 import { SwitchComponent } from './shared/components/switch/switch.component';
+import { IconComponent } from './shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-root',
@@ -46,7 +47,8 @@ import { SwitchComponent } from './shared/components/switch/switch.component';
     RouterLinkActive,
     RouterLink,
     NgOptimizedImage,
-    SwitchComponent
+    SwitchComponent,
+    IconComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

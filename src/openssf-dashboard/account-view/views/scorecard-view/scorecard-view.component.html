@@ -1,7 +1,7 @@
 @if (fatalError(); as fatalError) {
   <div class="panel error-message">
     <div>
-      <span class="material-symbols-outlined" [innerHTML]="fatalError.icon"></span>
+      <osd-icon icon="error"></osd-icon>
       <h1 [innerHTML]="fatalError.title"></h1>
       <h2 [innerHTML]="fatalError.message"></h2>
     </div>
@@ -35,24 +35,24 @@
             <!-- Action buttons for repo -->
             <div class="actions">
               <osd-link-button
-                  icon="arrow_back"
+                  icon="back"
                   label="Back"
                   title="Go back to the repository list"
                   (click)="onBackClicked()"></osd-link-button>
               <osd-link-button
-                  icon="scoreboard"
+                  icon="score"
                   label="scorecard.dev"
                   target="_blank"
                   title="View this repositories scorecard result on scorecard.dev"
                   [href]="scorecard.url"></osd-link-button>
               <osd-link-button
-                  icon="security"
+                  icon="locked"
                   label="Security"
                   target="_blank"
                   title="View the repository security guidelines"
                   [href]="repository.url + '/security'"></osd-link-button>
               <osd-link-button
-                  icon="editor_choice"
+                  icon="award"
                   label="Score Badge"
                   title="Generate an embeddable OpenSSF Score badge for this repository"
                   (click)="onGenerateBadge(repository)"></osd-link-button>

@@ -22,7 +22,7 @@
         <osd-input
             [(value)]="accountName"
             [focus]="true"
-            icon="badge"
+            icon="account"
             placeholder="scottstraughan, jetbrains, intel etc"></osd-input>
       </div>
       <div>
@@ -31,7 +31,7 @@
           heavily. API keys are stored in your browser's localstorage and <b>ONLY</b> transferred to the URL you
           provided above.</div>
         <osd-input
-            icon="key"
+            icon="locked"
             placeholder="A-2XJSJ123JSJS188DNDJK19SK"></osd-input>
       </div>
     }
@@ -49,7 +49,7 @@
         <osd-loading></osd-loading>
       } @else {
         <osd-link-button
-            icon="add_circle"
+            icon="add"
             label="Add Account"
             [disabled]="!isServiceFormsValid() || loading()"
             (click)="onAdd()"></osd-link-button>

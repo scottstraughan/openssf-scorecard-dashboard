@@ -11,8 +11,10 @@
     color: var(--inverted-text-color);
     padding: 4rem;
 
-    span {
-      font-size: 60px;
+    osd-icon {
+      display: inline-block;
+      height: 60px;
+      width: 60px;
     }
 
     h1 {

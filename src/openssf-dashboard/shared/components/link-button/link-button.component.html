@@ -7,9 +7,7 @@
     [class.active]="active()">
   <!-- Button Icon -->
   @if (icon(); as icon) {
-    <div class="icon">
-      <span class="material-symbols-outlined" [innerHTML]="icon"></span>
-    </div>
+    <osd-icon [icon]="icon"></osd-icon>
   }
 
   <!-- Button Label -->

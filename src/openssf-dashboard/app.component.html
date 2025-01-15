@@ -14,7 +14,7 @@
         </a>
       }
       <div class="item add" (click)="onAddServiceAccount()">
-        <span class="material-symbols-outlined">add_circle</span>
+        <osd-icon icon="add"></osd-icon>
       </div>
     </div>
   </div>
@@ -22,12 +22,14 @@
   <div class="settings">
     <div class="dark-mode">
       <osd-switch
+          iconActive="light"
+          iconInactive="light-off"
           [active]="darkMode() == true"
           (activeChange)="onToggleDarkMode($event)"></osd-switch>
     </div>
 
     <div class="button" title="View the about/help" (click)="onAboutClicked()">
-      <span class="material-symbols-outlined">help</span>
+      <osd-icon icon="books"></osd-icon>
     </div>
   </div>
 </nav>

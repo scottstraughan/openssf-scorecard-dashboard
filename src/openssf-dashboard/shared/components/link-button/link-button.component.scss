@@ -36,12 +36,12 @@
       cursor: not-allowed;
       pointer-events: none;
       opacity: .5;
-      background-color: var(--osd-link-button-disabled-color);
+      background-color: var(--osd-link-button-bg-color-unfocused);
     }
 
-    .icon {
-      display: flex;
-      align-items: center;
+    osd-icon {
+      width: 26px;
+      height: 26px;
     }
   }
 }

@@ -18,12 +18,14 @@
 
 import { ChangeDetectionStrategy, Component, HostListener, model, output, signal, WritableSignal } from '@angular/core';
 import { LinkButtonComponent } from '../link-button/link-button.component';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-multi-toggle-button',
   standalone: true,
   imports: [
     LinkButtonComponent,
+    IconComponent,
   ],
   templateUrl: './multi-toggle-button.component.html',
   styleUrl: './multi-toggle-button.component.scss',

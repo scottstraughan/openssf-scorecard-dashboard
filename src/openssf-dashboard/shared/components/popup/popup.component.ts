@@ -28,12 +28,14 @@ import {
 import { PopupReference } from './popup.service';
 import { NavigationStart, Router } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-popup',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    IconComponent
   ],
   templateUrl: './popup.component.html',
   styleUrl: './popup.component.scss',

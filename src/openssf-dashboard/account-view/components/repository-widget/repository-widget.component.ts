@@ -29,6 +29,7 @@ import { LoadingState } from '../../../shared/loading-state';
 import { catchError, of, tap } from 'rxjs';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 import { Router } from '@angular/router';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-repository-widget',
@@ -36,7 +37,8 @@ import { Router } from '@angular/router';
   imports: [
     ScoreRingComponent,
     DatePipe,
-    LoadingComponent
+    LoadingComponent,
+    IconComponent
   ],
   templateUrl: './repository-widget.component.html',
   styleUrl: './repository-widget.component.scss',

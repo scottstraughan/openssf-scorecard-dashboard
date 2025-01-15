@@ -41,6 +41,7 @@ import {
   MultiToggleButtonComponent,
   ToggleButtonItem
 } from '../../../shared/components/multi-toggle-button/multi-toggle-button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-repository-list-view',
@@ -50,7 +51,8 @@ import {
     RepositoryWidgetComponent,
     InputComponent,
     LoadingComponent,
-    MultiToggleButtonComponent
+    MultiToggleButtonComponent,
+    IconComponent
   ],
   templateUrl: './repository-list-view.component.html',
   styleUrl: './repository-list-view.component.scss',
@@ -312,14 +314,14 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       switch (this.layoutSortMode()) {
         case LayoutSortMode.NAME_DESC:
         case LayoutSortMode.SCORE_ASC:
-          return 'arrow_upward';
+          return 'arrow';
         case LayoutSortMode.NAME_ASC:
         case LayoutSortMode.SCORE_DESC:
-          return 'arrow_downward';
+          return 'arrow-down';
       }
     } else if (element == 'layout') {
       if (this.layoutView() == LayoutView.GRID) {
-        return 'grid_view';
+        return 'grid';
       } else if (this.layoutView() == LayoutView.LIST) {
         return 'list';
       }

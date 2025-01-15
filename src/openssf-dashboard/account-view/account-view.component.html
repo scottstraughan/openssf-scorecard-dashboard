@@ -2,7 +2,7 @@
   <!-- Shown when there is a fatal error -->
   <div class="panel error-message">
     <div>
-      <span class="material-symbols-outlined" [innerHTML]="fatalError.icon"></span>
+      <osd-icon icon="error"></osd-icon>
       <h1 [innerHTML]="fatalError.title"></h1>
       <h2 [innerHTML]="fatalError.message"></h2>
     </div>
@@ -34,7 +34,7 @@
           <div class="details">
             <div class="detail">
               <div>
-                <span class="material-symbols-outlined">public</span>
+                <osd-icon icon="public"></osd-icon>
                 <h1>Public Repositories</h1>
               </div>
               <span class="number" [innerHTML]="totalRepositories()">-</span>
@@ -42,7 +42,7 @@
 
             <div class="detail">
               <div>
-                <span class="material-symbols-outlined">scoreboard</span>
+                <osd-icon icon="score"></osd-icon>
                 <h1>Available Scorecards</h1>
               </div>
               <span class="number">
@@ -56,7 +56,7 @@
 
             <div class="detail">
               <div>
-                <span class="material-symbols-outlined">group</span>
+                <osd-icon icon="followers"></osd-icon>
                 <h1>Followers</h1>
               </div>
               <span class="number" [innerHTML]="account.followers">-</span>
@@ -65,7 +65,7 @@
 
           <div class="actions">
             <osd-link-button
-                icon="alt_route"
+                icon="link"
                 label="Visit Repository"></osd-link-button>
             <osd-link-button
                 icon="sync"

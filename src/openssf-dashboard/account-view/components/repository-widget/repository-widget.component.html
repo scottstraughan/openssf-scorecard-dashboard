@@ -2,7 +2,7 @@
   <div class="overview" (click)="onClick()">
     @if (repository.archived) {
       <div class="notice">
-        <span class="material-symbols-outlined">lock</span> Archived
+        <osd-icon icon="locked"></osd-icon> Archived
       </div>
     }
 
@@ -13,11 +13,11 @@
 
     <div class="stats">
       <div>
-        <span class="material-symbols-outlined">event</span>
+        <osd-icon icon="calendar"></osd-icon>
         <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
       </div>
       <div>
-        <span class="material-symbols-outlined">star</span>
+        <osd-icon icon="star"></osd-icon>
         <h1 [innerHTML]="repository.stars"></h1>
       </div>
     </div>
@@ -28,7 +28,7 @@
       @if (scorecard()?.score; as score) {
         <osd-score-ring [score]="score"></osd-score-ring>
       } @else {
-        <span class="material-symbols-outlined" title="No scorecard available">block</span>
+        <osd-icon icon="sad" title="No scorecard available"></osd-icon>
       }
     } @else {
       <osd-loading></osd-loading>
