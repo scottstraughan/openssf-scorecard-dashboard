@@ -40,6 +40,7 @@ import { Title } from '@angular/platform-browser';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { EmbedBadgePopupComponent } from './popups/embed-badge/embed-badge-popup.component';
 import { LoadingState } from '../../../shared/loading-state';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-scorecard-view',
@@ -50,7 +51,8 @@ import { LoadingState } from '../../../shared/loading-state';
     CheckComponent,
     DatePipe,
     LoadingComponent,
-    FadedBgComponent
+    FadedBgComponent,
+    IconComponent
   ],
   templateUrl: './scorecard-view.component.html',
   styleUrl: './scorecard-view.component.scss',

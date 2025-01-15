@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40.05" cy="40" r="26.44" style="fill: none; stroke: #ccc; stroke-miterlimit: 10; stroke-width: 4px;"/>
+  <path d="M40,13.56c14.6,0,26.44,11.84,26.44,26.44s-11.84,26.44-26.44,26.44-23.56-10.9-25.68-20.35" style="fill: none; fill-rule: evenodd; stroke: #2f80ed; stroke-miterlimit: 10; stroke-width: 4px;"/>
+  <path d="M32.04,54.83l4.72-29.66" style="fill: none; stroke: #2f80ed; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+  <path d="M42.15,54.83l4.72-29.66" style="fill: none; stroke: #56ccf2; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+  <path d="M26.9,34.7h27.38" style="fill: none; stroke: #2f80ed; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+  <path d="M24.62,45.3h27.38" style="fill: none; stroke: #56ccf2; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+  <path d="M14.26,45.8l.12.6" style="fill: none; stroke: #2f80ed; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+  <path d="M40.07,13.56h.61" style="fill: none; stroke: #2f80ed; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4px;"/>
+</svg>

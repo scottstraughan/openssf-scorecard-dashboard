@@ -17,11 +17,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-link-button',
   standalone: true,
-  imports: [],
+  imports: [
+    IconComponent
+  ],
   templateUrl: './link-button.component.html',
   styleUrl: './link-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

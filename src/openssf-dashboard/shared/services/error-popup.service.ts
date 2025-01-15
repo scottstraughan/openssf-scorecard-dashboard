@@ -76,7 +76,7 @@ export class ErrorPopupService {
     error: any
   ): ErrorPopupError {
     let title = 'A Wee Problem!';
-    let icon = 'report';
+    let icon = 'error';
     const message = error.message;
 
     if (error instanceof GenericError) {
@@ -86,15 +86,13 @@ export class ErrorPopupService {
     if (error instanceof RateLimitError) {
       icon = 'speed';
     } else if (error instanceof InvalidAccountError) {
-      icon = 'person_search';
-    } else if (error instanceof ServiceNotSupportedError) {
-      icon = 'engineering';
+      icon = 'followers';
     } else if (error instanceof DuplicateAccountError) {
-      icon = 'person_search';
+      icon = 'followers';
     } else if (error instanceof ScorecardNotFoundError) {
-      icon = 'scoreboard';
+      icon = 'score';
     } else if (error instanceof CheckNotFoundError) {
-      icon = 'scoreboard';
+      icon = 'score';
     }
 
     return {

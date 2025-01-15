@@ -83,8 +83,10 @@ input {
   opacity: .4;
   height: 100%;
 
-  span {
-    font-size: 50px;
+  osd-icon {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
   }
 
   h1, h2 {
