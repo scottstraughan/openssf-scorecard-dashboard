@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@an
 import { NgOptimizedImage } from '@angular/common';
 
 @Component({
-  selector: 'osd-icon',
+  selector: 'ossfd-icon',
   standalone: true,
   imports: [
     NgOptimizedImage

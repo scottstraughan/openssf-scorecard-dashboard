@@ -40,7 +40,7 @@ import { SwitchComponent } from './shared/components/switch/switch.component';
 import { IconComponent } from './shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-root',
+  selector: 'ossfd-app',
   standalone: true,
   imports: [
     RouterOutlet,

@@ -3,17 +3,17 @@
     @if (selectedAccount(); as account) {
       <div class="header">
         <div>
-          <osd-input
+          <ossfd-input
               [(value)]="searchString"
               icon="search"
-              placeholder="type to filter repositories"></osd-input>
+              placeholder="type to filter repositories"></ossfd-input>
         </div>
         <div>
-          <osd-link-button
+          <ossfd-link-button
               [icon]="getIcon('sort')"
               [label]="getSortLabel()"
-              (click)="onToggleSortMode()"></osd-link-button>
-          <osd-multi-toggle-button
+              (click)="onToggleSortMode()"></ossfd-link-button>
+          <ossfd-multi-toggle-button
               [items]="[{
                 id: LayoutVisibility.HIDE_NO_SCORECARD_REPOS,
                 name: 'Hide Repositories Missing Scorecards',
@@ -27,10 +27,10 @@
                 active: hideArchivedRepos()
               }]"
             (itemChange)="onVisibleItemsChanged($event)"
-          ></osd-multi-toggle-button>
-          <osd-link-button
+          ></ossfd-multi-toggle-button>
+          <ossfd-link-button
               [icon]="getIcon('layout')"
-              (click)="onToggleLayout()"></osd-link-button>
+              (click)="onToggleLayout()"></ossfd-link-button>
         </div>
       </div>
 
@@ -40,29 +40,29 @@
               [class.list]="layoutView() == LayoutView.LIST"
               [class.grid]="layoutView() == LayoutView.GRID">
             @for (repository of getVisibleRepositories(); track repository.url) {
-              <osd-repository-widget
+              <ossfd-repository-widget
                   [account]="account"
-                  [repository]="repository"></osd-repository-widget>
+                  [repository]="repository"></ossfd-repository-widget>
             }
           </div>
           @if (getVisibleRepositories().length < filteredRepositoriesCount) {
-            <osd-link-button
+            <ossfd-link-button
                 class="view-more"
                 label="View More Repositories"
                 icon="next_plan"
-                (click)="onViewMore()"></osd-link-button>
+                (click)="onViewMore()"></ossfd-link-button>
           }
         </div>
       } @else {
         <div class="error-message">
           <div>
-            <osd-icon icon="info"></osd-icon>
+            <ossfd-icon icon="info"></ossfd-icon>
             <h1>No Repositories Available</h1>
           </div>
         </div>
       }
     }
   } @else {
-    <osd-loading></osd-loading>
+    <ossfd-loading></ossfd-loading>
   }
 </div>

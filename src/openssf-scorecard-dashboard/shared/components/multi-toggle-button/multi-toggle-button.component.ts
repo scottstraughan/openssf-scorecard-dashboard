@@ -21,7 +21,7 @@ import { LinkButtonComponent } from '../link-button/link-button.component';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-multi-toggle-button',
+  selector: 'ossfd-multi-toggle-button',
   standalone: true,
   imports: [
     LinkButtonComponent,

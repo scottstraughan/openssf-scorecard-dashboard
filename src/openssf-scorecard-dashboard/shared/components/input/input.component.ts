@@ -21,7 +21,7 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-input',
+  selector: 'ossfd-input',
   standalone: true,
   imports: [
     FormsModule,

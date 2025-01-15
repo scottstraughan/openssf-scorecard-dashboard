@@ -2,7 +2,7 @@
   <div class="overview" (click)="onClick()">
     @if (repository.archived) {
       <div class="notice">
-        <osd-icon icon="locked"></osd-icon> Archived
+        <ossfd-icon icon="locked"></ossfd-icon> Archived
       </div>
     }
 
@@ -13,11 +13,11 @@
 
     <div class="stats">
       <div>
-        <osd-icon icon="calendar"></osd-icon>
+        <ossfd-icon icon="calendar"></ossfd-icon>
         <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
       </div>
       <div>
-        <osd-icon icon="star"></osd-icon>
+        <ossfd-icon icon="star"></ossfd-icon>
         <h1 [innerHTML]="repository.stars"></h1>
       </div>
     </div>
@@ -26,12 +26,12 @@
   <div class="score" title="Click to recheck score" (click)="onReloadScore()">
     @if (loading() == LoadingState.LOAD_SUCCESS) {
       @if (scorecard()?.score; as score) {
-        <osd-score-ring [score]="score"></osd-score-ring>
+        <ossfd-score-ring [score]="score"></ossfd-score-ring>
       } @else {
-        <osd-icon icon="sad" title="No scorecard available"></osd-icon>
+        <ossfd-icon icon="sad" title="No scorecard available"></ossfd-icon>
       }
     } @else {
-      <osd-loading></osd-loading>
+      <ossfd-loading></ossfd-loading>
     }
   </div>
 }

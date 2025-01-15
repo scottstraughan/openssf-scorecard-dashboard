@@ -21,7 +21,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-switch',
+  selector: 'ossfd-switch',
   standalone: true,
   templateUrl: './switch.component.html',
   styleUrl: './switch.component.scss',
@@ -34,13 +34,13 @@ import { IconComponent } from '../icon/icon.component';
       state(
         'active',
         style({
-          left: 'calc(0% + var(--osd-switch-internal-padding))'
+          left: 'calc(0% + var(--ossfd-switch-internal-padding))'
         }),
       ),
       state(
         'inactive',
         style({
-          left: 'calc(50% - var(--osd-switch-internal-padding))'
+          left: 'calc(50% - var(--ossfd-switch-internal-padding))'
         }),
       ),
       transition('* => *', [animate('.2s')]),

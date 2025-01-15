@@ -107,7 +107,7 @@ $switch-layout-breakpoint: 1000px;
           transition: var(--default-transition);
           box-shadow: var(--default-box-shadow);
 
-          osd-icon {
+          ossfd-icon {
             width: 34px;
             height: 34px;
           }
@@ -139,12 +139,12 @@ $switch-layout-breakpoint: 1000px;
         align-items: center;
         justify-content: center;
 
-        osd-switch {
-          --osd-switch-bg-color: rgba(0, 0, 0, .3);
+        ossfd-switch {
+          --ossfd-switch-bg-color: rgba(0, 0, 0, .3);
 
           :host-context(.dark-mode) {
-            .dark-mode osd-switch {
-              --osd-switch-bg-color: rgba(255, 255, 255, .2) !important;
+            .dark-mode ossfd-switch {
+              --ossfd-switch-bg-color: rgba(255, 255, 255, .2) !important;
             }
           }
 
@@ -166,7 +166,7 @@ $switch-layout-breakpoint: 1000px;
           background-color: rgba(0, 0, 0, .1);
         }
 
-        osd-icon {
+        ossfd-icon {
           width: 34px;
           height: 34px;
         }

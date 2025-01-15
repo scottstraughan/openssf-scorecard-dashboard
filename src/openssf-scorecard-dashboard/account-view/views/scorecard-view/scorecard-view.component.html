@@ -1,7 +1,7 @@
 @if (fatalError(); as fatalError) {
   <div class="panel error-message">
     <div>
-      <osd-icon icon="error"></osd-icon>
+      <ossfd-icon icon="error"></ossfd-icon>
       <h1 [innerHTML]="fatalError.title"></h1>
       <h2 [innerHTML]="fatalError.message"></h2>
     </div>
@@ -11,7 +11,7 @@
     @if (repository(); as repository) {
       @if (scorecard(); as scorecard) {
         <div class="panel scorecard">
-          <osd-faded-bg
+          <ossfd-faded-bg
               class="header"
               [opacity]=".2"
               [color]="ScoreRingComponent.getColorVariableForScore(scorecard.score || 0)">
@@ -20,7 +20,7 @@
               <!-- Score ring for repo -->
               @if (scorecard.score; as score) {
                 <div class="score">
-                  <osd-score-ring [score]="score"></osd-score-ring>
+                  <ossfd-score-ring [score]="score"></ossfd-score-ring>
                 </div>
               }
               <!-- Titling for repo -->
@@ -34,37 +34,37 @@
 
             <!-- Action buttons for repo -->
             <div class="actions">
-              <osd-link-button
+              <ossfd-link-button
                   icon="back"
                   label="Back"
                   title="Go back to the repository list"
-                  (click)="onBackClicked()"></osd-link-button>
-              <osd-link-button
+                  (click)="onBackClicked()"></ossfd-link-button>
+              <ossfd-link-button
                   icon="score"
                   label="scorecard.dev"
                   target="_blank"
                   title="View this repositories scorecard result on scorecard.dev"
-                  [href]="scorecard.url"></osd-link-button>
-              <osd-link-button
+                  [href]="scorecard.url"></ossfd-link-button>
+              <ossfd-link-button
                   icon="locked"
                   label="Security"
                   target="_blank"
                   title="View the repository security guidelines"
-                  [href]="repository.url + '/security'"></osd-link-button>
-              <osd-link-button
+                  [href]="repository.url + '/security'"></ossfd-link-button>
+              <ossfd-link-button
                   icon="award"
                   label="Score Badge"
                   title="Generate an embeddable OpenSSF Score badge for this repository"
-                  (click)="onGenerateBadge(repository)"></osd-link-button>
+                  (click)="onGenerateBadge(repository)"></ossfd-link-button>
             </div>
-          </osd-faded-bg>
+          </ossfd-faded-bg>
 
           <div class="container">
             @for (check of repository.scorecard?.checks; track check.name) {
-              <osd-scorecard-check
+              <ossfd-scorecard-check
                   [selected]="isSelected(check)"
                   (click)="onClicked(check)"
-                  [check]="check"></osd-scorecard-check>
+                  [check]="check"></ossfd-scorecard-check>
             }
           </div>
         </div>
@@ -74,31 +74,31 @@
             @if (scorecardCheckDetailsLoadState() == LoadingState.LOAD_SUCCESS) {
               @if (scorecardCheckDetails(); as scorecardCheckDetails) {
                 <div class="panel check-details">
-                  <osd-faded-bg class="header" [color]="getPriorityColor(scorecardCheckDetails)">
-                    <osd-link-button
+                  <ossfd-faded-bg class="header" [color]="getPriorityColor(scorecardCheckDetails)">
+                    <ossfd-link-button
                         icon="close"
                         label="Close"
-                        (click)="onCloseDetails(repository)"></osd-link-button>
-                    <osd-link-button
+                        (click)="onCloseDetails(repository)"></ossfd-link-button>
+                    <ossfd-link-button
                         icon="link"
                         label="View on GitHub.com"
                         target="_blank"
-                        [href]="scorecardCheckDetails.check.documentation.url"></osd-link-button>
-                  </osd-faded-bg>
+                        [href]="scorecardCheckDetails.check.documentation.url"></ossfd-link-button>
+                  </ossfd-faded-bg>
 
                   <div class="container" [innerHTML]="scorecardCheckDetails.details">
-                    <osd-loading></osd-loading>
+                    <ossfd-loading></ossfd-loading>
                   </div>
                 </div>
               }
             } @else {
-              <osd-loading></osd-loading>
+              <ossfd-loading></ossfd-loading>
             }
           </div>
         }
       }
     }
   } @else {
-    <osd-loading></osd-loading>
+    <ossfd-loading></ossfd-loading>
   }
 }

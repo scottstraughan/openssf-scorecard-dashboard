@@ -30,7 +30,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-score-ring',
+  selector: 'ossfd-score-ring',
   standalone: true,
   templateUrl: './score-ring.component.html',
   imports: [

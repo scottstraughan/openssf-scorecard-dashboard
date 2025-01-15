@@ -1,7 +1,7 @@
 .repositories {
-  --osd-repository-list-view-container-bg-color: var(--ui-secondary-color);
-  --osd-repository-list-view-header-bg-color: var(--ui-tertiary-color);
-  --osd-repository-list-view-spacing: 1rem;
+  --ossfd-repository-list-view-container-bg-color: var(--ui-secondary-color);
+  --ossfd-repository-list-view-header-bg-color: var(--ui-tertiary-color);
+  --ossfd-repository-list-view-spacing: 1rem;
 
   display: flex;
   flex-direction: column;
@@ -10,9 +10,9 @@
 
   .header {
     display: flex;
-    background-color: var(--osd-repository-list-view-header-bg-color);
-    padding: var(--osd-repository-list-view-spacing);
-    gap: calc(var(--osd-repository-list-view-spacing) / 2);
+    background-color: var(--ossfd-repository-list-view-header-bg-color);
+    padding: var(--ossfd-repository-list-view-spacing);
+    gap: calc(var(--ossfd-repository-list-view-spacing) / 2);
 
     > div {
       display: flex;
@@ -21,7 +21,7 @@
       &:nth-child(1) {
         flex: 1;
 
-        osd-input {
+        ossfd-input {
           width: 100%;
         }
       }
@@ -29,23 +29,23 @@
   }
 
   .container {
-    background-color: var(--osd-repository-list-view-container-bg-color);
+    background-color: var(--ossfd-repository-list-view-container-bg-color);
 
     flex: 1;
     container: repo-container / inline-size;
-    padding: var(--osd-repository-list-view-spacing);
+    padding: var(--ossfd-repository-list-view-spacing);
     overflow: scroll;
 
     .list {
       display: flex;
-      gap: var(--osd-repository-list-view-spacing);
+      gap: var(--ossfd-repository-list-view-spacing);
       flex-direction: column;
     }
 
     .grid {
       display: grid;
       grid-template-columns: 1fr;
-      grid-gap: var(--osd-repository-list-view-spacing);
+      grid-gap: var(--ossfd-repository-list-view-spacing);
 
       @container repo-container (min-width: 800px) {
         grid-template-columns: 1fr 1fr;
@@ -55,7 +55,7 @@
         grid-template-columns: 1fr 1fr 1fr;
       }
 
-      osf-repository-widget {
+      ossfd-repository-widget {
         display: flex;
         opacity: .8;
 
@@ -66,7 +66,7 @@
     }
 
     .view-more {
-      margin-top: var(--osd-repository-list-view-spacing);
+      margin-top: var(--ossfd-repository-list-view-spacing);
     }
   }
 }

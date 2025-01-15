@@ -19,40 +19,40 @@
     @if (service() == Service.GITHUB) {
       <div>
         <label>GitHub Account</label>
-        <osd-input
+        <ossfd-input
             [(value)]="accountName"
             [focus]="true"
             icon="account"
-            placeholder="scottstraughan, jetbrains, intel etc"></osd-input>
+            placeholder="scottstraughan, jetbrains, intel etc"></ossfd-input>
       </div>
       <div>
         <label>API Token <small>(optional)</small></label>
         <div class="details">Adding an API token can allow you to get around rate limiting if you use this tool
           heavily. API keys are stored in your browser's localstorage and <b>ONLY</b> transferred to the URL you
           provided above.</div>
-        <osd-input
+        <ossfd-input
             icon="locked"
-            placeholder="A-2XJSJ123JSJS188DNDJK19SK"></osd-input>
+            placeholder="A-2XJSJ123JSJS188DNDJK19SK"></ossfd-input>
       </div>
     }
   </div>
 
   <div class="actions">
     <div>
-      <osd-link-button
+      <ossfd-link-button
           (click)="onCloseClicked()"
           icon="close"
-          label="Cancel"></osd-link-button>
+          label="Cancel"></ossfd-link-button>
     </div>
     <div>
       @if (loading()) {
-        <osd-loading></osd-loading>
+        <ossfd-loading></ossfd-loading>
       } @else {
-        <osd-link-button
+        <ossfd-link-button
             icon="add"
             label="Add Account"
             [disabled]="!isServiceFormsValid() || loading()"
-            (click)="onAdd()"></osd-link-button>
+            (click)="onAdd()"></ossfd-link-button>
       }
     </div>
   </div>

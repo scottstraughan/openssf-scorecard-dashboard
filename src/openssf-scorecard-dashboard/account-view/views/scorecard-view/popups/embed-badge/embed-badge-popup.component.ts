@@ -24,7 +24,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-embed-badge-popup',
+  selector: 'ossfd-embed-badge-popup',
   standalone: true,
   templateUrl: './embed-badge-popup.component.html',
   imports: [

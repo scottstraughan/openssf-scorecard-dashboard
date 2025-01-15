@@ -51,8 +51,8 @@
           display: flex;
           position: relative;
 
-          osd-score-ring,
-          osd-loading {
+          ossfd-score-ring,
+          ossfd-loading {
             width: 40px;
             height: 40px;
 
@@ -112,7 +112,7 @@
             gap: .5rem;
           }
 
-          osd-icon {
+          ossfd-icon {
             width: 30px;
             height: 30px;
           }
@@ -134,7 +134,7 @@
             border: var(--default-border);
             box-shadow: var(--default-box-shadow);
 
-            osd-loading {
+            ossfd-loading {
               width: 17px;
               height: 17px;
             }

@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-repository-widget',
+  selector: 'ossfd-repository-widget',
   standalone: true,
   imports: [
     ScoreRingComponent,

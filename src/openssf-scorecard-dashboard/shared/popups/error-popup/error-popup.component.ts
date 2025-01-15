@@ -24,7 +24,7 @@ import { IconComponent } from '../../components/icon/icon.component';
 
 
 @Component({
-  selector: 'osf-error-popup',
+  selector: 'ossfd-error-popup',
   standalone: true,
   templateUrl: './error-popup.component.html',
   imports: [

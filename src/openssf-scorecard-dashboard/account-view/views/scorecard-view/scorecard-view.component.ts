@@ -43,7 +43,7 @@ import { LoadingState } from '../../../shared/loading-state';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-scorecard-view',
+  selector: 'ossfd-scorecard-view',
   standalone: true,
   imports: [
     ScoreRingComponent,
