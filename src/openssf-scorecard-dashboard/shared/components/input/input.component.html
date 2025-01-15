@@ -1,0 +1,7 @@
+@if (icon(); as icon) {
+  <div class="icon">
+    <ossfd-icon [icon]="icon"></ossfd-icon>
+  </div>
+}
+
+<input #input type="text" [(ngModel)]="value" [placeholder]="placeholder()" />

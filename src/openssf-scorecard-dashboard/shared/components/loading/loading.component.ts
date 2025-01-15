@@ -16,9 +16,19 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-scorecard-dashboard/app.config';
-import { AppComponent } from './openssf-scorecard-dashboard/app.component';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+@Component({
+  selector: 'ossfd-loading',
+  standalone: true,
+  templateUrl: './loading.component.html',
+  styleUrl: './loading.component.scss',
+  imports: [
+    NgOptimizedImage
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class LoadingComponent {
+
+}

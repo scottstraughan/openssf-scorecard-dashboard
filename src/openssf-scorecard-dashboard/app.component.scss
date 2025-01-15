@@ -1,0 +1,188 @@
+// Represents the px value where the layout switches from mobile/tablet mode to desktop
+$switch-layout-breakpoint: 1000px;
+
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: $switch-layout-breakpoint) {
+    flex-direction: row;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    gap: 1rem;
+    padding: 0 1rem;
+
+    @media screen and (min-width: $switch-layout-breakpoint) {
+      width: 115px;
+      flex-direction: column;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      display: flex;
+      padding: 1.2rem 1.4rem;
+      background-color: var(--hint-color);
+      margin-right: .7rem;
+      box-shadow: var(--default-box-shadow);
+      cursor: pointer;
+      max-width: 104px;
+      border-radius: 0 0 6px 6px;
+
+      @media screen and (min-width: $switch-layout-breakpoint) {
+        border-radius: 0 6px 6px 0;
+      }
+
+      &:hover {
+        opacity: .96;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+
+    .accounts {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      overflow: auto;
+
+      @media screen and (min-width: $switch-layout-breakpoint) {
+        display: block;
+      }
+
+      .list {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        gap: 1.5rem;
+        padding-top: 0;
+
+        @media screen and (min-width: $switch-layout-breakpoint) {
+          flex-direction: column;
+          padding-top: 3rem;
+        }
+
+        .item {
+          width: var(--icon-size);
+          height: var(--icon-size);
+          border-radius: 100%;
+          overflow: hidden;
+          padding: .3rem;
+          opacity: .7;
+          transition: var(--default-transition);
+          cursor: pointer;
+          flex-shrink: 0;
+
+          > div {
+            background-color: rgba(0, 0, 0, .2);
+            height: 100%;
+            width: 100%;
+            border-radius: 100%;
+            background-size: cover
+          }
+
+          &.selected {
+            border: var(--hint-color) 2px solid;
+            opacity: 1;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        .add {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: transparent;
+          border: var(--default-border);
+          transition: var(--default-transition);
+          box-shadow: var(--default-box-shadow);
+
+          ossfd-icon {
+            width: 34px;
+            height: 34px;
+          }
+
+          &:hover {
+            background-color: var(--ui-primary-color);
+
+            span {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+
+    .settings {
+      display: flex;
+      flex-direction: row;
+      gap: .5rem;
+      padding: .5rem 0;
+
+      @media screen and (min-width: $switch-layout-breakpoint) {
+        flex-direction: column;
+        padding: 0 1rem;
+      }
+
+      .dark-mode {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        ossfd-switch {
+          --ossfd-switch-bg-color: rgba(0, 0, 0, .3);
+
+          :host-context(.dark-mode) {
+            .dark-mode ossfd-switch {
+              --ossfd-switch-bg-color: rgba(255, 255, 255, .2) !important;
+            }
+          }
+
+          width: 55px;
+          height: 25px;
+        }
+      }
+
+      .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        border-radius: var(--default-border-radius);
+        transition: var(--default-transition);
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, .1);
+        }
+
+        ossfd-icon {
+          width: 34px;
+          height: 34px;
+        }
+      }
+    }
+  }
+
+  main {
+    flex: 1;
+    height: 0; // important, flex will overflow is this isn't present
+    padding: 1rem;
+    container: main / inline-size;
+
+    @media screen and (min-width: $switch-layout-breakpoint) {
+      padding-left: 0;
+      height: auto;
+    }
+  }
+}

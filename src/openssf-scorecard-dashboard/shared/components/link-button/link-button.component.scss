@@ -1,0 +1,47 @@
+:host {
+  --ossfd-link-button-default-border: var(--default-border);
+  --ossfd-link-button-box-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
+  --ossfd-link-button-transition: var(--default-transition);
+  --ossfd-link-button-bg-color-unfocused: var(--ossfd-component-bg-color-unfocused);
+  --ossfd-link-button-bg-color-focused: var(--ossfd-component-bg-color-focused);
+  --ossfd-link-button-box-shadow-focused: var(--ossfd-component-shadow-focused);
+  --ossfd-link-button-disabled-color: red;
+
+  display: block;
+  user-select: none;
+
+  > a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    height: 100%;
+    padding: 1rem;
+    border-radius: 6px;
+    opacity: .7;
+    cursor: pointer;
+    border: var(--ossfd-link-button-default-border);
+    box-shadow: var(--ossfd-link-button-box-shadow-unfocused);
+    transition: var(--ossfd-link-button-transition);
+    background-color: var(--ossfd-link-button-bg-color-unfocused);
+
+    &.active,
+    &:not(.disabled):hover {
+      opacity: 1;
+      background-color: var(--ossfd-link-button-bg-color-focused);
+      box-shadow: var(--ossfd-link-button-box-shadow-focused);
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+      opacity: .5;
+      background-color: var(--ossfd-link-button-bg-color-unfocused);
+    }
+
+    ossfd-icon {
+      width: 26px;
+      height: 26px;
+    }
+  }
+}

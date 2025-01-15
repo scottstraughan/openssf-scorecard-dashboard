@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *
- *  Copyright (C) Codeplay Software Ltd.
+ *  Copyright (C) Scott Straughan.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,17 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-scorecard-dashboard/app.config';
-import { AppComponent } from './openssf-scorecard-dashboard/app.component';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+@Component({
+  selector: 'ossfd-faded-bg',
+  standalone: true,
+  imports: [],
+  templateUrl: './faded-bg.component.html',
+  styleUrl: './faded-bg.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class FadedBgComponent {
+  readonly color = input.required<string>();
+  readonly opacity = input<number>(.1);
+}

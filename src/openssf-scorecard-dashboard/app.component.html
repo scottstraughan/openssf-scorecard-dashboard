@@ -1,0 +1,39 @@
+<nav>
+  <a class="logo" routerLink="/">
+    <img ngSrc="./assets/images/logo.svg" alt="OpenSSF Logo" height="539" width="734" />
+  </a>
+
+  <div class="accounts">
+    <div class="list">
+      @for (account of serviceAccounts(); track account.tag) {
+        <a [routerLink]="[account.service + '/' + account.tag]"
+           routerLinkActive="selected"
+           class="item"
+           title="View the {{ account.name }} account">
+          <div [style.background-image]="'url(' + account.icon + ')'"></div>
+        </a>
+      }
+      <div class="item add" (click)="onAddServiceAccount()">
+        <ossfd-icon icon="add"></ossfd-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings">
+    <div class="dark-mode">
+      <ossfd-switch
+          iconActive="light"
+          iconInactive="light-off"
+          [active]="darkMode() == true"
+          (activeChange)="onToggleDarkMode($event)"></ossfd-switch>
+    </div>
+
+    <div class="button" title="View the about/help" (click)="onAboutClicked()">
+      <ossfd-icon icon="books"></ossfd-icon>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <router-outlet></router-outlet>
+</main>

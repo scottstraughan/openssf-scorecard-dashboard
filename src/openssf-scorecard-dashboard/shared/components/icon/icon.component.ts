@@ -16,9 +16,33 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './openssf-scorecard-dashboard/app.config';
-import { AppComponent } from './openssf-scorecard-dashboard/app.component';
+import { ChangeDetectionStrategy, Component, computed, input, Signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+@Component({
+  selector: 'ossfd-icon',
+  standalone: true,
+  imports: [
+    NgOptimizedImage
+  ],
+  templateUrl: './icon.component.html',
+  styleUrl: './icon.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class IconComponent {
+  readonly icon = input.required<string>();
+  readonly alt: Signal<string> = input<string>('Icon');
+  readonly width = input<number>(26);
+  readonly height = input<number>(26);
+
+  readonly iconSrc: Signal<string>;
+
+  /**
+   * Constructor.
+   */
+  constructor() {
+    this.iconSrc = computed(() => {
+      return `./assets/icons/${this.icon()}.svg`;
+    });
+  }
+}

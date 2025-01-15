@@ -1,0 +1,24 @@
+:host {
+  --ossfd-loading-max-height: 100px;
+  --ossfd-loading-max-width: 100px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  img {
+    width: 100%;
+    height: 100%;
+    max-width: var(--ossfd-loading-max-width);
+    max-height: var(--ossfd-loading-max-height);
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

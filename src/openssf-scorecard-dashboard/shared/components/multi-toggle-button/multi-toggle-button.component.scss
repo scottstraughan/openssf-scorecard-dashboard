@@ -1,0 +1,66 @@
+:host {
+  --ossfd-multi-toggle-button-active-color: green;
+  --ossfd-multi-toggle-button-inactive-color: grey;
+  --ossfd-multi-toggle-button-border-radius: var(--default-border-radius);
+  --ossfd-multi-toggle-button-box-shadow-unfocused: var(--default-box-shadow);
+  --ossfd-multi-toggle-button-transition: var(--default-transition);
+  --ossfd-multi-toggle-button-spacing: 1rem;
+  --ossfd-multi-toggle-button-options-bg-color: var(--ui-primary-color);
+  --ossfd-multi-toggle-button-options-width: 300px;
+  --ossfd-multi-toggle-button-options-padding: .3rem;
+
+  .container {
+    position: relative;
+    background-color: var(--ossfd-multi-toggle-button-active-color);
+
+    ossfd-icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .options {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-radius: var(--ossfd-multi-toggle-button-border-radius);
+      box-shadow: var(--ossfd-multi-toggle-button-box-shadow-unfocused);
+      background-color: var(--ossfd-multi-toggle-button-options-bg-color);
+      padding: var(--ossfd-multi-toggle-button-options-padding);
+      width: var(--ossfd-multi-toggle-button-options-width);
+      z-index: 99999;
+      user-select: none;
+
+      > div {
+        display: flex;
+        gap: var(--ossfd-multi-toggle-button-spacing);
+        padding: var(--ossfd-multi-toggle-button-spacing);
+        border-radius: var(--ossfd-multi-toggle-button-border-radius);
+        transition: var(--ossfd-multi-toggle-button-transition);
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, .05);
+        }
+
+        > div {
+          display: flex;
+          align-items: center;
+        }
+
+        .name {
+          flex: 1;
+        }
+
+        .state {
+          .active {
+            color: var(--ossfd-multi-toggle-button-active-color);
+          }
+
+          .not-active {
+            color: var(--ossfd-multi-toggle-button-inactive-color);
+          }
+        }
+      }
+    }
+  }
+}

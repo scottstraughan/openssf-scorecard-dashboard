@@ -1,0 +1,12 @@
+<div class="header">
+  <ossfd-icon [icon]="icon()"></ossfd-icon>
+  <h1 [innerHTML]="title()"></h1>
+</div>
+
+<div class="body">
+  <p [innerHTML]="message()"></p>
+</div>
+
+<div class="actions">
+  <ossfd-link-button label="Close" icon="close" (click)="onClose()"></ossfd-link-button>
+</div>
