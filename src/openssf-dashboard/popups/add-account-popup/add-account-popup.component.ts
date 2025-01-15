@@ -145,7 +145,7 @@ export class AddAccountPopupComponent {
       ErrorPopupComponent, {
         title: 'Coming Soon!',
         message: 'GitLab is currently not supported, but its coming soon!',
-        icon: 'coffee'
+        icon: 'error'
       }, true);
   }
 }
