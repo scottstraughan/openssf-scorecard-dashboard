@@ -3,7 +3,7 @@
 
 # Open-Source Security Dashboard
 
-<a href="https://scottstraughan.github.io/openssf-scorecard-dashboard/" target="_blank">
+<a href="https://www.scoredash.xyz" target="_blank">
   <img src="https://raw.githubusercontent.com/scottstraughan/openssf-scorecard-dashboard/refs/heads/main/.github/images/run-button.png" width="250" />
 </a>
 

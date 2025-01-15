@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 env:
-  SITE_URL: /openssf-scorecard-dashboard/
+  SITE_URL: /
 
 jobs:
   # Build the Angular site
