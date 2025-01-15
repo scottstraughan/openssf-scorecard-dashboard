@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "openssf-dashboard": {
+    "openssf-scorecard-dashboard": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -12,12 +12,12 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "ossfd",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/openssf-dashboard",
+            "outputPath": "dist/openssf-scorecard-dashboard",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -62,10 +62,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "openssf-dashboard:build:production"
+              "buildTarget": "openssf-scorecard-dashboard:build:production"
             },
             "development": {
-              "buildTarget": "openssf-dashboard:build:development"
+              "buildTarget": "openssf-scorecard-dashboard:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -73,7 +73,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "openssf-dashboard:build"
+            "buildTarget": "openssf-scorecard-dashboard:build"
           }
         },
         "test": {

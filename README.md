@@ -1,14 +1,14 @@
 [![Scorecard supply-chain security](https://github.com/scottstraughan/openssf-dashboard/actions/workflows/scorecard.yml/badge.svg)](https://github.com/scottstraughan/openssf-dashboard/actions/workflows/scorecard.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/scottstraughan/openssf-dashboard/badge)](https://scorecard.dev/viewer/?uri=github.com/scottstraughan/openssf-dashboard)
 
-# OpenSSF Dashboard
+# Open Source Security Dashboard (OSSD)
 
 <a href="https://scottstraughan.github.io/openssf-dashboard/" target="_blank">
   <img src="https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/run-button.png" width="250" />
 </a>
 
-The OpenSSF dashboard can be used to inspect the OpenSSF scorecards for users/organizations or accounts stored on
-GitHub, GitLab or others.
+The Open Source Security Dashboard can be used to inspect the OpenSSF scorecards for users/organizations or accounts 
+stored on GitHub, GitLab or others.
 
 ![View the Dashboard](https://raw.githubusercontent.com/scottstraughan/openssf-dashboard/refs/heads/main/.github/images/dashboard.jpg)
 
