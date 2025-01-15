@@ -14,6 +14,11 @@
     position: relative;
     background-color: var(--osd-multi-toggle-button-active-color);
 
+    osd-icon {
+      width: 30px;
+      height: 30px;
+    }
+
     .options {
       position: absolute;
       top: 0;

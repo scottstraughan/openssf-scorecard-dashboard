@@ -29,6 +29,7 @@ import { PopupService } from '../shared/components/popup/popup.service';
 import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
 import { AccountService } from '../shared/services/account.service';
 import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-popup.service';
+import { IconComponent } from '../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-account-view',
@@ -38,6 +39,7 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
     ScoreRingComponent,
     LoadingComponent,
     RouterOutlet,
+    IconComponent,
   ],
   templateUrl: './account-view.component.html',
   styleUrl: './account-view.component.scss',

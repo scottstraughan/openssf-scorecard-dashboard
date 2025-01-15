@@ -1,7 +1,7 @@
 @if (visible) {
   <div class="popup-container" (click)="onContainerClick()">
     <div class="close">
-      <span class="material-symbols-outlined" title="Close">close</span>
+      <osd-icon icon="close"></osd-icon>
     </div>
     <div class="popup" (click)="onPopupClick($event)">
       <div #popupTarget></div>

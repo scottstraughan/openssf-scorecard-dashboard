@@ -1,5 +1,5 @@
 <osd-link-button
-    icon="tune"
+    icon="settings"
     (click)="onButtonClicked($event)"
     [active]="optionsVisible()"></osd-link-button>
 
@@ -9,14 +9,14 @@
       @for (option of items(); track option.name) {
         <div (click)="onOptionToggled($event, option)">
           <div class="icon">
-            <span class="material-symbols-outlined" [innerHTML]="option.icon"></span>
+            <osd-icon [icon]="option.icon"></osd-icon>
           </div>
           <div class="name" [innerHTML]="option.name"></div>
           <div class="state">
             @if (option.active) {
-              <span class="material-symbols-outlined active">check_circle</span>
+              <osd-icon icon="checked"></osd-icon>
             } @else {
-              <span class="material-symbols-outlined not-active">do_not_disturb_on</span>
+              <osd-icon icon="unchecked"></osd-icon>
             }
           </div>
         </div>

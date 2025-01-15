@@ -18,12 +18,14 @@
 
 import { ChangeDetectionStrategy, Component, ElementRef, input, model, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-input',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    IconComponent
   ],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
