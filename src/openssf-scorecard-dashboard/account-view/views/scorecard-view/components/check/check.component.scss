@@ -1,27 +1,27 @@
 :host {
-  --osd-check-ring-size: 50px;
-  --osd-check-border-radius: var(--default-border-radius);
-  --osd-check-box-shadow: var(--default-box-shadow);
-  --osd-check-transition: var(--default-transition);
-  --osd-check-background-color-focused: var(--ui-primary-color);
-  --osd-check-background-color-unfocused: var(--ui-primary-color);
-  --osd-check-score-border-left-width: 8px;
+  --ossfd-check-ring-size: 50px;
+  --ossfd-check-border-radius: var(--default-border-radius);
+  --ossfd-check-box-shadow: var(--default-box-shadow);
+  --ossfd-check-transition: var(--default-transition);
+  --ossfd-check-background-color-focused: var(--ui-primary-color);
+  --ossfd-check-background-color-unfocused: var(--ui-primary-color);
+  --ossfd-check-score-border-left-width: 8px;
 
-  osd-faded-bg {
+  ossfd-faded-bg {
     display: flex;
     gap: 1rem;
     padding: 1rem;
     cursor: pointer;
     container: check-container / inline-size;
-    border-radius: var(--osd-check-border-radius);
-    box-shadow: var(--osd-check-box-shadow);
-    transition: var(--osd-check-transition);
-    background-color: var(--osd-check-background-color-unfocused);
-    border-left: solid var(--osd-check-score-border-left-width) transparent;
+    border-radius: var(--ossfd-check-border-radius);
+    box-shadow: var(--ossfd-check-box-shadow);
+    transition: var(--ossfd-check-transition);
+    background-color: var(--ossfd-check-background-color-unfocused);
+    border-left: solid var(--ossfd-check-score-border-left-width) transparent;
     overflow: hidden;
 
     &:hover {
-      background-color: var(--osd-check-background-color-focused);
+      background-color: var(--ossfd-check-background-color-focused);
     }
 
     .details {
@@ -54,9 +54,9 @@
       display: flex;
       align-items: center;
 
-      osd-score-ring {
-        width: var(--osd-check-ring-size);
-        height: var(--osd-check-ring-size);
+      ossfd-score-ring {
+        width: var(--ossfd-check-ring-size);
+        height: var(--ossfd-check-ring-size);
       }
     }
   }

@@ -32,7 +32,7 @@ import { DuplicateAccountError } from '../../shared/errors/account';
 import { ErrorPopupService } from '../../shared/services/error-popup.service';
 
 @Component({
-  selector: 'osd-add-account-popup',
+  selector: 'ossfd-add-account-popup',
   standalone: true,
   templateUrl: './add-account-popup.component.html',
   imports: [

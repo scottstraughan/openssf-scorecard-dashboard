@@ -280,7 +280,7 @@ export class AccountService {
   private static createRepositoryStorageKey(
     account: AccountModel
   ): string {
-    return 'osf-repositories-' + account.service + '-' + account.tag;
+    return 'ossfd-repositories-' + account.service + '-' + account.tag;
   }
 }
 

@@ -31,7 +31,7 @@ import { filter, Subscription } from 'rxjs';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-popup',
+  selector: 'ossfd-popup',
   standalone: true,
   imports: [
     CommonModule,

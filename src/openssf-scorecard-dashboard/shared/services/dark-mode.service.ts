@@ -30,7 +30,7 @@ export class DarkModeService {
   /**
    * Local storage key.
    */
-  static readonly STORAGE_KEY = 'osd-dark-mode-enabled';
+  static readonly STORAGE_KEY = 'ossfd-dark-mode-enabled';
 
   /**
    * BehaviorSubject, used to track changes to the dark mode state.

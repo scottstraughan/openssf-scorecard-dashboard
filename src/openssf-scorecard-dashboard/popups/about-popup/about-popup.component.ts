@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-about-popup',
+  selector: 'ossfd-about-popup',
   standalone: true,
   templateUrl: './about-popup.component.html',
   imports: [

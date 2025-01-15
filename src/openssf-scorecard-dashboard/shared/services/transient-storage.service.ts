@@ -29,7 +29,7 @@ export class TransientStorage {
   /**
    * Storage key prefix.
    */
-  static readonly prefix: string = 'osd-ts';
+  static readonly prefix: string = 'ossfd-ts';
 
   /**
    * Constructor

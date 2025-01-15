@@ -32,7 +32,7 @@ import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-pop
 import { IconComponent } from '../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-account-view',
+  selector: 'ossfd-account-view',
   standalone: true,
   imports: [
     LinkButtonComponent,

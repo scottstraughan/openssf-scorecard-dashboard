@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 
 @Component({
-  selector: 'osd-loading',
+  selector: 'ossfd-loading',
   standalone: true,
   templateUrl: './loading.component.html',
   styleUrl: './loading.component.scss',

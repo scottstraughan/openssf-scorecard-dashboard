@@ -23,7 +23,7 @@ import { LoadingComponent } from '../shared/components/loading/loading.component
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'osd-home-view',
+  selector: 'ossfd-home-view',
   standalone: true,
   templateUrl: 'home-view.component.html',
   styleUrls: ['./home-view.component.scss'],

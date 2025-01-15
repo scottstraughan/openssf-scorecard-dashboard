@@ -44,7 +44,7 @@ import {
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
-  selector: 'osd-repository-list-view',
+  selector: 'ossfd-repository-list-view',
   standalone: true,
   imports: [
     LinkButtonComponent,

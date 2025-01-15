@@ -19,7 +19,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
-  selector: 'osd-faded-bg',
+  selector: 'ossfd-faded-bg',
   standalone: true,
   imports: [],
   templateUrl: './faded-bg.component.html',

@@ -2,7 +2,7 @@
   <!-- Shown when there is a fatal error -->
   <div class="panel error-message">
     <div>
-      <osd-icon icon="error"></osd-icon>
+      <ossfd-icon icon="error"></ossfd-icon>
       <h1 [innerHTML]="fatalError.title"></h1>
       <h2 [innerHTML]="fatalError.message"></h2>
     </div>
@@ -16,12 +16,12 @@
           <div class="overview">
             <div class="score">
               @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
-                <osd-score-ring
+                <ossfd-score-ring
                     [score]="averageScorecardScore()"
                     (click)="reloadScorecardResults(account)"
-                    title="Click to re-check all scorecard scores"></osd-score-ring>
+                    title="Click to re-check all scorecard scores"></ossfd-score-ring>
               } @else {
-                <osd-loading></osd-loading>
+                <ossfd-loading></ossfd-loading>
               }
             </div>
 
@@ -34,7 +34,7 @@
           <div class="details">
             <div class="detail">
               <div>
-                <osd-icon icon="public"></osd-icon>
+                <ossfd-icon icon="public"></ossfd-icon>
                 <h1>Public Repositories</h1>
               </div>
               <span class="number" [innerHTML]="totalRepositories()">-</span>
@@ -42,21 +42,21 @@
 
             <div class="detail">
               <div>
-                <osd-icon icon="score"></osd-icon>
+                <ossfd-icon icon="score"></ossfd-icon>
                 <h1>Available Scorecards</h1>
               </div>
               <span class="number">
             @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
               {{ totalRepositoriesWithScorecards() }}
             } @else {
-              <osd-loading></osd-loading>
+              <ossfd-loading></ossfd-loading>
             }
           </span>
             </div>
 
             <div class="detail">
               <div>
-                <osd-icon icon="followers"></osd-icon>
+                <ossfd-icon icon="followers"></ossfd-icon>
                 <h1>Followers</h1>
               </div>
               <span class="number" [innerHTML]="account.followers">-</span>
@@ -64,21 +64,21 @@
           </div>
 
           <div class="actions">
-            <osd-link-button
+            <ossfd-link-button
                 icon="link"
-                label="Visit Repository"></osd-link-button>
-            <osd-link-button
+                label="Visit Repository"></ossfd-link-button>
+            <ossfd-link-button
                 icon="sync"
                 label="Fetch Repos"
-                (click)="onFetchRepositories(account)"></osd-link-button>
-            <osd-link-button
+                (click)="onFetchRepositories(account)"></ossfd-link-button>
+            <ossfd-link-button
                 icon="delete"
                 label="Remove"
-                (click)="onDeleteServiceAccount(account)"></osd-link-button>
+                (click)="onDeleteServiceAccount(account)"></ossfd-link-button>
           </div>
         }
       } @else {
-        <osd-loading></osd-loading>
+        <ossfd-loading></ossfd-loading>
       }
     </div>
   </div>

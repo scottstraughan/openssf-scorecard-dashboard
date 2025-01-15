@@ -55,7 +55,7 @@ body {
       }
 
       @container scorecard (max-width: 930px) {
-        osd-link-button ::ng-deep .content {
+        ossfd-link-button ::ng-deep .content {
           display: none;
         }
       }
@@ -82,7 +82,7 @@ body {
       .score {
         padding-left: .5rem;
 
-        osd-score-ring {
+        ossfd-score-ring {
           height: 40px;
           width: 40px;
         }

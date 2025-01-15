@@ -1,5 +1,5 @@
 @if (check(); as check) {
-  <osd-faded-bg
+  <ossfd-faded-bg
       [color]="getPriorityColor(check, false)"
       [class.selected]="selected()"
       [style.border-left-color]="getPriorityColor(check)">
@@ -13,7 +13,7 @@
 
     <!-- Score ring -->
     <div class="score">
-      <osd-score-ring [allowReload]="false" [score]="check.score"></osd-score-ring>
+      <ossfd-score-ring [allowReload]="false" [score]="check.score"></ossfd-score-ring>
     </div>
-  </osd-faded-bg>
+  </ossfd-faded-bg>
 }

@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
-  selector: 'osd-link-button',
+  selector: 'ossfd-link-button',
   standalone: true,
   imports: [
     IconComponent

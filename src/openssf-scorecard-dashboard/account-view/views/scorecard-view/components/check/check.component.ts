@@ -23,7 +23,7 @@ import { FadedBgComponent } from '../../../../../shared/components/faded-bg/fade
 import { ScorecardService } from '../../../../../shared/services/scorecard.service';
 
 @Component({
-  selector: 'osd-scorecard-check',
+  selector: 'ossfd-scorecard-check',
   standalone: true,
   imports: [
     ScoreRingComponent,

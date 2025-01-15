@@ -1,20 +1,19 @@
 :host {
-  --osd-score-ring-width: 75px;
-  --osd-score-ring-height: 75px;
-
-  --osd-score-ring-cursor: var(--cursor);
-  --osd-score-ring-progress: var(--progress);
-  --osd-score-ring-thickness: 6cqw;
-  --osd-score-ring-progress-color: var(--hint-color);
-  --osd-score-ring-base-color: rgba(0, 0, 0, .15);
-  --osd-score-ring-background: conic-gradient(grey var(--p, var(--osd-score-ring-progress)), transparent 0%) border-box;
+  --ossfd-score-ring-width: 75px;
+  --ossfd-score-ring-height: 75px;
+  --ossfd-score-ring-cursor: var(--cursor);
+  --ossfd-score-ring-progress: var(--progress);
+  --ossfd-score-ring-thickness: 6cqw;
+  --ossfd-score-ring-progress-color: var(--hint-color);
+  --ossfd-score-ring-base-color: rgba(0, 0, 0, .15);
+  --ossfd-score-ring-background: conic-gradient(grey var(--p, var(--ossfd-score-ring-progress)), transparent 0%) border-box;
 
   position: relative;
   display: block;
-  width: var(--osd-score-ring-width);
-  height: var(--osd-score-ring-height);
+  width: var(--ossfd-score-ring-width);
+  height: var(--ossfd-score-ring-height);
   container: score-container / inline-size;
-  cursor: var(--osd-score-ring-cursor);
+  cursor: var(--ossfd-score-ring-cursor);
   user-select: none;
 
   .base,
@@ -29,11 +28,11 @@
 
   .base,
   .progress {
-    border: solid var(--osd-score-ring-thickness) var(--osd-score-ring-base-color);
+    border: solid var(--ossfd-score-ring-thickness) var(--ossfd-score-ring-base-color);
     aspect-ratio: 1;
     border-radius: 50%;
-    -webkit-mask: var(--osd-score-ring-background);
-    mask: var(--osd-score-ring-background);
+    -webkit-mask: var(--ossfd-score-ring-background);
+    mask: var(--ossfd-score-ring-background);
   }
 
   .base {
@@ -51,7 +50,7 @@
       font-size: 40cqw;
     }
 
-    osd-icon {
+    ossfd-icon {
       width: 40cqw;
       height: 40cqw;
     }
