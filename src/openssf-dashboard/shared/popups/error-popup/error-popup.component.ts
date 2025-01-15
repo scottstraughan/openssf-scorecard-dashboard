@@ -20,6 +20,7 @@ import { ChangeDetectionStrategy, Component, Inject, signal, WritableSignal } fr
 import { PopupReference } from '../../components/popup/popup.service';
 import { LinkButtonComponent } from '../../components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../components/icon/icon.component';
 
 
 @Component({
@@ -28,7 +29,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './error-popup.component.html',
   imports: [
     LinkButtonComponent,
-    FormsModule
+    FormsModule,
+    IconComponent
   ],
   styleUrls: [
     './error-popup.component.scss'

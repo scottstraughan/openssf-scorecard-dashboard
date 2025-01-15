@@ -21,6 +21,7 @@ import { LinkButtonComponent } from '../../../../../shared/components/link-butto
 import { PopupReference } from '../../../../../shared/components/popup/popup.service';
 import { RepositoryModel } from '../../../../../shared/models/repository.model';
 import { NgOptimizedImage } from '@angular/common';
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-embed-badge-popup',
@@ -29,6 +30,7 @@ import { NgOptimizedImage } from '@angular/common';
   imports: [
     LinkButtonComponent,
     NgOptimizedImage,
+    IconComponent,
   ],
   styleUrls: [
     '../../../../../shared/popups/error-popup/error-popup.component.scss',

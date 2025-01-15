@@ -107,8 +107,9 @@ $switch-layout-breakpoint: 1000px;
           transition: var(--default-transition);
           box-shadow: var(--default-box-shadow);
 
-          span {
-            font-size: 30px;
+          osd-icon {
+            width: 34px;
+            height: 34px;
           }
 
           &:hover {
@@ -157,19 +158,17 @@ $switch-layout-breakpoint: 1000px;
         align-items: center;
         justify-content: center;
         padding: 1rem;
-        opacity: .5;
         border-radius: var(--default-border-radius);
         transition: var(--default-transition);
         cursor: pointer;
-        background-color: rgba(0, 0, 0, .05);
 
         &:hover {
           background-color: rgba(0, 0, 0, .1);
-          opacity: 1;
         }
 
-        span {
-          font-size: 24px;
+        osd-icon {
+          width: 34px;
+          height: 34px;
         }
       }
     }

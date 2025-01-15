@@ -27,6 +27,7 @@ import {
 } from '@angular/core';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'osd-score-ring',
@@ -34,13 +35,14 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   templateUrl: './score-ring.component.html',
   imports: [
     NgCircleProgressModule,
+    IconComponent,
   ],
   styleUrl: './score-ring.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
-    trigger('rotateAndFade', [
-      state('blurred', style({ opacity: 0, transform: 'rotate(-180deg)' })),
-      state('focused', style({ opacity: 1, transform: 'rotate(0deg)' })),
+    trigger('revealOnHover', [
+      state('blurred', style({ opacity: 0 })),
+      state('focused', style({ opacity: 1 })),
       transition('blurred => focused', [animate('0.2s')]),
       transition('focused => blurred', [animate('0.2s')]),
     ])

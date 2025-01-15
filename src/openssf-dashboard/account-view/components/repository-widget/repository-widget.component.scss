@@ -26,7 +26,10 @@
     font-size: .8rem;
     border-radius: 6px 0 0 6px;
 
-    span {
+    osd-icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
       font-size: .8rem;
       vertical-align: middle;
     }
@@ -73,9 +76,11 @@
           padding-left: 1rem;
         }
 
-        span {
+        osd-icon {
           vertical-align: middle;
-          font-size: 22px;
+          display: inline-block;
+          width: 24px;
+          height: 24px;
         }
 
         h1 {
@@ -107,13 +112,14 @@
     }
 
     osd-score-ring,
-    osd-loading{
+    osd-loading {
       width: 60px;
       height: 60px;
     }
 
-    span {
-      font-size: 60px;
+    osd-icon {
+      width: 60px;
+      height: 60px;
       opacity: .3;
     }
   }

@@ -23,7 +23,7 @@
               {
                 id: LayoutVisibility.HIDE_ARCHIVED_REPOS,
                 name: 'Hide Locked/Read-Only Repositories',
-                icon: 'lock',
+                icon: 'locked',
                 active: hideArchivedRepos()
               }]"
             (itemChange)="onVisibleItemsChanged($event)"
@@ -56,7 +56,7 @@
       } @else {
         <div class="error-message">
           <div>
-            <span class="material-symbols-outlined">info</span>
+            <osd-icon icon="info"></osd-icon>
             <h1>No Repositories Available</h1>
           </div>
         </div>

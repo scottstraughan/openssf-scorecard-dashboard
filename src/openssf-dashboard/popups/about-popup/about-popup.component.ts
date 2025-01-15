@@ -20,6 +20,7 @@ import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { PopupReference } from '../../shared/components/popup/popup.service';
 import { LinkButtonComponent } from '../../shared/components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'osd-about-popup',
@@ -27,7 +28,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './about-popup.component.html',
   imports: [
     LinkButtonComponent,
-    FormsModule
+    FormsModule,
+    IconComponent
   ],
   styleUrls: [
     '../../shared/popups/error-popup/error-popup.component.scss',

@@ -37,8 +37,9 @@
     flex: 1;
     container: state-container / inline-size;
 
-    span {
-      font-size: 1.8cqh;
+    osd-icon {
+      width: 2cqh;
+      height: 2cqh;
     }
   }
 
