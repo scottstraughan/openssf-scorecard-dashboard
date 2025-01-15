@@ -1,0 +1,26 @@
+<ossfd-link-button
+    icon="settings"
+    (click)="onButtonClicked($event)"
+    [active]="optionsVisible()"></ossfd-link-button>
+
+@if (optionsVisible()) {
+  <div class="container">
+    <div class="options">
+      @for (option of items(); track option.name) {
+        <div (click)="onOptionToggled($event, option)">
+          <div class="icon">
+            <ossfd-icon [icon]="option.icon"></ossfd-icon>
+          </div>
+          <div class="name" [innerHTML]="option.name"></div>
+          <div class="state">
+            @if (option.active) {
+              <ossfd-icon icon="checked"></ossfd-icon>
+            } @else {
+              <ossfd-icon icon="unchecked"></ossfd-icon>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

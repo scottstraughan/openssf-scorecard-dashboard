@@ -1,0 +1,19 @@
+@if (check(); as check) {
+  <ossfd-faded-bg
+      [color]="getPriorityColor(check, false)"
+      [class.selected]="selected()"
+      [style.border-left-color]="getPriorityColor(check)">
+
+    <!-- Details for the check -->
+    <div class="details">
+      <div class="priority">{{ check.priority }}</div>
+      <h1 [innerHTML]="check.name"></h1>
+      <p [innerHTML]="check.reason"></p>
+    </div>
+
+    <!-- Score ring -->
+    <div class="score">
+      <ossfd-score-ring [allowReload]="false" [score]="check.score"></ossfd-score-ring>
+    </div>
+  </ossfd-faded-bg>
+}

@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 env:
-  SITE_URL: /openssf-dashboard/
+  SITE_URL: /openssf-scorecard-dashboard/
 
 jobs:
   # Build the Angular site
@@ -32,11 +32,11 @@ jobs:
       - name: Build
         run: npm run build -- --base-href "$SITE_URL" --configuration=production
       - name: Copy index.html to 404.html
-        run: cp ./dist/openssf-dashboard/browser/index.html ./dist/openssf-dashboard/browser/404.html
+        run: cp ./dist/openssf-scorecard-dashboard/browser/index.html ./dist/openssf-scorecard-dashboard/browser/404.html
       - name: Upload to GitHub Artifacts
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         with:
-          path: ./dist/openssf-dashboard/browser
+          path: ./dist/openssf-scorecard-dashboard/browser
 
   # Deployment the site to GitHub Pages
   deploy:

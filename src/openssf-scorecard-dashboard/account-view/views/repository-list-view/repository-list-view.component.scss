@@ -1,0 +1,72 @@
+.repositories {
+  --ossfd-repository-list-view-container-bg-color: var(--ui-secondary-color);
+  --ossfd-repository-list-view-header-bg-color: var(--ui-tertiary-color);
+  --ossfd-repository-list-view-spacing: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  height: 100%;
+
+  .header {
+    display: flex;
+    background-color: var(--ossfd-repository-list-view-header-bg-color);
+    padding: var(--ossfd-repository-list-view-spacing);
+    gap: calc(var(--ossfd-repository-list-view-spacing) / 2);
+
+    > div {
+      display: flex;
+      gap: .4rem;
+
+      &:nth-child(1) {
+        flex: 1;
+
+        ossfd-input {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .container {
+    background-color: var(--ossfd-repository-list-view-container-bg-color);
+
+    flex: 1;
+    container: repo-container / inline-size;
+    padding: var(--ossfd-repository-list-view-spacing);
+    overflow: scroll;
+
+    .list {
+      display: flex;
+      gap: var(--ossfd-repository-list-view-spacing);
+      flex-direction: column;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: var(--ossfd-repository-list-view-spacing);
+
+      @container repo-container (min-width: 800px) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      @container repo-container (min-width: 1200px) {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      ossfd-repository-widget {
+        display: flex;
+        opacity: .8;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    .view-more {
+      margin-top: var(--ossfd-repository-list-view-spacing);
+    }
+  }
+}

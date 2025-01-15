@@ -1,0 +1,50 @@
+:host {
+  --ossfd-input-border: var(--default-border);
+  --ossfd-input-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
+  --ossfd-input-shadow-focused: var(--ossfd-component-shadow-focused);
+  --ossfd-input-transition: var(--default-transition);
+  --ossfd-input-bg-color-focused: var(--ossfd-component-bg-color-focused);
+
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  border-radius: 6px;
+  opacity: .7;
+  border: var(--ossfd-input-border);
+  box-shadow: var(--ossfd-input-shadow-unfocused);
+  transition: var(--ossfd-input-transition);
+  background-color: var(--ossfd-input-bg-color-focused);
+
+  &:hover {
+    opacity: 1;
+    background-color: var(--ossfd-input-bg-color-focused);
+    box-shadow: var(--ossfd-input-shadow-focused);
+  }
+  > * {
+    padding: 1rem;
+
+  }
+
+  input {
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    outline: none;
+    padding: 1rem .5rem;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    border-right: var(--ossfd-input-border);
+    background-color: var(--ossfd-input-bg-color-focused);
+    cursor: default;
+    height: 100%;
+    user-select: none;
+
+    ossfd-icon {
+      width: 26px;
+      height: 26px;
+    }
+  }
+}

@@ -1,0 +1,159 @@
+body {
+  --color-shocking: #bc2323;
+  --color-poor: #ca5f1d;
+  --color-good: #bd9c52;
+  --color-verygood: #9abd76;
+  --color-excellent: #548318;
+}
+
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @container account-view-router-outlet (min-width: 750px) {
+    flex-direction: row;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    .header {
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.05);
+      display: flex;
+      gap: .5rem;
+    }
+
+    .container {
+      padding: 1rem;
+      flex: 1;
+      overflow: auto;
+    }
+  }
+
+  .scorecard {
+    padding: 0;
+    flex: 1;
+    container: scorecard / inline-size;
+
+    @container account-view-router-outlet (max-width: 750px) {
+      flex: 2;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-shadow: var(--default-box-shadow);
+
+      @container scorecard (min-width: 930px) {
+        flex-direction: row;
+      }
+
+      @container scorecard (max-width: 930px) {
+        ossfd-link-button ::ng-deep .content {
+          display: none;
+        }
+      }
+
+      .score-and-title {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        flex: 1;
+      }
+
+      .score,
+      .title,
+      .actions {
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        @container scorecard (min-width: 930px) {
+          justify-content: left;
+        }
+      }
+
+      .score {
+        padding-left: .5rem;
+
+        ossfd-score-ring {
+          height: 40px;
+          width: 40px;
+        }
+      }
+
+      .title {
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        h1 {
+          margin: 0;
+          font-size: 1.4rem;
+          font-weight: 500;
+        }
+
+        h2 {
+          margin: .2rem 0 0 0;
+          font-size: .8rem;
+          opacity: .5;
+          font-weight: normal;
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: .5rem;
+
+        @container scorecard (max-width: 930px) {
+          & > * {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .container {
+      overflow: auto;
+      transition: var(--default-transition);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 100%;
+      background-color: var(--ui-secondary-color);
+      box-shadow: inset -4px 0px 5px 0px rgba(0, 0, 0, .05);
+    }
+  }
+
+  .check-details {
+    flex: 1.6;
+    overflow: auto;
+
+    .header {
+      display: flex;
+      gap: .5rem;
+      position: relative;
+
+      * {
+        flex: 1;
+      }
+    }
+
+    .container {
+      padding: 1rem 2rem;
+
+      ::ng-deep {
+        a {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

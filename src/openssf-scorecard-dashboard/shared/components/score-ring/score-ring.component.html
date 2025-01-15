@@ -1,0 +1,18 @@
+<div class="base"></div>
+
+<div class="progress"
+     [style.border-color]="getColorVariableForScore(score())"></div>
+
+<div class="contents"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()">
+
+  <!-- Value of the score ring -->
+  <div class="score"
+       [@revealOnHover]="!hover() ? 'focused' : 'blurred'"
+       [innerHTML]="score()"></div>
+
+  <!-- Shown on hover -->
+  <ossfd-icon icon="sync"
+            [@revealOnHover]="hover() ? 'focused' : 'blurred'"></ossfd-icon>
+</div>
