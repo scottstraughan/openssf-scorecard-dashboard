@@ -32,6 +32,12 @@ export class TransientStorage {
   static readonly prefix: string = 'ossfd-ts';
 
   /**
+   * Use this to invalidate old cache, useful if you change the structure of the data and don't wish the client to
+   * receive invalid data.
+   */
+  static readonly version: string = '2';
+
+  /**
    * Constructor
    * @param storageService
    */
@@ -66,16 +72,17 @@ export class TransientStorage {
     value: T,
     timeoutInDays?: number
   ) {
-    if (!timeoutInDays) {
-      timeoutInDays = 365;
-    }
+    let expires = null;
 
-    const expires = new Date();
-    expires.setDate(expires.getDate() + timeoutInDays);
+    if (timeoutInDays) {
+      expires = new Date();
+      expires.setDate(expires.getDate() + timeoutInDays);
+    }
 
     this.storageService.set(TransientStorage.getFullKey(key), <TransientStorageWrapper<T>> {
       expires: expires,
-      data: value
+      data: value,
+      version: TransientStorage.version
     });
   }
 
@@ -113,7 +120,17 @@ export class TransientStorage {
 
     const stored: TransientStorageWrapper<T> = this.storageService.get(key);
 
-    if (new Date() >= new Date(stored.expires)) {
+    // Ensure the save data is conforming to the correct storage version
+    if (!('version' in stored)) {
+      this.storageService.clear();
+      return undefined;
+    } else if (stored.version !== TransientStorage.version) {
+      this.storageService.clear();
+      return undefined;
+    }
+
+    // Ensure the data is the correct date
+    if (stored.expires != null && new Date() >= new Date(stored.expires)) {
       this.storageService.remove(key);
       return undefined;
     }
@@ -137,6 +154,7 @@ export class TransientStorage {
  * Wraps a storage item with an expiry date.
  */
 interface TransientStorageWrapper<T> {
-  expires: Date
+  expires: Date | null // Null means infinite time
   data: T
+  version: string // Used to invalidate the cache, if the cache changes structure
 }

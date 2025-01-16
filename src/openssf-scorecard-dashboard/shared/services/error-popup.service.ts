@@ -21,7 +21,7 @@ import { PopupService } from '../components/popup/popup.service';
 import { ErrorPopupComponent } from '../popups/error-popup/error-popup.component';
 import { DuplicateAccountError, InvalidAccountError } from '../errors/account';
 import { CheckNotFoundError, ScorecardNotFoundError } from '../errors/scorecard';
-import { RateLimitError, ServiceNotSupportedError } from '../errors/service';
+import { RateLimitError } from '../errors/service';
 import { GenericError } from '../errors/generic';
 
 @Injectable({
