@@ -222,7 +222,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     repository: RepositoryModel
   ) {
     this.repository.set(repository);
-    this.title.setTitle(`${repository.name} - ${account.name} - OpenSSF Dashboard`);
+    this.title.setTitle(`${repository.name} - ${account.name} - OpenSSF Scorecard Dashboard`);
   }
 
   /**
