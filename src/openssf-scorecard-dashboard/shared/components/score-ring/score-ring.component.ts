@@ -33,11 +33,11 @@ import { IconComponent } from '../icon/icon.component';
   selector: 'ossfd-score-ring',
   standalone: true,
   templateUrl: './score-ring.component.html',
+  styleUrl: './score-ring.component.scss',
   imports: [
     NgCircleProgressModule,
     IconComponent,
   ],
-  styleUrl: './score-ring.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('revealOnHover', [

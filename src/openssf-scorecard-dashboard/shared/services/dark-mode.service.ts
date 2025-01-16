@@ -16,9 +16,9 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Inject, Injectable } from '@angular/core';
-import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { TransientStorage } from './transient-storage.service';
 
 /**
  * This service make it easy to enable or disable dark mode.
@@ -39,12 +39,12 @@ export class DarkModeService {
 
   /**
    * Constructor for DarkModeService.
-   * @param storageService
+   * @param transientStorage
    */
   constructor(
-    @Inject(LOCAL_STORAGE) private storageService: StorageService
+    private transientStorage: TransientStorage
   ) {
-    const savedDarkMode = this.storageService.get(DarkModeService.STORAGE_KEY);
+    const savedDarkMode = this.transientStorage.get<boolean>(DarkModeService.STORAGE_KEY);
     const browserDarkMode = this.isBrowserDarkModeEnabled();
 
     if (savedDarkMode !== undefined) {
@@ -69,7 +69,7 @@ export class DarkModeService {
   toggleDarkModeEnabled(): void {
     const darkModeEnabled = !this.darkModeEnabled$.getValue();
 
-    this.storageService.set(DarkModeService.STORAGE_KEY, darkModeEnabled);
+    this.transientStorage.set(DarkModeService.STORAGE_KEY, darkModeEnabled);
     this.darkModeEnabled$.next(darkModeEnabled);
   }
 
