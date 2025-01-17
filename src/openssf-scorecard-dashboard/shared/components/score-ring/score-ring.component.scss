@@ -1,35 +1,35 @@
 :host {
-  --ossfd-score-ring-width: 75px;
-  --ossfd-score-ring-height: 75px;
-  --ossfd-score-ring-cursor: var(--cursor);
-  --ossfd-score-ring-progress: var(--progress);
-  --ossfd-score-ring-thickness: 6cqw;
-  --ossfd-score-ring-progress-color: var(--hint-color);
-  --ossfd-score-ring-base-color: rgba(0, 0, 0, .15);
   --ossfd-score-ring-background: conic-gradient(grey var(--p, var(--ossfd-score-ring-progress)), transparent 0%) border-box;
+  --ossfd-score-ring-base-color: rgba(0, 0, 0, .15);
+  --ossfd-score-ring-cursor: var(--cursor);
+  --ossfd-score-ring-height: 75px;
+  --ossfd-score-ring-progress: var(--progress);
+  --ossfd-score-ring-progress-color: var(--hint-color);
+  --ossfd-score-ring-thickness: 6cqw;
+  --ossfd-score-ring-width: 75px;
 
-  position: relative;
-  display: block;
-  width: var(--ossfd-score-ring-width);
-  height: var(--ossfd-score-ring-height);
   container: score-container / inline-size;
   cursor: var(--ossfd-score-ring-cursor);
+  display: block;
+  height: var(--ossfd-score-ring-height);
+  position: relative;
   user-select: none;
+  width: var(--ossfd-score-ring-width);
 
   .base,
   .progress,
   .contents {
-    position: absolute;
-    width: 100%;
     height: 100%;
     left: 0;
+    position: absolute;
     top: 0;
+    width: 100%;
   }
 
   .base,
   .progress {
-    border: solid var(--ossfd-score-ring-thickness) var(--ossfd-score-ring-base-color);
     aspect-ratio: 1;
+    border: solid var(--ossfd-score-ring-thickness) var(--ossfd-score-ring-base-color);
     border-radius: 50%;
     -webkit-mask: var(--ossfd-score-ring-background);
     mask: var(--ossfd-score-ring-background);
@@ -40,19 +40,19 @@
   }
 
   .contents {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
     position: relative;
 
     > * {
-      position: absolute;
       font-size: 40cqw;
+      position: absolute;
     }
 
     ossfd-icon {
-      width: 40cqw;
       height: 40cqw;
+      width: 40cqw;
     }
   }
 }
