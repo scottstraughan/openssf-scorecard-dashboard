@@ -176,7 +176,7 @@ export class SelectedAccountStateService {
       }
     }
 
-    return Number(Math.round(totalScore / scoreCount).toFixed(2));
+    return Number((totalScore / scoreCount).toFixed(1));
   }
 
   /**
