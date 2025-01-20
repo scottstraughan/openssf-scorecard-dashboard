@@ -1,47 +1,47 @@
 :host {
-  --ossfd-link-button-default-border: var(--default-border);
-  --ossfd-link-button-box-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
-  --ossfd-link-button-transition: var(--default-transition);
-  --ossfd-link-button-bg-color-unfocused: var(--ossfd-component-bg-color-unfocused);
-  --ossfd-link-button-bg-color-focused: var(--ossfd-component-bg-color-focused);
-  --ossfd-link-button-box-shadow-focused: var(--ossfd-component-shadow-focused);
-  --ossfd-link-button-disabled-color: red;
-
   display: block;
+  --ossfd-link-button-bg-color-focused: var(--ossfd-component-bg-color-focused);
+  --ossfd-link-button-bg-color-unfocused: var(--ossfd-component-bg-color-unfocused);
+  --ossfd-link-button-box-shadow-focused: var(--ossfd-component-shadow-focused);
+  --ossfd-link-button-box-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
+  --ossfd-link-button-default-border: var(--default-border);
+  --ossfd-link-button-disabled-color: red;
+  --ossfd-link-button-transition: var(--default-transition);
+
   user-select: none;
 
   > a {
-    display: flex;
-    justify-content: center;
     align-items: center;
+    background-color: var(--ossfd-link-button-bg-color-unfocused);
+    border: var(--ossfd-link-button-default-border);
+    border-radius: 6px;
+    box-shadow: var(--ossfd-link-button-box-shadow-unfocused);
+    cursor: pointer;
+    display: flex;
     gap: .5rem;
     height: 100%;
-    padding: 1rem;
-    border-radius: 6px;
+    justify-content: center;
     opacity: .7;
-    cursor: pointer;
-    border: var(--ossfd-link-button-default-border);
-    box-shadow: var(--ossfd-link-button-box-shadow-unfocused);
+    padding: 1rem;
     transition: var(--ossfd-link-button-transition);
-    background-color: var(--ossfd-link-button-bg-color-unfocused);
 
     &.active,
     &:not(.disabled):hover {
-      opacity: 1;
       background-color: var(--ossfd-link-button-bg-color-focused);
       box-shadow: var(--ossfd-link-button-box-shadow-focused);
+      opacity: 1;
     }
 
     &.disabled {
-      cursor: not-allowed;
-      pointer-events: none;
-      opacity: .5;
       background-color: var(--ossfd-link-button-bg-color-unfocused);
+      cursor: not-allowed;
+      opacity: .5;
+      pointer-events: none;
     }
 
     ossfd-icon {
-      width: 26px;
       height: 26px;
+      width: 26px;
     }
   }
 }

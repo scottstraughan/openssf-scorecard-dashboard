@@ -60,6 +60,9 @@ export class AppComponent {
    */
   readonly serviceAccounts: Signal<AccountModel[]> = signal([]);
 
+  /**
+   * Signal used for dark mode enabling/disabling.
+   */
   readonly darkMode: WritableSignal<boolean | undefined> = signal(undefined);
 
   /**
@@ -111,7 +114,7 @@ export class AppComponent {
   /**
    * Toggle the dark mode.
    */
-  onToggleDarkMode($event: boolean) {
+  onToggleDarkMode() {
     this.darkModeService.toggleDarkModeEnabled();
   }
 }

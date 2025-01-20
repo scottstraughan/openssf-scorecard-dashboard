@@ -2,32 +2,30 @@
 @use 'themes' as *;
 
 html, body {
-  height: 100%;
-  color: #111;
-
-  --default-transition: .2s all;
-  --default-border-radius: 7px;
-  --default-border-radius-large: 10px;
-
-  --inverted-text-color: #fff;
-
-  --ui-primary-color: #fff;
-  --ui-secondary-color: #fafafa;
-  --ui-tertiary-color: #ebebeb;
-
-  --hint-color: #23064c;
-  --color-shocking: #bc2323;
-  --color-poor: #ca5f1d;
-  --color-good: #bd9c52;
-  --color-verygood: #9abd76;
-  --color-excellent: #548318;
-
-  --default-mobile-width: 1000px;
-  --icon-size: 58px;
-
   --default-border: var(--border-color) 1px solid;
+  --default-border-radius: 7px;
+
+  --default-border-radius-large: 10px;
   --default-box-shadow: 2px 2px 5px 0 var(--box-shadow-color);
   --slight-box-shadow: 2px 2px 3px 0 var(--box-shadow-color);
+
+  --hint-color: #23064c;
+  --color-excellent: #548318;
+  --color-good: #bd9c52;
+  --color-poor: #ca5f1d;
+  --color-shocking: #bc2323;
+
+  --default-mobile-width: 1000px;
+  --ui-primary-color: #fff;
+  --ui-secondary-color: #fafafa;
+  --icon-size: 58px;
+  --ui-tertiary-color: #ebebeb;
+  --inverted-text-color: #fff;
+  --default-transition: .2s all;
+  --color-verygood: #9abd76;
+
+  color: #111;
+  height: 100%;
 
   @include light-mode
 }
@@ -58,13 +56,13 @@ body {
 }
 
 a {
-  text-decoration: inherit;
   color: inherit;
+  text-decoration: inherit;
 }
 
 input {
-  font: inherit;
   color: inherit;
+  font: inherit;
 }
 
 .panel {
@@ -76,17 +74,17 @@ input {
 }
 
 .error-message {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  opacity: .4;
+  display: flex;
   height: 100%;
+  justify-content: center;
+  opacity: .4;
+  text-align: center;
 
   ossfd-icon {
     display: inline-block;
-    width: 60px;
     height: 60px;
+    width: 60px;
   }
 
   h1, h2 {

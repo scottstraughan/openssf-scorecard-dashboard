@@ -1,26 +1,26 @@
 :host {
+  --ossfd-switch-bg-color: var(--ossfd-component-bg-color-inverted);
+  --ossfd-switch-box-shadow-focused: var(--ossfd-component-shadow-focused);
+  --ossfd-switch-box-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
+  --ossfd-switch-icon-color: var(--inverted-text-color);
   --ossfd-switch-internal-padding: 2px;
   --ossfd-switch-nipple-color: var(--hint-color);
-  --ossfd-switch-icon-color: var(--inverted-text-color);
-  --ossfd-switch-box-shadow-unfocused: var(--ossfd-component-shadow-unfocused);
-  --ossfd-switch-box-shadow-focused: var(--ossfd-component-shadow-focused);
-  --ossfd-switch-transition: var(--default-transition);
   --ossfd-switch-nipple-height: 30px;
-  --ossfd-switch-bg-color: var(--ossfd-component-bg-color-inverted);
+  --ossfd-switch-transition: var(--default-transition);
 
-  display: flex;
-  width: 100%;
-  height: var(--ossfd-switch-nipple-height);
-  border-radius: var(--ossfd-switch-nipple-height);
   background-color: var(--ossfd-switch-bg-color);
-  color: var(--ossfd-switch-icon-color);
+  border-radius: var(--ossfd-switch-nipple-height);
   box-shadow: var(--ossfd-component-shadow-unfocused);
-  position: relative;
-  padding: var(--ossfd-switch-internal-padding);
-  overflow: hidden;
+  color: var(--ossfd-switch-icon-color);
   cursor: pointer;
-  user-select: none;
+  display: flex;
+  height: var(--ossfd-switch-nipple-height);
+  overflow: hidden;
+  padding: var(--ossfd-switch-internal-padding);
+  position: relative;
   transition: var(--ossfd-switch-transition);
+  user-select: none;
+  width: 100%;
 
   &:hover {
     box-shadow: var(--ossfd-switch-box-shadow-focused);
@@ -28,27 +28,27 @@
 
   .state,
   .nipple {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
   }
 
   .state {
-    flex: 1;
     container: state-container / inline-size;
+    flex: 1;
 
     ossfd-icon {
-      width: 2cqh;
       height: 2cqh;
+      width: 2cqh;
     }
   }
 
   .nipple {
+    background-color: var(--ossfd-switch-nipple-color);
+    border-radius: var(--ossfd-switch-nipple-height);
+    height: calc(100% - var(--ossfd-switch-internal-padding) - var(--ossfd-switch-internal-padding));
     position: absolute;
     top: var(--ossfd-switch-internal-padding);
     width: 50%;
-    height: calc(100% - var(--ossfd-switch-internal-padding) - var(--ossfd-switch-internal-padding));
-    background-color: var(--ossfd-switch-nipple-color);
-    border-radius: var(--ossfd-switch-nipple-height);
   }
 }

@@ -3,10 +3,10 @@
 
   .body {
     .badge-wrapper {
-      display: flex;
       align-items: flex-start;
-      position: relative;
+      display: flex;
       height: 20px;
+      position: relative;
 
       img {
         object-fit: contain;
@@ -27,13 +27,13 @@
     }
 
     .example {
-      display: block;
       background-color: var(--ui-secondary-color);
-      color: var(--text-color);
-      padding: 1rem;
       border-radius: var(--default-border-radius);
+      color: var(--text-color);
+      display: block;
       font-size: .8rem;
       overflow: scroll;
+      padding: 1rem;
       white-space: nowrap;
     }
   }
