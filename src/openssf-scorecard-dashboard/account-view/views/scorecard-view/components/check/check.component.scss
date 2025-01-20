@@ -1,39 +1,41 @@
 :host {
-  --ossfd-check-ring-size: 50px;
-  --ossfd-check-border-radius: var(--default-border-radius);
-  --ossfd-check-box-shadow: var(--default-box-shadow);
-  --ossfd-check-transition: var(--default-transition);
   --ossfd-check-background-color-focused: var(--ui-primary-color);
   --ossfd-check-background-color-unfocused: var(--ui-primary-color);
+  --ossfd-check-border-radius: var(--default-border-radius);
+  --ossfd-check-box-shadow: var(--default-box-shadow);
+  --ossfd-check-ring-size: 50px;
   --ossfd-check-score-border-left-width: 8px;
+  --ossfd-check-transition: var(--default-transition);
 
   ossfd-faded-bg {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    cursor: pointer;
-    container: check-container / inline-size;
-    border-radius: var(--ossfd-check-border-radius);
-    box-shadow: var(--ossfd-check-box-shadow);
-    transition: var(--ossfd-check-transition);
     background-color: var(--ossfd-check-background-color-unfocused);
     border-left: solid var(--ossfd-check-score-border-left-width) transparent;
+    border-radius: var(--ossfd-check-border-radius);
+    box-shadow: var(--ossfd-check-box-shadow);
+    container: check-container / inline-size;
+    cursor: pointer;
+    display: flex;
+    gap: 1rem;
     overflow: hidden;
+    padding: 1rem;
+    transition: var(--ossfd-check-transition);
 
     &:hover {
       background-color: var(--ossfd-check-background-color-focused);
     }
 
     .details {
-      flex: 1;
       display: flex;
+      flex: 1;
       flex-direction: column;
       gap: .2rem;
 
-      * {
-        padding: 0;
-        margin: 0;
+      .priority,
+      h1,
+      p {
         display: block;
+        margin: 0;
+        padding: 0;
       }
 
       h1 {
@@ -51,12 +53,12 @@
     }
 
     .score {
-      display: flex;
       align-items: center;
+      display: flex;
 
       ossfd-score-ring {
-        width: var(--ossfd-check-ring-size);
         height: var(--ossfd-check-ring-size);
+        width: var(--ossfd-check-ring-size);
       }
     }
   }

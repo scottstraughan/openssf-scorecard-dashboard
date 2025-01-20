@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ApplicationConfig, SecurityContext } from '@angular/core';
+import { ApplicationConfig, ChangeDetectionStrategy, SecurityContext, ViewEncapsulation } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -25,7 +25,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideMarkdown } from 'ngx-markdown';
 import { gfmHeadingId } from 'marked-gfm-heading-id';
 
-export const appConfig: ApplicationConfig = {
+export const appConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
@@ -36,5 +36,7 @@ export const appConfig: ApplicationConfig = {
       sanitize: SecurityContext.NONE,
       markedExtensions: [gfmHeadingId()],
     })
-  ]
+  ],
+  defaultEncapsulation: ViewEncapsulation.ShadowDom,
+  defaultChangeDetection: ChangeDetectionStrategy.OnPush
 };

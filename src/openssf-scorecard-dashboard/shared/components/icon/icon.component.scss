@@ -1,13 +1,12 @@
 :host {
-  width: 26px;
-  height: 26px;
-
-  display: flex;
   align-items: center;
+  display: flex;
+  height: 26px;
   justify-content: center;
+  width: 26px;
 
   img {
-    width: auto;
     height: 100%;
+    width: auto;
   }
 }
