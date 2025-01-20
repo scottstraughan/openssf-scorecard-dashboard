@@ -21,12 +21,12 @@
     opacity: 1;
   }
 
-  > * {
+  .icon,
+  .input {
     padding: 1rem;
-
   }
 
-  input {
+  .input {
     background-color: transparent;
     border: none;
     outline: none;

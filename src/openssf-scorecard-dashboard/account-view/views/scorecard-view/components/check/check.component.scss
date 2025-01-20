@@ -30,7 +30,9 @@
       flex-direction: column;
       gap: .2rem;
 
-      * {
+      .priority,
+      h1,
+      p {
         display: block;
         margin: 0;
         padding: 0;
