@@ -104,7 +104,7 @@
         gap: .5rem;
 
         @container scorecard (max-width: 930px) {
-          & > * {
+          ossfd-link-button {
             flex: 1;
           }
         }
@@ -133,7 +133,7 @@
       gap: .5rem;
       position: relative;
 
-      * {
+      ossfd-link-button {
         flex: 1;
       }
     }
