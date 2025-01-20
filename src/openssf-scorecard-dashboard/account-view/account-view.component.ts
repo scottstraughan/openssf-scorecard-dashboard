@@ -59,6 +59,10 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
   readonly averageScorecardScore: WritableSignal<number> = signal(0);
 
+  /**
+   * This is used to clean up when ngOnDestroy is called, or we wish to reset state.
+   * @private
+   */
   private cleanup = new Subject<void>();
 
   /**
@@ -177,7 +181,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Reset the UI.
+   * Reset the UI state.
    */
   private reset() {
     this.cleanup.complete();
