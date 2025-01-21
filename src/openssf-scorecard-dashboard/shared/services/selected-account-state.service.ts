@@ -25,7 +25,6 @@ import { AccountModel } from '../models/account.model';
 import { Injectable } from '@angular/core';
 import { AccountService } from './account.service';
 import { ScorecardRequest } from '../models/scorecard-request.model';
-import { Service } from '../enums/service';
 import { RepositoryNotFoundError } from '../errors/account';
 import { ScorecardNotFoundError } from '../errors/scorecard';
 
@@ -129,7 +128,7 @@ export class SelectedAccountStateService {
    * @param accountName
    */
   setAccount(
-    service: Service,
+    service: string,
     accountName: string
   ): Observable<AccountModel> {
     this.reset();
@@ -169,11 +168,19 @@ export class SelectedAccountStateService {
     let totalScore = 0;
     let scoreCount = 0;
 
+    if (this.scorecardRequests.size == 0) {
+      return 0;
+    }
+
     for (const scorecardRequest of this.scorecardRequests.values()) {
       if (scorecardRequest.scorecard?.score) {
         totalScore += scorecardRequest.scorecard.score;
         scoreCount += 1;
       }
+    }
+
+    if (scoreCount == 0) {
+      return 0;
     }
 
     return Number((totalScore / scoreCount).toFixed(1));
