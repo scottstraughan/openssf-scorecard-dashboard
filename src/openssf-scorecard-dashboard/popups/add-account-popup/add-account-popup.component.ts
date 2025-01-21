@@ -23,7 +23,6 @@ import { LinkButtonComponent } from '../../shared/components/link-button/link-bu
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../shared/services/account.service';
 import { catchError, of, take, tap } from 'rxjs';
-import { ErrorPopupComponent } from '../../shared/popups/error-popup/error-popup.component';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
@@ -87,13 +86,7 @@ export class AddAccountPopupComponent {
    * Determine if all the forms are valid.
    */
   isServiceFormsValid(): boolean {
-    if (this.service() == 'github') {
-      if (this.accountName().length == 0) {
-        return false;
-      }
-    }
-
-    return true;
+    return this.accountName().length != 0;
   }
 
   /**
@@ -138,14 +131,9 @@ export class AddAccountPopupComponent {
   }
 
   /**
-   * Called when a user clicks the gitlab icon (temporary).
+   * Called when a user clicks the to change the service.
    */
-  onGitlabClicked() {
-    this.popupService.create(
-      ErrorPopupComponent, {
-        title: 'Coming Soon!',
-        message: 'GitLab is currently not supported, but its coming soon!',
-        icon: 'error'
-      }, true);
+  onChangeService(service: Service) {
+    this.service.set(service);
   }
 }
