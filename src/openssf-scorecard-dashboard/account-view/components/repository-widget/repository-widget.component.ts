@@ -96,6 +96,7 @@ export class RepositoryWidgetComponent implements OnInit {
         ErrorPopupComponent, {
           title: 'No Scorecard',
           message: 'This repository does not have any associated scorecard available.',
+          icon: 'score'
         }, true);
     }
   }
