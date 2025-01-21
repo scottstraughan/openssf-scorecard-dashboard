@@ -18,13 +18,15 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { BehaviorSubject, catchError, forkJoin, Observable, Observer, of, take, tap, } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, Observable, of, take, tap, throwError, } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { MinimumAccountError } from '../errors/account';
 import { Service } from '../enums/service';
 import { ServiceNotSupportedError } from '../errors/service';
 import { TransientStorage } from './transient-storage.service';
+import { GitlabService } from './repository-services/gitlab.service';
+import { BaseRepositoryService } from './repository-services/base-repository-service';
 
 @Injectable({
   providedIn: 'root'
@@ -65,10 +67,12 @@ export class AccountService {
    * Constructor
    * @param transientStorage
    * @param githubAccountService
+   * @param gitlabAccountService
    */
   constructor(
     private transientStorage: TransientStorage,
-    private githubAccountService: GithubService
+    private githubAccountService: GithubService,
+    private gitlabAccountService: GitlabService
   ) {
     this.initializeAccounts()
       .pipe(
@@ -92,10 +96,15 @@ export class AccountService {
    * @param apiToken
    */
   getAccount(
-    service: Service,
+    service: any,
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
+    // Check if the service is supported or not
+    if (!Object.values(Service).includes(service.toString())) {
+      return throwError(() => new ServiceNotSupportedError());
+    }
+
     const existingAccount = this.accounts.get(AccountService.createAccountMapKey(service, accountName));
 
     if (existingAccount) {
@@ -126,16 +135,26 @@ export class AccountService {
       return of(repositories);
     }
 
-    switch (account.service) {
-      case Service.GITHUB:
-        return this.githubAccountService.getRepositories(account)
-          .pipe(
-            tap(repositories => this.transientStorage.set<RepositoryModel[]>(
-              storageKey, repositories, AccountService.STORAGE_REPOSITORIES_TIMEOUT_IN_DAYS))
-          );
+    return this.getServiceProvider(account.service)
+      .getRepositories(account)
+      .pipe(
+        tap(repositories => this.transientStorage.set<RepositoryModel[]>(
+          storageKey, repositories, AccountService.STORAGE_REPOSITORIES_TIMEOUT_IN_DAYS))
+      );
+  }
+
+  /**
+   * Get a service provider.
+   * @param service
+   */
+  getServiceProvider(
+    service: Service
+  ): BaseRepositoryService {
+    if (service == Service.GITLAB) {
+      return this.gitlabAccountService;
     }
 
-    throw Error('Unsupported account service type.');
+    return this.githubAccountService;
   }
 
   /**
@@ -214,26 +233,8 @@ export class AccountService {
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
-    return new Observable((observer: Observer<AccountModel>) => {
-      switch (service) {
-        case Service.GITHUB:
-          return this.githubAccountService.getAccount(accountName, apiToken)
-            .pipe(
-              tap(account => {
-                observer.next(account);
-                observer.complete();
-              }),
-              take(1),
-              catchError(error => {
-                observer.error(error);
-                return of(error);
-              })
-            )
-            .subscribe();
-      }
-      
-      throw new ServiceNotSupportedError();
-    });
+    return this.getServiceProvider(service)
+      .getAccount(accountName, apiToken);
   }
 
   /**
