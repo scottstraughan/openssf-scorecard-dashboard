@@ -40,7 +40,7 @@ import { IconComponent } from '../../components/icon/icon.component';
 export class ErrorPopupComponent {
   title: WritableSignal<string> = signal('');
   message: WritableSignal<string> = signal('');
-  icon: WritableSignal<string> = signal('warning');
+  icon: WritableSignal<string> = signal('error');
 
   /**
    * Constructor
