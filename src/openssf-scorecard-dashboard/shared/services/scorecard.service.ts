@@ -10,6 +10,7 @@ import { ScorecardCheckDetails } from '../models/scorecard-check-details.model';
 import { ResultPriority } from '../enums/scorecard';
 import { CheckNotFoundError, ScorecardNotFoundError, UnableToParseCheckDetailsSegment } from '../errors/scorecard';
 import { TransientStorage } from './transient-storage.service';
+import { Service } from '../enums/service';
 
 @Injectable({
   providedIn: 'root'
@@ -139,7 +140,13 @@ export class ScorecardService {
     repository: RepositoryModel,
     forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
-    const url = `https://api.securityscorecards.dev/projects/github.com/${account.tag}/${repository.name}`;
+    let serviceProviderUrl = 'github.com';
+
+    if (account.service == Service.GITLAB) {
+      serviceProviderUrl = 'gitlab.com'
+    }
+
+    const url = `https://api.securityscorecards.dev/projects/${serviceProviderUrl}/${account.tag}/${repository.name}`;
     const storageKey = `${account.service}-${account.tag}-${repository.name}`.toLowerCase();
 
     if (forceReload) {
