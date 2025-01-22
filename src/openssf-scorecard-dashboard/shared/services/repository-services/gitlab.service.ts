@@ -20,10 +20,8 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { AccountModel } from '../../models/account.model';
-import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BaseRepositoryService } from './base-repository-service';
 import { Service } from '../../enums/service';
-import { RateLimitError } from '../../errors/service';
 import { InvalidAccountError } from '../../errors/account';
 
 @Injectable({
@@ -37,10 +35,10 @@ export class GitlabService extends BaseRepositoryService {
     accountName: string,
     apiToken?: string
   ): Observable<AccountModel> {
-    return this.getAccountViaGroups(accountName, apiToken)
+    return this.getAccountViaMethod(Method.GROUPS, accountName, apiToken)
       .pipe(
         catchError(() => {
-          return this.getAccountViaUser(accountName, apiToken)
+          return this.getAccountViaMethod(Method.USERS, accountName, apiToken)
             .pipe(
               catchError(() => {
                 throw new InvalidAccountError()
@@ -48,95 +46,6 @@ export class GitlabService extends BaseRepositoryService {
             )
         })
       );
-  }
-
-  /**
-   * Attempt to get an account using the groups API endpoint.
-   * @param accountName
-   * @param apiToken
-   * @private
-   */
-  private getAccountViaGroups(
-    accountName: string,
-    apiToken?: string
-  ) {
-    const apiUrl = `${GitlabService.generateApiUrl(Method.GROUPS, accountName)}?with_projects=false`;
-
-    return this.getRequestInstance(apiUrl, apiToken)
-      .pipe(
-        map((accountResult: any) => {
-          return <AccountModel> {
-            service: Service.GITLAB,
-            tag: accountResult['path'],
-            name: accountResult['name'] ? accountResult['name'] : accountName,
-            icon: accountResult['avatar_url'] || '/assets/images/missing-avatar.png',
-            description: accountResult['description'] || 'The group has no description available.',
-            averageScore: 0,
-            totalRepositories: 0,
-            repositoriesWithScorecards: 0,
-            followers: accountResult['followers'] || 0,
-            url: accountResult['html_url'],
-            apiToken: apiToken
-          }
-        }),
-        switchMap(account =>
-          this.injectTotalRepositoryCount(Method.GROUPS, account, apiToken))
-      );
-  }
-
-  /**
-   * Attempt to get an account using the users API endpoint.
-   * @param accountName
-   * @param apiToken
-   * @private
-   */
-  private getAccountViaUser(
-    accountName: string,
-    apiToken?: string
-  ) {
-    return this.getRequestInstance(`https://gitlab.com/api/v4/users?username=${accountName}`, apiToken)
-      .pipe(
-        map((accountResult: any) => {
-          return <AccountModel> {
-            service: Service.GITLAB,
-            tag: accountResult[0]['username'],
-            name: accountResult[0]['name'] ? accountResult[0]['name'] : accountName,
-            icon: accountResult[0]['avatar_url'] || '/assets/images/missing-avatar.png',
-            description: accountResult[0]['description'] || 'The user has no description available.',
-            averageScore: 0,
-            totalRepositories: 0,
-            repositoriesWithScorecards: 0,
-            followers: 0,
-            url: accountResult[0]['web_url'],
-            apiToken: apiToken
-          }
-        }),
-        switchMap(account =>
-          this.injectTotalRepositoryCount(Method.USERS, account, apiToken))
-      );
-  }
-
-  /**
-   * Inject the total repository count for a given account.
-   * @param method
-   * @param account
-   * @param apiToken
-   * @private
-   */
-  private injectTotalRepositoryCount(
-    method: Method,
-    account: AccountModel,
-    apiToken?: string
-  ): Observable<AccountModel> {
-    const apiUrl = `${GitlabService.generateApiUrl(method, account.tag)}/projects?with_projects=false`;
-
-    return this.getRequestInstance(`${apiUrl}&per_page=${GitlabService.RESULTS_PER_PAGE}&page=1`, apiToken, 'response')
-      .pipe(
-        map((response: any) => {
-          account.totalRepositories = response.headers.get('x-total-pages');
-          return account;
-        })
-      )
   }
 
   /**
@@ -154,6 +63,64 @@ export class GitlabService extends BaseRepositoryService {
   }
 
   /**
+   * @inheritdoc
+   */
+  private getAccountViaMethod(
+    method: Method,
+    accountName: string,
+    apiToken?: string
+  ): Observable<AccountModel> {
+    return this.getRequestInstance(GitlabService.generateApiForAccount(method, accountName), apiToken)
+      .pipe(
+        // The user endpoint will return response in different format, modify it, so it matches group response
+        map(response =>
+          method == Method.USERS ? GitlabService.transmogrifyUserResponse(response) : response),
+        // Convert the response into the account response
+        map((accountResult: any) => {
+          return <AccountModel> {
+            service: Service.GITLAB,
+            tag: accountResult['path'],
+            name: accountResult['name'] ? accountResult['name'] : accountName,
+            icon: accountResult['avatar_url'] || '/assets/images/missing-avatar.png',
+            description: accountResult['description'] || 'The group has no description available.',
+            averageScore: 0,
+            totalRepositories: 0,
+            repositoriesWithScorecards: 0,
+            followers: accountResult['followers'] || 0,
+            url: accountResult['html_url'],
+            apiToken: apiToken
+          }
+        }),
+        // Inject the repository account number
+        switchMap(account =>
+          this.injectTotalRepositoryCount(method, account, apiToken))
+      );
+  }
+
+  /**
+   * Inject the total repository count for a given account.
+   * @param method
+   * @param account
+   * @param apiToken
+   * @private
+   */
+  private injectTotalRepositoryCount(
+    method: Method,
+    account: AccountModel,
+    apiToken?: string
+  ): Observable<AccountModel> {
+    const apiUrl = `${GitlabService.generateApiUrl(method, account.tag)}/projects?with_projects=false&page=1`;
+
+    return this.getRequestInstance(apiUrl, apiToken, 'response')
+      .pipe(
+        map((response: any) => {
+          account.totalRepositories = response.headers.get('x-total-pages');
+          return account;
+        })
+      )
+  }
+
+  /**
    * Fetch all the repositories for a given account, going through each API request page until complete.
    * @param method
    * @param accountName
@@ -163,7 +130,7 @@ export class GitlabService extends BaseRepositoryService {
    * @private
    */
   private getAllRepositories(
-    method: Method = Method.GROUPS,
+    method: Method,
     accountName: string,
     apiToken?: string,
     page: number = 1,
@@ -193,49 +160,23 @@ export class GitlabService extends BaseRepositoryService {
           exhausted ? of(repositories) : this.getAllRepositories(
             method, accountName, apiToken, page + 1, repositories)),
         catchError(error =>
-          throwError(() => this.throwDecentError(error)))
+          throwError(() => this.throwDecentError(Service.GITLAB, error)))
       );
   }
 
   /**
-   * Get a request instance, initialized with some defaults.
-   * @param url
-   * @param apiToken
-   * @param observe
-   */
-  private getRequestInstance(
-    url: string,
-    apiToken?: string,
-    observe?: any
-  ) {
-    let headers: HttpHeaders = new HttpHeaders();
-
-    if (apiToken) {
-      headers = headers.set('Authorization', `Bearer ${apiToken}`);
-    }
-
-    if (!observe) {
-      observe = 'body';
-    }
-
-    return this.httpClient.get(url, { responseType: 'json', headers: headers, observe: observe });
-  }
-
-  /**
-   * Throw a more helpful error.
-   * @param error
+   * Modify a response from the user endpoint to match the groups endpoint.
+   * @param response
    * @private
    */
-  private throwDecentError(error: HttpErrorResponse) {
-    if (error.status == 429 || error.status == 403) {
-      return new RateLimitError(
-        'You have been throttled by GitLab. Please wait 30 minutes or add a different API key to the account.');
-    } else if (error.status == 404) {
-      return new InvalidAccountError(
-        `No GitLab account with the provided name was found. Please recheck the account name.`);
-    }
+  private static transmogrifyUserResponse(
+    response: any
+  ): any {
+    response = response[0];
+    response['path'] = response['username'];
+    response['html_url'] = response['web_url'];
 
-    return error;
+    return response;
   }
 
   /**
@@ -248,6 +189,23 @@ export class GitlabService extends BaseRepositoryService {
     accountName: string
   ): string {
     return `https://gitlab.com/api/v4/${method.toString()}/${accountName}`;
+  }
+
+  /**
+   * Generate an API url for requesting account information.
+   * @param method
+   * @param accountName
+   * @private
+   */
+  private static generateApiForAccount(
+    method: Method,
+    accountName: string
+  ) {
+    if (method == Method.USERS) {
+      return `https://gitlab.com/api/v4/users?username=${accountName}`;
+    }
+
+    return `${GitlabService.generateApiUrl(Method.GROUPS, accountName)}?with_projects=false`;
   }
 }
 
