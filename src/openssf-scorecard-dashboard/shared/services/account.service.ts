@@ -173,7 +173,9 @@ export class AccountService {
     }
 
     return this.fetchAccount(service, accountName, apiToken)
-      .pipe(tap(account => this.setAccounts([account])));
+      .pipe(
+        tap(account => this.setAccounts([account]))
+      );
   }
 
   /**
@@ -205,12 +207,14 @@ export class AccountService {
 
     const defaultAccountsObservables = AccountService.DEFAULT_ACCOUNTS.map(
       defaultAccount => this.add(defaultAccount.service, defaultAccount.account)
-        .pipe(catchError(() => of()))); // Skip any errors
+        .pipe(
+          catchError(() => of())
+        )); // Skip any errors
 
     return forkJoin(defaultAccountsObservables)
-      .pipe(tap(accounts => {
-        this.setAccounts(accounts, false);
-      }));
+      .pipe(
+        tap(accounts => this.setAccounts(accounts, false))
+      );
   }
 
   /**
