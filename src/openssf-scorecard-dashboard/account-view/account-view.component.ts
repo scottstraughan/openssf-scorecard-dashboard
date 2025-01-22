@@ -16,7 +16,16 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  OnDestroy,
+  OnInit,
+  Signal,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
 import { ScoreRingComponent } from '../shared/components/score-ring/score-ring.component';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -30,6 +39,7 @@ import { SelectedAccountStateService } from '../shared/services/selected-account
 import { AccountService } from '../shared/services/account.service';
 import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-popup.service';
 import { IconComponent } from '../shared/components/icon/icon.component';
+import { Service } from '../shared/enums/service';
 
 @Component({
   selector: 'ossfd-account-view',
@@ -58,6 +68,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   readonly totalRepositories: WritableSignal<number> = signal(0);
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
   readonly averageScorecardScore: WritableSignal<number> = signal(0);
+  readonly selectedAccountServiceName: Signal<string> = signal('');
 
   /**
    * This is used to clean up when ngOnDestroy is called, or we wish to reset state.
@@ -83,7 +94,19 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     protected selectedAccountService: SelectedAccountStateService,
     protected accountService: AccountService,
     protected errorPopupService: ErrorPopupService
-  ) { }
+  ) {
+    // Used for the visit repository button
+    this.selectedAccountServiceName = computed(() => {
+      switch (this.selectedAccount()?.service) {
+        case Service.GITHUB:
+          return 'GitHub.com'
+        case Service.GITLAB:
+          return 'GitLab.com'
+        default:
+          return ''
+      }
+    })
+  }
 
   /**
    * @inheritdoc
