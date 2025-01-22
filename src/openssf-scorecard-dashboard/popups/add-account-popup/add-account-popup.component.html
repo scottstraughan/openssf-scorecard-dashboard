@@ -21,7 +21,12 @@
 
   <div class="content">
     <div>
-      <label>{{service()}} User/Group or Organization Name</label>
+      @if (service() == Service.GITLAB) {
+        <label>GitLab User or Group Name</label>
+      } @else if (service() == Service.GITHUB) {
+        <label>GitHub User or Organization Name</label>
+      }
+
       <ossfd-input
           [(value)]="accountName"
           [focus]="true"
