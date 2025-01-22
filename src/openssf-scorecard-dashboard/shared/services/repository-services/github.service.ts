@@ -20,11 +20,8 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { RepositoryModel } from '../../models/repository.model';
 import { AccountModel } from '../../models/account.model';
-import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BaseRepositoryService } from './base-repository-service';
 import { Service } from '../../enums/service';
-import { RateLimitError } from '../../errors/service';
-import { InvalidAccountError } from '../../errors/account';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +56,7 @@ export class GithubService extends BaseRepositoryService {
           }
         }),
         catchError(error =>
-          throwError(() => this.throwDecentError(error)))
+          throwError(() => this.throwDecentError(Service.GITHUB, error)))
       );
   }
 
@@ -111,43 +108,8 @@ export class GithubService extends BaseRepositoryService {
         switchMap(repositories =>
           exhausted ? of(repositories) : this.getAllRepositories(accountName, apiToken, page + 1, repositories)),
         catchError(error =>
-          throwError(() => this.throwDecentError(error)))
+          throwError(() => this.throwDecentError(Service.GITHUB, error)))
       );
-  }
-
-  /**
-   * Get a request instance, initialized with some defaults.
-   * @param url
-   * @param apiToken
-   */
-  private getRequestInstance(
-    url: string,
-    apiToken?: string
-  ) {
-    let headers: HttpHeaders = new HttpHeaders();
-
-    if (apiToken) {
-      headers = headers.set('Authorization', `Bearer ${apiToken}`);
-    }
-
-    return this.httpClient.get(url, { responseType: 'json', headers: headers });
-  }
-
-  /**
-   * Throw a more helpful error.
-   * @param error
-   * @private
-   */
-  private throwDecentError(error: HttpErrorResponse) {
-    if (error.status == 429 || error.status == 403) {
-      return new RateLimitError(
-        'You have been throttled by GitHub. Please wait 30 minutes or add a different API key to the account.');
-    } else if (error.status == 404) {
-      return new InvalidAccountError(
-        `No GitHub account with the provided name was found. Please recheck the account name.`);
-    }
-
-    return error;
   }
 
   /**
