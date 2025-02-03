@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - uses: actions/checkout
       - run: ls -a
       - name: Setup Node.js 22
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
@@ -34,7 +34,7 @@ jobs:
       - name: Copy index.html to 404.html
         run: cp ./dist/openssf-scorecard-dashboard/browser/index.html ./dist/openssf-scorecard-dashboard/browser/404.html
       - name: Upload to GitHub Artifacts
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        uses: actions/upload-pages-artifact
         with:
           path: ./dist/openssf-scorecard-dashboard/browser
 
@@ -49,4 +49,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+        uses: actions/deploy-pages
