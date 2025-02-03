@@ -30,7 +30,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@2.20.3
+      uses: github/codeql-action/init@3.28.8
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -46,6 +46,6 @@ jobs:
         exit 1
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@2.20.3
+      uses: github/codeql-action/analyze@3.28.8
       with:
         category: "/language:${{matrix.language}}"
