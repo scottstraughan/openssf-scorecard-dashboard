@@ -190,12 +190,15 @@ export class AccountService {
   /**
    * Initialize the accounts for all observers.
    */
-  initialize(): Observable<any> {
+  initialize(): Observable<AccountModel[]> {
     const cached = this.transientStorage.get<AccountModel[]>('accounts');
 
     if (Array.isArray(cached) && cached.length > 0) {
       this.setAccounts(cached, false);
-      return of(undefined);
+      return of(cached).pipe(
+        tap(() =>
+          this.notifyObservers())
+      );
     }
 
     const defaultAccountsObservables = AccountService.DEFAULT_ACCOUNTS.map(
