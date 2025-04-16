@@ -41,6 +41,7 @@
               [class.grid]="layoutView() == LayoutView.GRID">
             @for (repository of getVisibleRepositories(); track repository.url) {
               <ossfd-repository-widget
+                  [layout]="layoutView()"
                   [account]="account"
                   [repository]="repository"></ossfd-repository-widget>
             }

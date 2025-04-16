@@ -30,6 +30,8 @@ import { catchError, of, tap } from 'rxjs';
 import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
 import { Router } from '@angular/router';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
+import { LayoutView } from '../../views/repository-list-view/repository-list-view.component';
 
 @Component({
   selector: 'ossfd-repository-widget',
@@ -38,17 +40,20 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     ScoreRingComponent,
     DatePipe,
     LoadingComponent,
-    IconComponent
+    IconComponent,
+    TruncatePipe
   ],
   templateUrl: './repository-widget.component.html',
   styleUrl: './repository-widget.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RepositoryWidgetComponent implements OnInit {
+  protected readonly LayoutView = LayoutView;
   protected readonly LoadingState = LoadingState;
 
   readonly account = input.required<AccountModel>();
   readonly repository = input.required<RepositoryModel>();
+  readonly layout = input<LayoutView>(LayoutView.GRID);
 
   readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
   readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);

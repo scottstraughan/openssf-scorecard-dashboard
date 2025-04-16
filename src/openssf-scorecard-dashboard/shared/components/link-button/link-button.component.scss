@@ -1,3 +1,5 @@
+@use "../../../../mixins" as *;
+
 :host {
   display: block;
   --ossfd-link-button-bg-color-focused: var(--ossfd-component-bg-color-focused);
@@ -11,16 +13,15 @@
   user-select: none;
 
   > a {
-    align-items: center;
+    @include center;
+
     background-color: var(--ossfd-link-button-bg-color-unfocused);
     border: var(--ossfd-link-button-default-border);
     border-radius: 6px;
     box-shadow: var(--ossfd-link-button-box-shadow-unfocused);
     cursor: pointer;
-    display: flex;
     gap: .5rem;
     height: 100%;
-    justify-content: center;
     opacity: .7;
     padding: 1rem;
     transition: var(--ossfd-link-button-transition);
