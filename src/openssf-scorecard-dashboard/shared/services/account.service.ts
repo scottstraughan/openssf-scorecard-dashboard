@@ -73,14 +73,7 @@ export class AccountService {
     private transientStorage: TransientStorage,
     private githubAccountService: GithubService,
     private gitlabAccountService: GitlabService
-  ) {
-    this.initializeAccounts()
-      .pipe(
-        tap(() => this.notifyObservers()),
-        take(1),
-      )
-      .subscribe();
-  }
+  ) { }
 
   /**
    * Get the accounts observable.
@@ -195,9 +188,9 @@ export class AccountService {
   }
 
   /**
-   * Initialize the accounts, will notify observers once initialization is completed.
+   * Initialize the accounts for all observers.
    */
-  private initializeAccounts(): Observable<any> {
+  initialize(): Observable<any> {
     const cached = this.transientStorage.get<AccountModel[]>('accounts');
 
     if (Array.isArray(cached) && cached.length > 0) {
@@ -213,7 +206,10 @@ export class AccountService {
 
     return forkJoin(defaultAccountsObservables)
       .pipe(
-        tap(accounts => this.setAccounts(accounts, false))
+        tap(accounts =>
+          this.setAccounts(accounts, false)),
+        tap(() =>
+          this.notifyObservers())
       );
   }
 
