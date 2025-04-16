@@ -1,5 +1,6 @@
 @use 'fonts' as *;
 @use 'themes' as *;
+@use 'mixins' as *;
 
 html, body {
   --default-border: var(--border-color) 1px solid;
@@ -74,10 +75,9 @@ input {
 }
 
 .error-message {
-  align-items: center;
-  display: flex;
+  @include center;
+
   height: 100%;
-  justify-content: center;
   opacity: .4;
   text-align: center;
 

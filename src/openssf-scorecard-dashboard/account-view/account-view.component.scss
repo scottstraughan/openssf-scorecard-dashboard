@@ -1,3 +1,5 @@
+@use "../../mixins" as *;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -124,13 +126,13 @@
           }
 
           .number {
-            align-items: center;
+            @include center;
+
             border: var(--default-border);
             border-radius: 4px;
             box-shadow: var(--default-box-shadow);
             display: inline-flex;
             font-size: .9rem;
-            justify-content: center;
             padding: .5rem;
 
             ossfd-loading {
