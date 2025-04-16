@@ -20,7 +20,8 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { AccountService } from '../shared/services/account.service';
 import { Router } from '@angular/router';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
+import { AccountModel } from '../shared/models/account.model';
 
 @Component({
   selector: 'ossfd-home-view',
@@ -56,16 +57,11 @@ export class HomeViewComponent implements OnInit, OnDestroy {
       .subscribe((accounts) => {
         if (accounts.length == 0) {
           this.serviceStoreService.initialize()
+            .pipe(
+              tap(accounts =>
+                this.redirectToFirstAccount(accounts))
+            )
             .subscribe();
-        }
-
-        this.accountSubscription$?.unsubscribe();
-
-        if (accounts.length > 0) {
-          const firstAccount = accounts[0];
-
-          this.router.navigate([`/${firstAccount.service}/${firstAccount.tag}`])
-            .then();
         }
       });
   }
@@ -75,5 +71,23 @@ export class HomeViewComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.accountSubscription$?.unsubscribe();
+  }
+
+  /**
+   * Redirect a user to the first account.
+   * @param accounts
+   * @private
+   */
+  private redirectToFirstAccount(
+    accounts: AccountModel[]
+  ) {
+    this.accountSubscription$?.unsubscribe();
+
+    if (accounts.length > 0) {
+      const firstAccount = accounts[0];
+
+      this.router.navigate([`/${firstAccount.service}/${firstAccount.tag}`])
+        .then();
+    }
   }
 }
