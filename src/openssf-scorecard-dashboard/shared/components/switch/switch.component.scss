@@ -1,3 +1,5 @@
+@use "../../../../mixins" as *;
+
 :host {
   --ossfd-switch-bg-color: var(--ossfd-component-bg-color-inverted);
   --ossfd-switch-box-shadow-focused: var(--ossfd-component-shadow-focused);
@@ -28,9 +30,7 @@
 
   .state,
   .nipple {
-    align-items: center;
-    display: flex;
-    justify-content: center;
+    @include center;
   }
 
   .state {

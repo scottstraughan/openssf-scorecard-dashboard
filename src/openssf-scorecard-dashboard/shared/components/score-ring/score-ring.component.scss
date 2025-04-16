@@ -1,3 +1,5 @@
+@use "../../../../mixins" as *;
+
 :host {
   --ossfd-score-ring-background: conic-gradient(grey var(--p, var(--ossfd-score-ring-progress)), transparent 0%) border-box;
   --ossfd-score-ring-base-color: rgba(0, 0, 0, .15);
@@ -40,9 +42,8 @@
   }
 
   .contents {
-    align-items: center;
-    display: flex;
-    justify-content: center;
+    @include center;
+
     position: relative;
 
     .score,

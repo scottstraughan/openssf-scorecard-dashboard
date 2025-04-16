@@ -1,8 +1,9 @@
+@use "../../../../mixins" as *;
+
 :host {
-  align-items: center;
-  display: flex;
+  @include center;
+
   height: 26px;
-  justify-content: center;
   width: 26px;
 
   img {

@@ -1,3 +1,5 @@
+@use "../mixins" as *;
+
 // Represents the px value where the layout switches from mobile/tablet mode to desktop
 $switch-layout-breakpoint: 1000px;
 
@@ -99,12 +101,12 @@ $switch-layout-breakpoint: 1000px;
         }
 
         .add {
+          @include center;
+
           align-items: center;
           background-color: transparent;
           border: var(--default-border);
           box-shadow: var(--default-box-shadow);
-          display: flex;
-          justify-content: center;
           transition: var(--default-transition);
 
           ossfd-icon {
@@ -135,9 +137,7 @@ $switch-layout-breakpoint: 1000px;
       }
 
       .dark-mode {
-        align-items: center;
-        display: flex;
-        justify-content: center;
+        @include center;
 
         ossfd-switch {
           height: 25px;
@@ -154,11 +154,10 @@ $switch-layout-breakpoint: 1000px;
       }
 
       .button {
-        align-items: center;
+        @include center;
+
         border-radius: var(--default-border-radius);
         cursor: pointer;
-        display: flex;
-        justify-content: center;
         padding: 1rem;
         transition: var(--default-transition);
 
