@@ -63,6 +63,8 @@ export class HomeViewComponent implements OnInit, OnDestroy {
             )
             .subscribe();
         }
+
+        this.redirectToFirstAccount(accounts);
       });
   }
 
