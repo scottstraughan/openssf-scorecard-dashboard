@@ -1,3 +1,5 @@
+@use "../../../../mixins" as *;
+
 :host {
   --ossfd-repository-widget-bg-color-focused: rgba(0, 0, 0, .03);
   --ossfd-repository-widget-bg-color-unfocused: var(--ui-primary-color);
@@ -7,124 +9,174 @@
   --ossfd-repository-widget-notice-bg-color: #666;
   --ossfd-repository-widget-notice-color: var(--inverted-text-color);
   --ossfd-repository-widget-transition: var(--default-transition);
+  --ossfd-repository-widget-padding: 2rem;
 
-  background-color: var(--ossfd-repository-widget-bg-color-unfocused);
-  border: var(--ossfd-repository-widget-border);
-  border-radius: var(--ossfd-repository-widget-border-radius);
-  box-shadow: var(--ossfd-repository-widget-box-shadow);
-  display: flex;
-  overflow: hidden;
-  position: relative;
-
-  .notice {
-    background-color: var(--ossfd-repository-widget-notice-bg-color);
-    border-radius: 6px 0 0 6px;
-    color: var(--ossfd-repository-widget-notice-color);
-    font-size: .8rem;
-    padding: .4rem;
-    position: absolute;
-    right: 0;
-    top: 1rem;
-
-    ossfd-icon {
-      display: inline-block;
-      font-size: .8rem;
-      height: 16px;
-      vertical-align: middle;
-      width: 16px;
-    }
-  }
-
-  .overview {
-    cursor: pointer;
+  .container {
+    background-color: var(--ossfd-repository-widget-bg-color-unfocused);
+    border: var(--ossfd-repository-widget-border);
+    border-radius: var(--ossfd-repository-widget-border-radius);
+    box-shadow: var(--ossfd-repository-widget-box-shadow);
     display: flex;
-    flex: 1;
-    flex-direction: column;
-    transition: var(--ossfd-repository-widget-transition);
+    overflow: hidden;
+    position: relative;
+    width: 100%;
 
-    &:hover {
-      background-color: var(--ossfd-repository-widget-bg-color-focused);
+    .notice {
+      background-color: var(--ossfd-repository-widget-notice-bg-color);
+      border-radius: 6px 0 0 6px;
+      color: var(--ossfd-repository-widget-notice-color);
+      font-size: .8rem;
+      padding: .4rem;
+      position: absolute;
+      right: 0;
+      top: 1rem;
+
+      ossfd-icon {
+        display: inline-block;
+        font-size: .8rem;
+        height: 16px;
+        vertical-align: middle;
+        width: 16px;
+      }
     }
 
-    .details {
+    .overview {
+      cursor: pointer;
+      display: flex;
       flex: 1;
-      padding: 2rem;
+      flex-direction: column;
+      transition: var(--ossfd-repository-widget-transition);
 
-      h1 {
-        margin-top: 0;
+      &:hover {
+        background-color: var(--ossfd-repository-widget-bg-color-focused);
       }
 
-      p {
-        margin-top: 0;
-        opacity: .6;
-        word-break: break-all;
-      }
-    }
-
-    .stats {
-      border-top: var(--ossfd-repository-widget-border);
-      display: grid;
-      font-size: .9rem;
-      grid-template-columns: 1fr 1fr;
-      opacity: .6;
-      padding: 0 1rem;
-
-      > div {
-        padding: .8rem 1rem;
-
-        &:nth-of-type(2) {
-          padding-left: 1rem;
-        }
-
-        ossfd-icon {
-          display: inline-block;
-          height: 24px;
-          vertical-align: middle;
-          width: 24px;
-        }
+      .details {
+        flex: 1;
+        padding: var(--ossfd-repository-widget-padding);
 
         h1 {
-          display: inline;
-          font-size: inherit;
-          font-weight: normal;
-          padding-left: .3rem;
+          margin-top: 0;
+        }
+
+        p {
+          margin: 0;
+          opacity: .6;
+          word-break: break-all;
         }
       }
 
-      > div:nth-of-type(1) {
-        border-right: var(--ossfd-repository-widget-border);
+      .stats {
+        border-top: var(--ossfd-repository-widget-border);
+        display: grid;
+        font-size: .9rem;
+        grid-template-columns: 1fr 1fr;
+        opacity: .6;
+        padding: 0 1rem;
+
+        > div {
+          padding: .8rem 1rem;
+
+          &:nth-of-type(2) {
+            padding-left: 1rem;
+          }
+
+          ossfd-icon {
+            display: inline-block;
+            height: 24px;
+            vertical-align: middle;
+            width: 24px;
+          }
+
+          h1 {
+            display: inline;
+            font-size: inherit;
+            font-weight: normal;
+            padding-left: .3rem;
+          }
+        }
+
+        > div:nth-of-type(1) {
+          border-right: var(--ossfd-repository-widget-border);
+        }
       }
     }
+
+    .score {
+      @include center;
+
+      background-color: rgba(0, 0, 0, .08);
+      box-shadow: inset 3px 0 4px -1px rgba(0, 0, 0, .1);
+      cursor: pointer;
+      min-width: 92px;
+      padding: 1rem;
+      transition: var(--ossfd-repository-widget-transition);
+
+      &:hover {
+        background-color: rgba(0, 0, 0, .1);
+      }
+
+      ossfd-score-ring,
+      ossfd-loading {
+        height: 60px;
+        width: 60px;
+      }
+
+      ossfd-icon {
+        height: 60px;
+        opacity: .3;
+        width: 60px;
+      }
+    }
+
+    h1 {
+      font-size: 1.1rem;
+    }
   }
 
-  .score {
-    align-items: center;
-    background-color: rgba(0, 0, 0, .08);
-    box-shadow: inset 3px 0 4px -1px rgba(0, 0, 0, .1);
-    cursor: pointer;
-    display: flex;
-    min-width: 92px;
-    padding: 1rem;
-    transition: var(--ossfd-repository-widget-transition);
-
-    &:hover {
-      background-color: rgba(0, 0, 0, .1);
-    }
+  .container.list {
+    --ossfd-repository-widget-padding: 1.2rem;
 
     ossfd-score-ring,
-    ossfd-loading {
-      height: 60px;
-      width: 60px;
-    }
-
+    ossfd-loading,
     ossfd-icon {
-      height: 60px;
-      opacity: .3;
-      width: 60px;
+      height: 40px !important;
+      width: 40px !important;
     }
-  }
 
-  h1 {
-    font-size: 1.1rem;
+    .overview {
+      flex-direction: row;
+
+      .details {
+        display: flex;
+        align-items: center;
+
+        h1 {
+          margin: 0;
+        }
+
+        p {
+          display: none;
+        }
+      }
+
+      .stats {
+        width: 300px;
+
+        .stat-icon {
+          width: 25px !important;
+          height: 25px !important;
+        }
+
+        > div {
+          @include center;
+
+          padding: .5rem
+        }
+        > div:nth-of-type(1) {
+          border-left: var(--ossfd-repository-widget-border);
+        }
+      }
+    }
   }
 }

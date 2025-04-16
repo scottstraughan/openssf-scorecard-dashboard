@@ -1,0 +1,8 @@
+@mixin center($justify: true) {
+  display: flex;
+  align-items: center;
+
+  @if $justify == true {
+    justify-content: center;
+  }
+}

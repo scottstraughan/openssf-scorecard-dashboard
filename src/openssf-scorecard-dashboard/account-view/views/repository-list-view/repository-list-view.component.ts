@@ -429,7 +429,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 /**
  * Enum for layout views.
  */
-enum LayoutView {
+export enum LayoutView {
   GRID = 'grid',
   LIST = 'list'
 }

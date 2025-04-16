@@ -1,37 +1,39 @@
 @if (repository(); as repository) {
-  <div class="overview" (click)="onClick()">
-    @if (repository.archived) {
-      <div class="notice">
-        <ossfd-icon icon="locked"></ossfd-icon> Archived
-      </div>
-    }
-
-    <div class="details">
-      <h1 [innerHTML]="repository.name"></h1>
-      <p [innerHTML]="repository.description"></p>
-    </div>
-
-    <div class="stats">
-      <div>
-        <ossfd-icon icon="calendar"></ossfd-icon>
-        <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
-      </div>
-      <div>
-        <ossfd-icon icon="star"></ossfd-icon>
-        <h1 [innerHTML]="repository.stars"></h1>
-      </div>
-    </div>
-  </div>
-
-  <div class="score" title="Click to recheck score" (click)="onReloadScore()">
-    @if (loading() == LoadingState.LOAD_SUCCESS) {
-      @if (scorecard()?.score; as score) {
-        <ossfd-score-ring [score]="score"></ossfd-score-ring>
-      } @else {
-        <ossfd-icon icon="sad" title="No scorecard available"></ossfd-icon>
+  <div class="container" [class.list]="layout() == LayoutView.LIST">
+    <div class="overview" (click)="onClick()">
+      @if (repository.archived) {
+        <div class="notice">
+          <ossfd-icon icon="locked"></ossfd-icon> Archived
+        </div>
       }
-    } @else {
-      <ossfd-loading></ossfd-loading>
-    }
+
+      <div class="details">
+        <h1 [innerHTML]="repository.name"></h1>
+        <p [innerHTML]="repository.description | truncate:75"></p>
+      </div>
+
+      <div class="stats">
+        <div>
+          <ossfd-icon class="stat-icon" icon="calendar"></ossfd-icon>
+          <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
+        </div>
+        <div>
+          <ossfd-icon class="stat-icon" icon="star"></ossfd-icon>
+          <h1 [innerHTML]="repository.stars"></h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="score" title="Click to recheck score" (click)="onReloadScore()">
+      @if (loading() == LoadingState.LOAD_SUCCESS) {
+        @if (scorecard()?.score; as score) {
+          <ossfd-score-ring [score]="score"></ossfd-score-ring>
+        } @else {
+          <ossfd-icon icon="sad" title="No scorecard available"></ossfd-icon>
+        }
+      } @else {
+        <ossfd-loading></ossfd-loading>
+      }
+    </div>
   </div>
 }
