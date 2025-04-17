@@ -104,7 +104,7 @@ export class WatchAccountPopupComponent {
         tap((account) => {
           this.popupReference.close();
           this.loading.set(false);
-          this.router.navigate([`/${account.service}/${account.tag}`, { replaceUrl: true }]).then();
+          this.router.navigate([`/${account.service}/${account.tag}`], { replaceUrl: true }).then();
         }),
         take(1),
         catchError((error) => {

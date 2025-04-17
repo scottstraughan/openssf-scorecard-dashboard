@@ -26,7 +26,9 @@
               <!-- Titling for repo -->
               <div class="title">
                 <div>
-                  <h1 [innerHTML]="repository.name"></h1>
+                  <a [href]="repository.url" target="_blank" rel="noopener" title="Click to visit repository">
+                    <h1 [innerHTML]="repository.name"></h1>
+                  </a>
                   <h2>Scorecard generated at {{ scorecard.dateGenerated | date: 'mediumDate' }}.</h2>
                 </div>
               </div>
