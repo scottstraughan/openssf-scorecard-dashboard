@@ -57,11 +57,16 @@ export class HomeViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.accountSubscription$ = this.serviceStoreService.observeAccounts()
       .subscribe(accounts => {
+        if (accounts.length == 0) {
+          this.router.navigate(
+            [`/${AccountService.DEFAULT_ACCOUNT}`], { relativeTo: this.activatedRoute, replaceUrl: true })
+            .then();
+
+          return ;
+        }
+
         return this.redirectToFirstAccount(accounts);
       });
-
-    this.serviceStoreService.initialize()
-      .subscribe();
   }
 
   /**
