@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { catchError, forkJoin, Observable, of, Subject, tap, throwError, } from 'rxjs';
+import { Observable, of, ReplaySubject, take, tap, throwError, } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { MinimumAccountError } from '../errors/account';
@@ -35,12 +35,7 @@ export class AccountService {
   /**
    * Default accounts, for when nothing is stored.
    */
-  static readonly DEFAULT_ACCOUNTS: any[] = [
-    {
-      service: Service.GITHUB,
-      account: 'scottstraughan'
-    }
-  ];
+  static readonly DEFAULT_ACCOUNT: string = 'github/scottstraughan';
 
   /**
    * Storage timeout for accounts.
@@ -55,7 +50,7 @@ export class AccountService {
   /**
    * Accounts observable.
    */
-  private accounts$: Subject<AccountModel[]> = new Subject<AccountModel[]>();
+  private accounts$: ReplaySubject<AccountModel[]> = new ReplaySubject<AccountModel[]>();
 
   /**
    * Initialized observable.
@@ -79,7 +74,11 @@ export class AccountService {
     private transientStorage: TransientStorage,
     private githubAccountService: GithubService,
     private gitlabAccountService: GitlabService
-  ) { }
+  ) {
+    this.initialize()
+      .pipe(take(1))
+      .subscribe();
+  }
 
   /**
    * Get the accounts observable.
@@ -196,7 +195,7 @@ export class AccountService {
   /**
    * Initialize the accounts for all observers.
    */
-  initialize() {
+  initialize()  {
     return new Observable(subscriber => {
       if (this.initialized) {
         subscriber.next();
@@ -204,7 +203,7 @@ export class AccountService {
         return ;
       }
 
-      this._initialize()
+      this.getCachedAccounts()
         .pipe(
           tap(() => this.initialized = true),
           tap(() => {
@@ -214,37 +213,24 @@ export class AccountService {
         )
         .subscribe();
     }).pipe(
-      tap(() => this.notifyObservers()),
+      tap(() => {
+        this.notifyObservers()
+      })
     );
   }
 
   /**
-   * Internally, initialize the accounts for all observers.
+   * Get any cached accounts.
    */
-  private _initialize(): Observable<AccountModel[]> {
-    if (this.initialized) {
-      return of([]);
-    }
-
+  private getCachedAccounts(): Observable<AccountModel[]> {
     const cached = this.transientStorage.get<AccountModel[]>('accounts');
 
     if (Array.isArray(cached) && cached.length > 0) {
       this.setAccounts(cached, false);
-
       return of(cached);
     }
 
-    const defaultAccountsObservables = AccountService.DEFAULT_ACCOUNTS.map(
-      defaultAccount => this.add(defaultAccount.service, defaultAccount.account)
-        .pipe(
-          catchError(() => of())
-        )); // Skip any errors
-
-    return forkJoin(defaultAccountsObservables)
-      .pipe(
-        tap(accounts =>
-          this.setAccounts(accounts, false)),
-      );
+    return of([]);
   }
 
   /**
