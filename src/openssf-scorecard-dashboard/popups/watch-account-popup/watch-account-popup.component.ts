@@ -104,12 +104,12 @@ export class WatchAccountPopupComponent {
         tap((account) => {
           this.popupReference.close();
           this.loading.set(false);
-          this.router.navigate([`/${account.service}/${account.tag}`]).then();
+          this.router.navigate([`/${account.service}/${account.tag}`, { replaceUrl: true }]).then();
         }),
         take(1),
         catchError((error) => {
           if (error instanceof DuplicateAccountError) {
-            this.router.navigate([`/${this.service()}/${this.accountName()}`]).then();
+            this.router.navigate([`/${this.service()}/${this.accountName()}`], { replaceUrl: true }).then();
             this.popupReference.close();
             return of();
           }

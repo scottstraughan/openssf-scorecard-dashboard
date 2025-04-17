@@ -267,7 +267,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     if (fatal) {
       this.fatalError.set(this.errorPopupService.convertError(error));
 
-      this.router.navigate([`../`])
+      this.router.navigate([`../`, { replaceUrl: true }])
         .then();
     }
   }
