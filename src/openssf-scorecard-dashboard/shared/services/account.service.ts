@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../models/account.model';
-import { BehaviorSubject, catchError, forkJoin, Observable, of, take, tap, throwError, } from 'rxjs';
+import { catchError, forkJoin, Observable, of, Subject, tap, throwError, } from 'rxjs';
 import { GithubService } from './repository-services/github.service';
 import { RepositoryModel } from '../models/repository.model';
 import { MinimumAccountError } from '../errors/account';
@@ -55,7 +55,13 @@ export class AccountService {
   /**
    * Accounts observable.
    */
-  private accounts$: BehaviorSubject<AccountModel[]> = new BehaviorSubject<AccountModel[]>([]);
+  private accounts$: Subject<AccountModel[]> = new Subject<AccountModel[]>();
+
+  /**
+   * Initialized observable.
+   * @private
+   */
+  private initialized: boolean = false;
 
   /**
    * Internal accounts map.
@@ -190,15 +196,42 @@ export class AccountService {
   /**
    * Initialize the accounts for all observers.
    */
-  initialize(): Observable<AccountModel[]> {
+  initialize() {
+    return new Observable(subscriber => {
+      if (this.initialized) {
+        subscriber.next();
+        subscriber.complete();
+        return ;
+      }
+
+      this._initialize()
+        .pipe(
+          tap(() => this.initialized = true),
+          tap(() => {
+            subscriber.next();
+            subscriber.complete();
+          })
+        )
+        .subscribe();
+    }).pipe(
+      tap(() => this.notifyObservers()),
+    );
+  }
+
+  /**
+   * Internally, initialize the accounts for all observers.
+   */
+  private _initialize(): Observable<AccountModel[]> {
+    if (this.initialized) {
+      return of([]);
+    }
+
     const cached = this.transientStorage.get<AccountModel[]>('accounts');
 
     if (Array.isArray(cached) && cached.length > 0) {
       this.setAccounts(cached, false);
-      return of(cached).pipe(
-        tap(() =>
-          this.notifyObservers())
-      );
+
+      return of(cached);
     }
 
     const defaultAccountsObservables = AccountService.DEFAULT_ACCOUNTS.map(
@@ -211,8 +244,6 @@ export class AccountService {
       .pipe(
         tap(accounts =>
           this.setAccounts(accounts, false)),
-        tap(() =>
-          this.notifyObservers())
       );
   }
 
