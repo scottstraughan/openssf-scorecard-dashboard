@@ -407,7 +407,8 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams,
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
+      replaceUrl: true
     }).then();
   }
 
