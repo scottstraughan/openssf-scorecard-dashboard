@@ -187,7 +187,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
       this.accountService.delete(account);
 
       // On success, navigate to the root where we will redirect to the correct place
-      this.router.navigate(['/']).then();
+      this.router.navigate(['/'], { replaceUrl: true }).then();
     } catch (error) {
       this.errorPopupService.handleError(error);
     }
