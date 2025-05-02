@@ -24,7 +24,6 @@ import { GenericError } from './generic';
 export class ServiceNotSupportedError extends GenericError {
   /**
    * Constructor.
-   * @param message
    */
   constructor(
     message?: string

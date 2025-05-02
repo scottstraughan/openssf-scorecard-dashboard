@@ -53,10 +53,9 @@ export class EmbedBadgePopupComponent {
 
   /**
    * Constructor
-   * @param popupReference
    */
   constructor(
-    @Inject('POPUP_DATA') protected popupReference: PopupReference
+    @Inject('POPUP_DATA') private popupReference: PopupReference
   ) {
     const repository: RepositoryModel = popupReference.data;
 

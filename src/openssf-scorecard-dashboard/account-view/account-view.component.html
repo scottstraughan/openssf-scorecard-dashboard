@@ -1,92 +1,81 @@
-@if (fatalError(); as fatalError) {
-  <!-- Shown when there is a fatal error -->
-  <div class="panel error-message">
-    <div>
-      <ossfd-icon icon="error"></ossfd-icon>
-      <h1 [innerHTML]="fatalError.title"></h1>
-      <h2 [innerHTML]="fatalError.message"></h2>
-    </div>
-  </div>
-} @else {
-  <!-- Account Overview Panel -->
-  <div class="account-panel-container">
-    <div class="panel">
-      @if (accountLoadState() == LoadingState.LOAD_SUCCESS) {
-        @if (selectedAccount(); as account) {
-          <div class="overview">
-            <div class="score">
-              @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
-                <ossfd-score-ring
-                    [score]="averageScorecardScore()"
-                    (click)="reloadScorecardResults(account)"
-                    title="Click to re-check all scorecard scores"></ossfd-score-ring>
-              } @else {
-                <ossfd-loading></ossfd-loading>
-              }
-            </div>
-
-            <div class="title">
-              <h1 [innerHTML]="account.name"></h1>
-              <h2 [innerHTML]="account.description"></h2>
-            </div>
+<!-- Account Overview Panel -->
+<div class="account-panel-container">
+  <div class="panel">
+    @if (accountLoadState() == LoadingState.LOAD_SUCCESS) {
+      @if (selectedAccount(); as account) {
+        <div class="overview">
+          <div class="score">
+            @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
+              <ossfd-score-ring
+                  [score]="averageScorecardScore()"
+                  (click)="reloadScorecardResults()"
+                  title="Click to re-check all scorecard scores"></ossfd-score-ring>
+            } @else {
+              <ossfd-loading></ossfd-loading>
+            }
           </div>
 
-          <div class="details">
-            <div class="detail">
-              <div>
-                <ossfd-icon icon="public"></ossfd-icon>
-                <h1>Public Repositories</h1>
-              </div>
-              <span class="number" [innerHTML]="totalRepositories()">-</span>
-            </div>
+          <div class="title">
+            <h1 [innerHTML]="account.name"></h1>
+            <h2 [innerHTML]="account.description"></h2>
+          </div>
+        </div>
 
-            <div class="detail">
-              <div>
-                <ossfd-icon icon="score"></ossfd-icon>
-                <h1>Available Scorecards</h1>
-              </div>
-              <span class="number">
+        <div class="details">
+          <div class="detail">
+            <div>
+              <ossfd-icon icon="public"></ossfd-icon>
+              <h1>Public Repositories</h1>
+            </div>
+            <span class="number" [innerHTML]="totalRepositories()">-</span>
+          </div>
+
+          <div class="detail">
+            <div>
+              <ossfd-icon icon="score"></ossfd-icon>
+              <h1>Available Scorecards</h1>
+            </div>
+            <span class="number">
             @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
               {{ totalRepositoriesWithScorecards() }}
             } @else {
               <ossfd-loading></ossfd-loading>
             }
           </span>
-            </div>
-
-            <div class="detail">
-              <div>
-                <ossfd-icon icon="followers"></ossfd-icon>
-                <h1>Followers</h1>
-              </div>
-              <span class="number" [innerHTML]="account.followers">-</span>
-            </div>
           </div>
 
-          <div class="actions">
-            <ossfd-link-button
-                icon="link"
-                label="Visit {{ selectedAccountServiceName() }}"
-                target="_blank"
-                [href]="account.url"></ossfd-link-button>
-            <ossfd-link-button
-                icon="sync"
-                label="Fetch Repos"
-                (click)="onFetchRepositories(account)"></ossfd-link-button>
-            <ossfd-link-button
-                icon="delete"
-                label="Remove"
-                (click)="onDeleteServiceAccount(account)"></ossfd-link-button>
+          <div class="detail">
+            <div>
+              <ossfd-icon icon="followers"></ossfd-icon>
+              <h1>Followers</h1>
+            </div>
+            <span class="number" [innerHTML]="account.followers">-</span>
           </div>
-        }
-      } @else {
-        <ossfd-loading></ossfd-loading>
+        </div>
+
+        <div class="actions">
+          <ossfd-link-button
+              icon="link"
+              label="Visit {{ selectedAccountServiceName() }}"
+              target="_blank"
+              [href]="account.url"></ossfd-link-button>
+          <ossfd-link-button
+              icon="sync"
+              label="Fetch Repos"
+              (click)="onReloadRepositories(account)"></ossfd-link-button>
+          <ossfd-link-button
+              icon="delete"
+              label="Remove"
+              (click)="onDeleteServiceAccount(account)"></ossfd-link-button>
+        </div>
       }
-    </div>
+    } @else {
+      <ossfd-loading></ossfd-loading>
+    }
   </div>
+</div>
 
-  <!-- Router Outlet Target -->
-  <div class="router-outlet">
-    <router-outlet></router-outlet>
-  </div>
-}
+<!-- Router Outlet Target -->
+<div class="router-outlet">
+  <router-outlet></router-outlet>
+</div>

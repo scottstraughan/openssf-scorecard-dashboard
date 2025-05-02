@@ -6,15 +6,31 @@
 
   @include center;
 
-  height: 100%;
+  max-height: var(--ossfd-loading-max-height);
+  max-width: var(--ossfd-loading-max-width);
   width: 100%;
+  height: auto;
 
-  img {
-    animation: spin 1s linear infinite;
-    height: 100%;
-    max-height: var(--ossfd-loading-max-height);
-    max-width: var(--ossfd-loading-max-width);
+  .indicator {
     width: 100%;
+    height: 100%;
+    position: relative;
+    @include center;
+
+    img {
+      position: absolute;
+      z-index: 1;
+      animation: spin 1s linear infinite;
+      width: 100%;
+      height: 100%;
+    }
+
+    .progress {
+      z-index: 2;
+      position: absolute;
+      color: var(--text-color);
+      opacity: .7;
+    }
   }
 }
 

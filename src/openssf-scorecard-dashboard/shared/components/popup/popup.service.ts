@@ -23,21 +23,21 @@ import { PopupComponent } from './popup.component';
   providedIn: 'root'
 })
 export class PopupService {
-  protected rootContainerReference: ViewContainerRef | undefined;
+  /**
+   * Reference to root container.
+   * @protected
+   */
+  private rootContainerReference: ViewContainerRef | undefined;
 
   /**
    * Constructor.
-   * @param applicationRef
    */
   constructor(
-    protected applicationRef: ApplicationRef
+    private applicationRef: ApplicationRef
   ) { }
 
   /**
    * Create a new popup, returning a reference to it.
-   * @param component
-   * @param data
-   * @param immediatelyShow
    */
   create<T>(component: T, data: any, immediatelyShow: boolean = false): PopupReference {
     this.rootContainerReference = this.applicationRef.components[0].injector.get(ViewContainerRef);
@@ -74,17 +74,14 @@ export class PopupReference {
 
   /**
    * Constructor for a panel reference.
-   * @param componentRef
-   * @param data
    */
   constructor(
-    public componentRef: ComponentRef<PopupComponent>,
+    private componentRef: ComponentRef<PopupComponent>,
     public data: any
   ) { }
 
   /**
    * Close the popup.
-   * @param data
    */
   close(data?: any) {
     this.onChanged.emit(data);

@@ -75,12 +75,10 @@ export class PopupComponent implements AfterViewInit {
 
   /**
    * Constructor.
-   * @param document
-   * @param router
    */
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    protected router: Router
+    private router: Router
   ) {
     /**
      * To avoid the popup lingering when a link is clicked, we will subscribe to router changes
@@ -115,11 +113,12 @@ export class PopupComponent implements AfterViewInit {
 
   /**
    * Attach a component into the popup container element.
-   * @param component
-   * @param injector
-   * @param popupReference
    */
-  attach(component: any, injector: Injector, popupReference: PopupReference) {
+  attach(
+    component: any,
+    injector: Injector,
+    popupReference: PopupReference
+  ) {
     this.injector = injector;
     this.component = component;
     this.popupReference = popupReference;
@@ -144,9 +143,10 @@ export class PopupComponent implements AfterViewInit {
 
   /**
    * Called when a user clicks on the popup, used to avoid closing the popup.
-   * @param event
    */
-  onPopupClick(event: Event) {
+  onPopupClick(
+    event: Event
+  ) {
     event.stopPropagation();
   }
 

@@ -1,3 +1,5 @@
+@use "../../../mixins" as *;
+
 :host {
   display: flex;
   max-width: 870px;
@@ -104,7 +106,8 @@
       }
 
       ossfd-loading {
-        height: 58px;
+        height: 58px !important;
+        margin: 0 auto;
       }
     }
   }

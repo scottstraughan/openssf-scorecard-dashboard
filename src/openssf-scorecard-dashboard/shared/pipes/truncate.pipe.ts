@@ -7,9 +7,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class TruncatePipe implements PipeTransform {
   /**
    * Truncate a string of text to a specific length.
-   * @param value
-   * @param limit
-   * @param ellipsis
+   * @param value the value to truncate
+   * @param limit the max length of the string
+   * @param ellipsis the ellipsis to use at the end of the truncated string
    */
   transform(
     value: string | null | undefined,

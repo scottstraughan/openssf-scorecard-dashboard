@@ -21,7 +21,8 @@ import { PopupReference } from '../../components/popup/popup.service';
 import { LinkButtonComponent } from '../../components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
-
+import { GenericError } from '../../errors/generic';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'ossfd-error-popup',
@@ -38,23 +39,22 @@ import { IconComponent } from '../../components/icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorPopupComponent {
-  title: WritableSignal<string> = signal('');
-  message: WritableSignal<string> = signal('');
-  icon: WritableSignal<string> = signal('error');
+  readonly title: WritableSignal<string> = signal('');
+  readonly message: WritableSignal<string> = signal('');
+  readonly icon: WritableSignal<string> = signal('error');
 
   /**
    * Constructor
-   * @param popupReference
    */
   constructor(
-    @Inject('POPUP_DATA') protected popupReference: PopupReference
+    @Inject('POPUP_DATA') private popupReference: PopupReference,
+    errorService: ErrorService,
   ) {
-    this.title.set(popupReference.data['title']);
-    this.message.set(popupReference.data['message']);
+    const error: GenericError = popupReference.data;
 
-    if (popupReference.data['icon']) {
-      this.icon.set(popupReference.data['icon']);
-    }
+    this.title.set(error.title);
+    this.message.set(error.message);
+    this.icon.set(errorService.getIconForError(error));
   }
 
   /**
