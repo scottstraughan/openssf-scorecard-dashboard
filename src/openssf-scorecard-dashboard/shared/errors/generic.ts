@@ -17,12 +17,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 export class GenericError extends Error {
-  public title: string | undefined;
+  public title: string;
 
   /**
    * Constructor.
-   * @param title
-   * @param message
    */
   constructor(
     title: string,

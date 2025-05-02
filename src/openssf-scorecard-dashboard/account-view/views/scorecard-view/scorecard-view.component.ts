@@ -22,25 +22,23 @@ import { ScoreRingComponent } from '../../../shared/components/score-ring/score-
 import { LinkButtonComponent } from '../../../shared/components/link-button/link-button.component';
 import { CheckComponent } from './components/check/check.component';
 import { RepositoryModel } from '../../../shared/models/repository.model';
-import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
-import { catchError, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
+import { catchError, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScorecardModel } from '../../../shared/models/scorecard.model';
-import { ScorecardService } from '../../../shared/services/scorecard.service';
+import { ScorecardService } from '../../../shared/services/providers/scorecard.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { ErrorPopupError, ErrorPopupService } from '../../../shared/services/error-popup.service';
+import { ErrorService } from '../../../shared/services/error.service';
 import { ScorecardCheck } from '../../../shared/models/scorecard-check.model';
 import { FadedBgComponent } from '../../../shared/components/faded-bg/faded-bg.component';
 import { ScorecardCheckDetails } from '../../../shared/models/scorecard-check-details.model';
 import { AccountModel } from '../../../shared/models/account.model';
-import { GenericError } from '../../../shared/errors/generic';
 import { ScorecardNotFoundError } from '../../../shared/errors/scorecard';
-import { InvalidAccountError } from '../../../shared/errors/account';
 import { Title } from '@angular/platform-browser';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { EmbedBadgePopupComponent } from './popups/embed-badge/embed-badge-popup.component';
 import { LoadingState } from '../../../shared/loading-state';
-import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { RepositoryService } from '../../../shared/services/providers/repository.service';
 
 @Component({
   selector: 'ossfd-scorecard-view',
@@ -51,8 +49,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     CheckComponent,
     DatePipe,
     LoadingComponent,
-    FadedBgComponent,
-    IconComponent
+    FadedBgComponent
   ],
   templateUrl: './scorecard-view.component.html',
   styleUrl: './scorecard-view.component.scss',
@@ -65,65 +62,43 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
   protected account: AccountModel | undefined;
   protected cleanup = new Subject<void>();
 
-  readonly fatalError: WritableSignal<ErrorPopupError | undefined> = signal(undefined);
-  readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
-  readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
+  protected readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  protected readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
+  protected readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
 
-  readonly selectedScorecardCheck: WritableSignal<ScorecardCheck | undefined> = signal(undefined);
-  readonly scorecardCheckDetailsLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly scorecardCheckDetails: WritableSignal<ScorecardCheckDetails | undefined> = signal(undefined);
+  protected readonly selectedScorecardCheck: WritableSignal<ScorecardCheck | undefined> = signal(undefined);
+  protected readonly scorecardCheckDetailsLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  protected readonly scorecardCheckDetails: WritableSignal<ScorecardCheckDetails | undefined> = signal(undefined);
 
   /**
    * Constructor.
-   * @param router
-   * @param location
-   * @param selectedAccountService
-   * @param activatedRoute
-   * @param scorecardService
-   * @param errorPopupService
-   * @param popupService
-   * @param title
    */
   constructor(
-    protected router: Router,
-    protected location: Location,
-    protected selectedAccountService: SelectedAccountStateService,
-    protected activatedRoute: ActivatedRoute,
-    protected scorecardService: ScorecardService,
-    protected errorPopupService: ErrorPopupService,
-    protected popupService: PopupService,
-    protected title: Title
+    private router: Router,
+    private location: Location,
+    private accountViewModelService: AccountViewModelService,
+    private repositoryService: RepositoryService,
+    private activatedRoute: ActivatedRoute,
+    private scorecardService: ScorecardService,
+    private errorService: ErrorService,
+    private popupService: PopupService,
+    private title: Title
   ) { }
 
   /**
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.observeScorecardsLoadState()
-      .pipe(
-        tap(loadState => this.loading.set(loadState)),
-        takeUntil(this.cleanup)
-      )
-      .subscribe();
-
     this.activatedRoute.params
       .pipe(
-        tap(params => {
-          // Watch changes to the selected account
-          this.selectedAccountService.observeAccount()
+        // Fetch all the required data
+        switchMap(params =>
+          this.accountViewModelService.observeAccount()
             .pipe(
               tap(account =>
                 this.account = account),
-              map(account => {
-                if (!account) {
-                  throw new InvalidAccountError();
-                }
-
-                return account;
-              }),
               switchMap(account =>
-                this.selectedAccountService.getRepository(params['repositoryName'])
+                this.repositoryService.observeRepository(account, params['repositoryName'])
                   .pipe(
                     tap(repository =>
                       this.setRepository(account, repository)),
@@ -132,15 +107,15 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
                         .pipe(tap(scorecard => this.setScorecard(scorecard, params['checkName'])))
                     )
                   )
-              ),
-              catchError(error => {
-                this.handleError(error, true);
-                return of(error);
-              }),
-              take(1)
+              )
             )
-            .subscribe();
-        }),
+        ),
+
+        // Catch any error
+        catchError(error =>
+          this.errorService.handleError(error, true)),
+
+        // Take until cleanup
         takeUntil(this.cleanup)
       )
       .subscribe();
@@ -157,7 +132,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
    * Called when a user clicks the back button.
    */
   onBackClicked() {
-    this.router.navigate(['../'])
+    this.router.navigate(['../'], { relativeTo: this.activatedRoute })
       .then();
   }
 
@@ -176,7 +151,6 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
   /**
    * Called when the user clicks on the check.
-   * @param check
    */
   onClicked(
     check: ScorecardCheck
@@ -186,7 +160,6 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
   /**
    * Check if a check is selected.
-   * @param check
    */
   isSelected(
     check: ScorecardCheck
@@ -196,7 +169,6 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
   /**
    * Get the priority color for the UI.
-   * @param scorecardCheckDetails
    */
   getPriorityColor(
     scorecardCheckDetails: ScorecardCheckDetails
@@ -213,8 +185,6 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
   /**
    * Set the selected repository.
-   * @param account
-   * @param repository
    * @private
    */
   private setRepository(
@@ -227,8 +197,6 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
 
   /**
    * Set the selected scorecard.
-   * @param scorecard
-   * @param selectedCheckName
    * @private
    */
   private setScorecard(
@@ -247,34 +215,14 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
         this.setSelectedCheck(
           this.scorecardService.getCheckByName(selectedCheckName, scorecard));
       } catch (error: any) {
-        return this.handleError(error, false);
+        this.errorService.handleError(error, false)
       }
     }
   }
 
   /**
-   * Handle an error.
-   * @param error
-   * @param fatal
-   * @private
-   */
-  private handleError(
-    error: GenericError,
-    fatal: boolean = true
-  ) {
-    this.errorPopupService.handleError(error);
-
-    if (fatal) {
-      this.fatalError.set(this.errorPopupService.convertError(error));
-
-      this.router.navigate([`../`], { replaceUrl: true })
-        .then();
-    }
-  }
-
-  /**
    * Set the currently selected check, showing the information panel.
-   * @param check
+   * @private
    */
   private setSelectedCheck(
     check: ScorecardCheck | undefined

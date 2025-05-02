@@ -17,11 +17,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { AccountService } from '../shared/services/account.service';
+import { AccountService } from '../shared/services/providers/account.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { Subscription } from 'rxjs';
 import { AccountModel } from '../shared/models/account.model';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'ossfd-home-view',
@@ -41,9 +42,6 @@ export class HomeViewComponent implements OnInit, OnDestroy {
 
   /**
    * Constructor.
-   * @param serviceStoreService
-   * @param activatedRoute
-   * @param router
    */
   constructor(
     private serviceStoreService: AccountService,
@@ -59,7 +57,7 @@ export class HomeViewComponent implements OnInit, OnDestroy {
       .subscribe(accounts => {
         if (accounts.length == 0) {
           this.router.navigate(
-            [`/${AccountService.DEFAULT_ACCOUNT}`], { relativeTo: this.activatedRoute, replaceUrl: true })
+            [`/${environment.defaultAccount}`], { relativeTo: this.activatedRoute, replaceUrl: true })
             .then();
 
           return ;
@@ -78,7 +76,6 @@ export class HomeViewComponent implements OnInit, OnDestroy {
 
   /**
    * Redirect a user to the first account.
-   * @param accounts
    * @private
    */
   private redirectToFirstAccount(

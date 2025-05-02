@@ -40,10 +40,9 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
 export class AboutPopupComponent {
   /**
    * Constructor
-   * @param popupReference
    */
   constructor(
-    @Inject('POPUP_DATA') protected popupReference: PopupReference
+    @Inject('POPUP_DATA') private popupReference: PopupReference
   ) { }
 
   /**

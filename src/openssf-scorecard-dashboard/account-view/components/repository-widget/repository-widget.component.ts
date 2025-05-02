@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, input, OnInit, signal, WritableSignal, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, OnDestroy, OnInit, signal, WritableSignal, } from '@angular/core';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { DatePipe } from '@angular/common';
@@ -26,8 +26,8 @@ import { ScorecardModel } from '../../../shared/models/scorecard.model';
 import { PopupService } from '../../../shared/components/popup/popup.service';
 import { ErrorPopupComponent } from '../../../shared/popups/error-popup/error-popup.component';
 import { LoadingState } from '../../../shared/loading-state';
-import { catchError, of, tap } from 'rxjs';
-import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
+import { catchError, of, Subscription, take, tap } from 'rxjs';
+import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
 import { Router } from '@angular/router';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
@@ -47,7 +47,7 @@ import { LayoutView } from '../../views/repository-list-view/repository-list-vie
   styleUrl: './repository-widget.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoryWidgetComponent implements OnInit {
+export class RepositoryWidgetComponent implements OnInit, OnDestroy {
   protected readonly LayoutView = LayoutView;
   protected readonly LoadingState = LoadingState;
 
@@ -55,26 +55,25 @@ export class RepositoryWidgetComponent implements OnInit {
   readonly repository = input.required<RepositoryModel>();
   readonly layout = input<LayoutView>(LayoutView.GRID);
 
-  readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
-  readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  protected readonly scorecard: WritableSignal<ScorecardModel | undefined> = signal(undefined);
+  protected readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+
+  private scorecardSubscription: Subscription | undefined;
 
   /**
    * Constructor.
-   * @param popupService
-   * @param selectedAccountService
-   * @param router
    */
   constructor(
-    protected popupService: PopupService,
-    protected selectedAccountService: SelectedAccountStateService,
-    protected router: Router
+    private popupService: PopupService,
+    private selectedAccountService: AccountViewModelService,
+    private router: Router
   ) { }
 
   /**
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.getScorecardRequestByRepository(this.repository())
+    this.scorecardSubscription = this.selectedAccountService.observeScorecardRequestByRepository(this.repository())
       .pipe(
         tap(scorecardRequest => {
           this.scorecard.set(scorecardRequest.scorecard);
@@ -87,6 +86,13 @@ export class RepositoryWidgetComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  ngOnDestroy() {
+    this.scorecardSubscription?.unsubscribe();
   }
 
   /**
@@ -111,7 +117,8 @@ export class RepositoryWidgetComponent implements OnInit {
    */
   onReloadScore() {
     this.loading.set(LoadingState.LOADING);
-
-    this.selectedAccountService.reloadScorecards(this.account(), this.repository());
+    this.selectedAccountService.reloadScorecard(this.repository())
+      .pipe(take(1))
+      .subscribe();
   }
 }

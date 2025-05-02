@@ -17,17 +17,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
-import { RepositoryModel } from '../../models/repository.model';
+import { catchError, map, Observable, Observer, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
 import { AccountModel } from '../../models/account.model';
-import { BaseRepositoryService } from './base-repository-service';
+import { BaseApiService, RepositoryCollection } from './base-api-service';
 import { Service } from '../../enums/service';
-import { InvalidAccountError } from '../../errors/account';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GitlabService extends BaseRepositoryService {
+export class GitlabService extends BaseApiService {
   /**
    * @inheritdoc
    */
@@ -40,9 +39,9 @@ export class GitlabService extends BaseRepositoryService {
         catchError(() => {
           return this.getAccountViaMethod(Method.USERS, accountName, apiToken)
             .pipe(
-              catchError(() => {
-                throw new InvalidAccountError()
-              })
+              catchError(error =>
+                throwError(() =>
+                  this.throwDecentError(Service.GITLAB, error)))
             )
         })
       );
@@ -53,12 +52,12 @@ export class GitlabService extends BaseRepositoryService {
    */
   public getRepositories(
     account: AccountModel,
-    apiToken?: string
-  ): Observable<RepositoryModel[]> {
-    return this.getAllRepositories(Method.GROUPS, account.tag, apiToken)
+    cancelled$: Subject<void>
+  ): Observable<RepositoryCollection> {
+    return this.fetchRepositories(Method.GROUPS, account, cancelled$)
       .pipe(
         catchError(() =>
-          this.getAllRepositories(Method.USERS, account.tag, apiToken))
+          this.fetchRepositories(Method.USERS, account, cancelled$))
       )
   }
 
@@ -99,9 +98,6 @@ export class GitlabService extends BaseRepositoryService {
 
   /**
    * Inject the total repository count for a given account.
-   * @param method
-   * @param account
-   * @param apiToken
    * @private
    */
   private injectTotalRepositoryCount(
@@ -121,52 +117,103 @@ export class GitlabService extends BaseRepositoryService {
   }
 
   /**
-   * Fetch all the repositories for a given account, going through each API request page until complete.
-   * @param method
-   * @param accountName
-   * @param apiToken
-   * @param page
-   * @param repositories
-   * @private
+   * Fetch repositories from GitLab for the provided account. Since the API returns pages of results, we need to fetch
+   * each page until we have exhausted.
+   * @param apiMethod what API method to use
+   * @param accountModel the account for the repositories to fetch
+   * @param cancelled$ subject to use to cancel the requests
    */
-  private getAllRepositories(
-    method: Method,
-    accountName: string,
-    apiToken?: string,
-    page: number = 1,
-    repositories: RepositoryModel[] = []
-  ): Observable<RepositoryModel[]> {
-    const apiUrl = GitlabService.generateApiUrl(method, accountName) + '/projects';
-    let exhausted = false;
+  private fetchRepositories(
+    apiMethod: Method,
+    accountModel: AccountModel,
+    cancelled$: Subject<void>
+  ): Observable<RepositoryCollection> {
+    const loadState: RepositoryCollection = new RepositoryCollection();
+    const loggingService = this.loggingService;
+    const apiUrl = GitlabService.generateApiUrl(apiMethod, accountModel.tag) + '/projects';
 
-    return this.getRequestInstance(`${apiUrl}?per_page=${GitlabService.RESULTS_PER_PAGE}&page=${page}`, apiToken)
-      .pipe(
-        map((repositoriesResult: any) => {
-          for (const repository of repositoriesResult) {
-            repositories.push({
-              name: repository['name'],
-              url: repository['web_url'],
-              lastUpdated: new Date(repository['last_activity_at']),
-              stars: repository['star_count'],
-              description: repository['description'] ?? 'This repository has no description available.',
-              archived: repository['archived']
-            });
-          }
+    /**
+     * The GitLab repository API limits the number of repositories it will return per "page". Therefor, to load all the
+     * repositories, we need to recursively fetch each page until exhaustion.
+     * nothing more to fetch.
+     */
+    function fetchRepositoryPage(
+      observer: Observer<any>,
+      service: GitlabService,
+      accountModel: AccountModel,
+      page: number = 1
+    ): Observable<RepositoryCollection> {
+      return service.getRequestInstance(
+        `${apiUrl}?per_page=${GitlabService.RESULTS_PER_PAGE}&page=${page}`, accountModel.apiToken, 'response')
+        .pipe(
+          tap(() =>
+            loggingService.info(`Fetched repository page ${page} from GitLab API.`)),
 
-          exhausted = repositoriesResult.length < GitlabService.RESULTS_PER_PAGE;
-          return repositories;
-        }),
-        switchMap(repositories =>
-          exhausted ? of(repositories) : this.getAllRepositories(
-            method, accountName, apiToken, page + 1, repositories)),
-        catchError(error =>
-          throwError(() => this.throwDecentError(Service.GITLAB, error)))
-      );
+          // Set the total number of repos we can fetch
+          tap((response: HttpResponse<any>) =>
+            loadState.totalRepositories = Number.parseInt(response.headers.get('x-total') || '0')),
+
+          // Convert response
+          map((result: HttpResponse<any>) =>
+            result.body.map((repository: any) => {
+              return {
+                name: repository['name'],
+                url: repository['web_url'],
+                lastUpdated: new Date(repository['last_activity_at']),
+                stars: repository['star_count'],
+                description: repository['description'] ?? 'This repository has no description available.',
+                archived: repository['archived'],
+              }
+            })
+          ),
+
+          // Update load state
+          map(repositories => {
+            loadState.addRepositories(repositories);
+            loadState.completed = repositories.length < GitlabService.RESULTS_PER_PAGE;
+            return loadState;
+          }),
+
+          // Notify observers of new updates
+          tap(repositories =>
+            observer.next(repositories)),
+
+          // Capture any error that happens and then throw it
+          catchError(error => {
+            return throwError(() => error);
+          }),
+
+          // Continue to next page or return finally state
+          switchMap(loadState =>
+            loadState.completed
+              ? of(loadState)
+              : fetchRepositoryPage(observer, service, accountModel, page + 1)),
+        )
+    }
+
+    return new Observable(observer => {
+      fetchRepositoryPage(observer, this, accountModel)
+        .pipe(
+          // Notify observers we have completed
+          tap(loadState =>
+            loadState.completed && observer.complete()),
+
+          // Handle any error and notify observer
+          catchError(error => {
+            observer.error(this.throwDecentError(Service.GITLAB, error));
+            return of(error);
+          }),
+
+          // Stop loading if we are cancelled
+          takeUntil(cancelled$)
+        )
+        // Subscribe
+        .subscribe();
+    });
   }
 
   /**
-   * Modify a response from the user endpoint to match the groups endpoint.
-   * @param response
+   * Modify a response from the user endpoint to match the groups' endpoint.
    * @private
    */
   private static transmogrifyUserResponse(
@@ -181,8 +228,6 @@ export class GitlabService extends BaseRepositoryService {
 
   /**
    * Generate an API URL.
-   * @param method
-   * @param accountName
    */
   private static generateApiUrl(
     method: Method,
@@ -193,8 +238,6 @@ export class GitlabService extends BaseRepositoryService {
 
   /**
    * Generate an API url for requesting account information.
-   * @param method
-   * @param accountName
    * @private
    */
   private static generateApiForAccount(

@@ -42,7 +42,6 @@ export class LinkButtonComponent {
 
   /**
    * Called when a user clicks the component.
-   * @param $event
    */
   onClick($event: MouseEvent) {
     if (this.disabled()) {

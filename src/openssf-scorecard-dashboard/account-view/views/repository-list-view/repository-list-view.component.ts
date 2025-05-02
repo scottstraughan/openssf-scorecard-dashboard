@@ -33,15 +33,17 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/loading-state';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { SelectedAccountStateService } from '../../../shared/services/selected-account-state.service';
-import { TransientStorage } from '../../../shared/services/transient-storage.service';
+import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
+import { KeyValueStore } from '../../../shared/services/storage/key-value.service';
 import {
   MultiToggleButtonComponent,
   ToggleButtonItem
 } from '../../../shared/components/multi-toggle-button/multi-toggle-button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { RepositoryCollection } from '../../../shared/services/api/base-api-service';
+import { ErrorService } from '../../../shared/services/error.service';
 
 @Component({
   selector: 'ossfd-repository-list-view',
@@ -64,15 +66,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    */
   static readonly RESULTS_PER_PAGE = 30;
 
-  readonly LoadingState = LoadingState;
   readonly LayoutView = LayoutView;
   readonly LayoutVisibility = LayoutVisibility;
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
-  readonly selectedAccountRepositories: WritableSignal<RepositoryModel[]> = signal([]);
-  readonly fatalError: WritableSignal<boolean> = signal(false);
-
-  readonly repositoryLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
+  readonly repositories: WritableSignal<RepositoryCollection> = signal(new RepositoryCollection());
+  readonly loadingPercentage: WritableSignal<number> = signal(0);
 
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
   readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
@@ -87,18 +86,14 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Constructor
-   * @param router
-   * @param activatedRoute
-   * @param changeDetectorRef
-   * @param selectedAccountService
-   * @param transientStorage
    */
   constructor(
-    protected router: Router,
-    protected activatedRoute: ActivatedRoute,
-    protected changeDetectorRef: ChangeDetectorRef,
-    protected selectedAccountService: SelectedAccountStateService,
-    protected transientStorage: TransientStorage
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef,
+    private selectedAccountService: AccountViewModelService,
+    private transientStorage: KeyValueStore,
+    private errorService: ErrorService
   ) {
     effect(() => {
       // Save changes to the ui settings to the storage
@@ -115,34 +110,47 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.selectedAccountService.observeAccount()
       .pipe(
-        tap(account => this.selectedAccount.set(account)),
-        takeUntil(this.cleanup)
-      )
-      .subscribe();
+        // When the account changes, reset the view
+        tap(() =>
+          this.reset()),
 
-    this.selectedAccountService.observeRepositoriesLoadState()
-      .pipe(
-        tap(loadState => this.repositoryLoadState.set(loadState)),
+        // Set the selected account
+        tap(account =>
+          this.selectedAccount.set(account)),
+
+        // Take until cleanup
         takeUntil(this.cleanup)
       )
       .subscribe();
 
     this.selectedAccountService.observeRepositories()
       .pipe(
-        tap(repositories => {
-          this.selectedAccountRepositories.set(repositories);
+        // Update repositories signal
+        tap(repositories =>
+          this.repositories.set(repositories)),
+
+        // Update progress signal
+        tap(repositoryLoadState =>
+          this.loadingPercentage.set(repositoryLoadState.loadPercentage())),
+
+        // Handle any errors
+        catchError(error => {
+          this.errorService.handleError(error);
+          return of(error);
         }),
-        takeUntil(this.cleanup)
+
+        // Close on cleanup
+        takeUntil(this.cleanup),
       )
       .subscribe();
 
-    this.selectedAccountService.observeScorecardsLoadState()
+    this.selectedAccountService.observeScorecardsLoading()
       .pipe(
-        tap(loaded => {
-          if (loaded == LoadingState.LOAD_SUCCESS) {
-            this.changeDetectorRef.detectChanges();
-          }
-        }),
+        // Detect any new changes on LOAD_SUCCESS
+        tap(loaded =>
+          loaded == LoadingState.LOAD_SUCCESS && this.changeDetectorRef.detectChanges()),
+
+        // Close on cleanup
         takeUntil(this.cleanup)
       )
       .subscribe();
@@ -175,8 +183,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Get a param value, casting some value to a proper type (all params are strings or arrays).
-   * @param params
-   * @param key
    */
   getParamValue(
     params: Params,
@@ -283,7 +289,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Called when the view filters have changed.
-   * @param changedItem
    */
   onVisibleItemsChanged(
     changedItem: ToggleButtonItem
@@ -305,7 +310,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Get a UI icon for a give element.
-   * @param element
    */
   getIcon(
     element: string
@@ -332,8 +336,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Set the sort mode.
-   * @param sortMode
-   * @param redirect
    */
   private setSortMode(
     sortMode: LayoutSortMode,
@@ -350,8 +352,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Set a storage value to the transient storage for the UI.
-   * @param key
-   * @param value
    */
   private setStorageValue(
     key: string,
@@ -362,7 +362,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Get a storage value, falling back.
-   * @param key
    */
   private getStorageValue<T>(
     key: string
@@ -374,9 +373,7 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    * Get a list of repositories after the results have been filtered.
    */
   private getFilteredRepositories(): RepositoryModel[] {
-    let repositories: RepositoryModel[] = this.selectedAccountRepositories().slice();
-
-    const searchString = this.searchString();
+    let repositories: RepositoryModel[] = this.repositories()?.repositories.slice();
 
     if (this.hideNoScorecardRepos()) {
       repositories = repositories.filter(
@@ -388,6 +385,8 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
         (repo) => !repo.archived);
     }
 
+    const searchString = this.searchString();
+
     if (searchString.length > 0) {
       repositories = repositories.filter((repo) =>
         JSON.stringify(repo).toLowerCase().includes(searchString));
@@ -398,7 +397,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Updates the query params, merging values and ensuring the page doesn't reload.
-   * @param queryParams
    * @private
    */
   private navigateWithQueryParams(
@@ -414,16 +412,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
 
   /**
    * Reset the UI.
+   * @private
    */
   private reset() {
-    this.cleanup.next();
-    this.cleanup.complete();
-
-    this.fatalError.set(false);
+    this.loadingPercentage.set(0);
     this.selectedAccount.set(undefined);
-    this.selectedAccountRepositories.set([]);
-
-    this.repositoryLoadState.set(LoadingState.LOADING);
+    this.repositories.set(new RepositoryCollection());
   }
 }
 
