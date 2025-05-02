@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ScoreRingComponent } from '../../../../../shared/components/score-ring/score-ring.component';
 import { ScorecardCheck } from '../../../../../shared/models/scorecard-check.model';
 import { FadedBgComponent } from '../../../../../shared/components/faded-bg/faded-bg.component';
-import { ScorecardService } from '../../../../../shared/services/scorecard.service';
+import { ScorecardService } from '../../../../../shared/services/providers/scorecard.service';
 
 @Component({
   selector: 'ossfd-scorecard-check',
@@ -39,16 +39,13 @@ export class CheckComponent {
 
   /**
    * Constructor.
-   * @param scorecardService
    */
   constructor(
-    protected scorecardService: ScorecardService
+    private scorecardService: ScorecardService
   ) { }
 
   /**
    * Get priority color.
-   * @param check
-   * @param showOnlyOnSelected
    */
   getPriorityColor(
     check: ScorecardCheck,

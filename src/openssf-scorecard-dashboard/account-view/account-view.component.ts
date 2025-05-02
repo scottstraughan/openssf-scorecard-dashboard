@@ -32,12 +32,11 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { AccountModel } from '../shared/models/account.model';
 import { LoadingComponent } from '../shared/components/loading/loading.component';
 import { LoadingState } from '../shared/loading-state';
-import { catchError, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
-import { PopupService } from '../shared/components/popup/popup.service';
-import { SelectedAccountStateService } from '../shared/services/selected-account-state.service';
-import { AccountService } from '../shared/services/account.service';
-import { ErrorPopupError, ErrorPopupService } from '../shared/services/error-popup.service';
+import { AccountViewModelService } from '../shared/services/account-view-model.service';
+import { AccountService } from '../shared/services/providers/account.service';
+import { ErrorService } from '../shared/services/error.service';
 import { IconComponent } from '../shared/components/icon/icon.component';
 import { Service } from '../shared/enums/service';
 
@@ -61,7 +60,6 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    */
   readonly LoadingState = LoadingState;
 
-  readonly fatalError: WritableSignal<ErrorPopupError | undefined> = signal(undefined);
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly accountLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly scorecardLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
@@ -78,22 +76,14 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
   /**
    * Constructor.
-   * @param router
-   * @param title
-   * @param activatedRoute
-   * @param popupService
-   * @param selectedAccountService
-   * @param accountService
-   * @param errorPopupService
    */
   constructor(
-    protected router: Router,
-    protected title: Title,
-    protected activatedRoute: ActivatedRoute,
-    protected popupService: PopupService,
-    protected selectedAccountService: SelectedAccountStateService,
-    protected accountService: AccountService,
-    protected errorPopupService: ErrorPopupService
+    private router: Router,
+    private title: Title,
+    private activatedRoute: ActivatedRoute,
+    private selectedAccountService: AccountViewModelService,
+    private accountService: AccountService,
+    private errorService: ErrorService,
   ) {
     // Used for the visit repository button
     this.selectedAccountServiceName = computed(() => {
@@ -114,44 +104,52 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.selectedAccountService.observeRepositories()
       .pipe(
-        tap(repositories => this.totalRepositories.set(repositories.length)),
+        tap(repositoryCollection =>
+          this.totalRepositories.set(repositoryCollection.repositories.length)),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.observeScorecardsLoadState()
+    this.selectedAccountService.observeScorecardsLoading()
       .pipe(
         tap(loadState => {
           this.scorecardLoadState.set(loadState);
 
           if (loadState == LoadingState.LOAD_SUCCESS) {
-            this.averageScorecardScore.set(this.selectedAccountService.calculateAverageScore());
-            this.totalRepositoriesWithScorecards.set(this.selectedAccountService.countValidScorecards());
+
+            this.averageScorecardScore.set(this.selectedAccountService.getAverageAccountScore());
+            this.totalRepositoriesWithScorecards.set(this.selectedAccountService.getRepositoriesWithScorecardCount());
           }
         }),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
+    this.selectedAccountService.observeAccount()
+      .pipe(
+        tap(account => {
+          this.title.setTitle(`${account.name} - OpenSSF Scorecard Dashboard`);
+
+          this.selectedAccount.set(account);
+          this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
+        }),
+        catchError(error =>
+          this.errorService.handleError(error)),
+
+        takeUntil(this.cleanup)
+      )
+      .subscribe()
+
     this.activatedRoute.params
       .pipe(
         tap(() => this.reset()),
-        switchMap(params => {
-          return this.selectedAccountService.setAccount(params['serviceTag'], params['accountTag'])
-            .pipe(
-              tap(account => {
-                this.title.setTitle(`${account.name} - OpenSSF Scorecard Dashboard`);
 
-                this.selectedAccount.set(account);
-                this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
-              }),
-              catchError(error => {
-                this.errorPopupService.handleError(error);
-                this.fatalError.set(this.errorPopupService.convertError(error));
-                return of(error);
-              })
-            )
-        }),
+        switchMap(params =>
+          this.selectedAccountService.setSelectedAccount(params['serviceTag'], params['accountTag'])),
+
+        catchError(error =>
+          this.errorService.handleError(error)),
+
         takeUntil(this.cleanup)
       )
       .subscribe();
@@ -167,54 +165,69 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
   /**
    * Reload all the scorecard results.
-   * @param account
    */
-  reloadScorecardResults(
-    account: AccountModel
-  ) {
-    this.selectedAccountService.reloadScorecards(account);
+  reloadScorecardResults() {
+    this.selectedAccountService.reloadScorecards(true)
+      .pipe(take(1))
+      .subscribe();
   }
 
   /**
    * Called when a user presses the delete service account button.
-   * @param account
    */
   onDeleteServiceAccount(
     account: AccountModel
   ) {
     try {
       // Delete the account
-      this.accountService.delete(account);
+      this.accountService.deleteCached(account)
+        .pipe(
+          // On success, navigate to the root where we will redirect to the correct place
+          tap(() =>
+            this.router.navigate(['/'], { replaceUrl: true }).then()),
 
-      // On success, navigate to the root where we will redirect to the correct place
-      this.router.navigate(['/'], { replaceUrl: true }).then();
-    } catch (error) {
-      this.errorPopupService.handleError(error);
+          // Handle any error
+          catchError(error =>
+            this.errorService.handleError(error, false)),
+
+          // Ensure we close
+          take(1)
+        )
+        .subscribe();
+    } catch (error: any) {
+      this.errorService.handleError(error, false);
     }
   }
 
   /**
-   * Called when a user wishes to re-fetch the repositories.
-   * @param account
+   * Called when a user wishes to reload the repositories.
    */
-  onFetchRepositories(
+  onReloadRepositories(
     account: AccountModel
   ) {
-    this.selectedAccountService.getRepositories(account, true);
+    this.selectedAccountService.reloadRepositories(true, false)
+      .pipe(
+        tap(() =>
+          this.router.navigate(
+            [`/${account.service}/${account.tag}`],
+            { relativeTo: this.activatedRoute })),
+
+        catchError(error =>
+          this.errorService.handleError(error, false))
+      )
+      .subscribe();
   }
 
   /**
    * Reset the UI state.
+   * @private
    */
   private reset() {
     this.cleanup.complete();
 
-    this.fatalError.set(undefined);
     this.selectedAccount.set(undefined);
-
     this.accountLoadState.set(LoadingState.LOADING);
     this.scorecardLoadState.set(LoadingState.LOADING);
-
     this.totalRepositoriesWithScorecards.set(0);
     this.averageScorecardScore.set(0);
   }

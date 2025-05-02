@@ -1,1 +1,7 @@
-<img ngSrc="./assets/images/loading.svg" alt="Loading..." height="24" width="24" priority />
+<div class="indicator">
+  <img ngSrc="./assets/images/loading.svg" alt="Loading..." height="24" width="24" priority />
+
+  @if (percentage(); as percentage) {
+    <div class="progress">{{ percentage }}%</div>
+  }
+</div>

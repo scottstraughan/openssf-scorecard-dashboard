@@ -21,6 +21,7 @@ import { AccountViewComponent } from './account-view/account-view.component';
 import { HomeViewComponent } from './home-view/home-view.component';
 import { RepositoryListViewComponent } from './account-view/views/repository-list-view/repository-list-view.component';
 import { ScorecardViewComponent } from './account-view/views/scorecard-view/scorecard-view.component';
+import { ErrorViewComponent } from './error-view/error-view.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
         component: ScorecardViewComponent
       }
     ]
+  },
+  {
+    path: 'error',
+    component: ErrorViewComponent
   },
   {
     path: '**',

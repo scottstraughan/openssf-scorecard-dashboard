@@ -51,17 +51,20 @@ export class MultiToggleButtonComponent {
   /**
    * Called when a user clicks on the button.
    */
-  onButtonClicked(event: MouseEvent) {
+  onButtonClicked(
+    event: MouseEvent
+  ) {
     event.stopPropagation();
     this.optionsVisible.set(!this.optionsVisible());
   }
 
   /**
    * Called when a user toggles an option.
-   * @param event
-   * @param option
    */
-  onOptionToggled(event: MouseEvent, option: ToggleButtonItem): void {
+  onOptionToggled(
+    event: MouseEvent,
+    option: ToggleButtonItem
+  ): void {
     event.stopPropagation();
 
     option.active = !option.active;
