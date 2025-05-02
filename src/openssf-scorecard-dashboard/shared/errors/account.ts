@@ -35,7 +35,6 @@ export class InvalidAccountError extends GenericError {
 export class DuplicateAccountError extends GenericError {
   /**
    * Constructor.
-   * @param message
    */
   constructor(
     message?: string
@@ -50,7 +49,6 @@ export class DuplicateAccountError extends GenericError {
 export class MinimumAccountError extends GenericError {
   /**
    * Constructor.
-   * @param message
    */
   constructor(
     message?: string
@@ -66,11 +64,21 @@ export class MinimumAccountError extends GenericError {
 export class RepositoryNotFoundError extends GenericError {
   /**
    * Constructor.
-   * @param message
    */
   constructor(
     message?: string
   ) {
     super('Repository Not Found', message || 'The requested repository could not be found in the account.');
+  }
+}
+
+/**
+ * When the API token is invalid.
+ */
+export class InvalidApiTokenError extends GenericError {
+  constructor(
+    message?: string
+  ) {
+    super('Invalid API Token', message || 'The provided API token is invalid.');
   }
 }

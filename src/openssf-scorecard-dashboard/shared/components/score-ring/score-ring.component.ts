@@ -49,25 +49,25 @@ import { IconComponent } from '../icon/icon.component';
   ],
 })
 export class ScoreRingComponent {
-  readonly hoverDelay: number = 350;
   readonly score = input.required<number>();
   readonly allowReload = input<boolean>(true);
 
-  protected timeout: any | undefined;
-
   @HostBinding('style.--progress')
-  percentage: string = '0%';
+  protected percentage: string = '0%';
 
   @HostBinding('style.--cursor')
-  cursor: string = 'default';
+  protected cursor: string = 'default';
 
-  hover: WritableSignal<boolean> = signal(false);
+  protected readonly hover: WritableSignal<boolean> = signal(false);
+
+  private readonly hoverDelay: number = 350;
+  private timeout: any | undefined;
 
   /**
    * Constructor.
    */
   constructor(
-    @SkipSelf() protected cdRef: ChangeDetectorRef
+    @SkipSelf() private cdRef: ChangeDetectorRef
   ) {
     effect(() => {
       this.percentage = Math.round(this.score() * 10) + '%';
@@ -82,7 +82,6 @@ export class ScoreRingComponent {
 
   /**
    * Get the color grade of the repository based on its score.
-   * @param score
    */
   getColorVariableForScore(
     score?: number
@@ -119,7 +118,6 @@ export class ScoreRingComponent {
 
   /**
    * Get the color grade of the repository based on its score.
-   * @param score
    */
   static getColorVariableForScore(
     score?: number

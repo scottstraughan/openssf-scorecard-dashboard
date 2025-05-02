@@ -17,18 +17,18 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, HostListener, Inject, signal, WritableSignal } from '@angular/core';
-import { PopupReference, PopupService } from '../../shared/components/popup/popup.service';
+import { PopupReference } from '../../shared/components/popup/popup.service';
 import { InputComponent } from '../../shared/components/input/input.component';
 import { LinkButtonComponent } from '../../shared/components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
-import { AccountService } from '../../shared/services/account.service';
+import { AccountService } from '../../shared/services/providers/account.service';
 import { catchError, of, take, tap } from 'rxjs';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Service } from '../../shared/enums/service';
 import { DuplicateAccountError } from '../../shared/errors/account';
-import { ErrorPopupService } from '../../shared/services/error-popup.service';
+import { ErrorService } from '../../shared/services/error.service';
 
 @Component({
   selector: 'ossfd-watch-account-popup',
@@ -51,23 +51,17 @@ export class WatchAccountPopupComponent {
 
   readonly service: WritableSignal<Service> = signal(Service.GITHUB);
   readonly accountName: WritableSignal<string> = signal('');
-  readonly apiToken: WritableSignal<string | undefined> = signal(undefined);
+  readonly apiToken: WritableSignal<string> = signal('');
   readonly loading: WritableSignal<boolean> = signal(false);
 
   /**
    * Constructor.
-   * @param popupReference
-   * @param accountService
-   * @param popupService
-   * @param errorPopupService
-   * @param router
    */
   constructor(
-    @Inject('POPUP_DATA') protected popupReference: PopupReference,
-    protected accountService: AccountService,
-    protected popupService: PopupService,
-    protected errorPopupService: ErrorPopupService,
-    protected router: Router
+    @Inject('POPUP_DATA') private popupReference: PopupReference,
+    private accountService: AccountService,
+    private errorService: ErrorService,
+    private router: Router
   ) { }
 
   /**
@@ -99,7 +93,9 @@ export class WatchAccountPopupComponent {
 
     this.loading.set(true);
 
-    this.accountService.add(this.service(), this.accountName(), this.apiToken())
+    const apiToken = this.apiToken().length > 0 ? this.apiToken() : undefined;
+
+    this.accountService.add(this.service(), this.accountName(), apiToken)
       .pipe(
         tap((account) => {
           this.popupReference.close();
@@ -114,7 +110,7 @@ export class WatchAccountPopupComponent {
             return of();
           }
 
-          this.errorPopupService.handleError(error);
+          this.errorService.handleError(error, false);
 
           this.loading.set(false);
           return of();

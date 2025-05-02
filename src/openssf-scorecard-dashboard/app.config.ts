@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ApplicationConfig, ChangeDetectionStrategy, SecurityContext, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, SecurityContext, ViewEncapsulation } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';

@@ -1,63 +1,93 @@
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AccountModel } from '../models/account.model';
-import { ScorecardModel } from '../models/scorecard.model';
-import { RepositoryModel } from '../models/repository.model';
-import { ScorecardCheck } from '../models/scorecard-check.model';
+import { AccountModel } from '../../models/account.model';
+import { ScorecardModel } from '../../models/scorecard.model';
+import { RepositoryModel } from '../../models/repository.model';
+import { ScorecardCheck } from '../../models/scorecard-check.model';
 import { MarkdownService } from 'ngx-markdown';
-import { ScorecardCheckDetails } from '../models/scorecard-check-details.model';
-import { ResultPriority } from '../enums/scorecard';
-import { CheckNotFoundError, ScorecardNotFoundError, UnableToParseCheckDetailsSegment } from '../errors/scorecard';
-import { TransientStorage } from './transient-storage.service';
-import { Service } from '../enums/service';
+import { ScorecardCheckDetails } from '../../models/scorecard-check-details.model';
+import { ResultPriority } from '../../enums/scorecard';
+import { CheckNotFoundError, UnableToParseCheckDetailsSegment } from '../../errors/scorecard';
+import { Service } from '../../enums/service';
+import { CacheService } from '../storage/cache.service';
+import { LoggingService } from '../logging.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScorecardService {
   /**
-   * This URL is linked to the OpenSSF GitHub that contains information on scorecard checks.
+   * Cache table name.
    */
-  static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md'
+  private static readonly CACHE_TABLE_NAME = 'scorecards';
 
   /**
-   * Timeout for the storage cache.
+   * Cache timeout in days.
    */
-  static readonly STORAGE_TIMEOUT_IN_DAYS = 7;
+  private static readonly CACHE_TIMEOUT = 1;
+
+  /**
+   * This URL is linked to the OpenSSF GitHub that contains information on scorecard checks.
+   */
+  private static readonly CHECK_DETAILS_URL = 'https://raw.githubusercontent.com/ossf/scorecard/main/docs/checks.md'
 
   /**
    * Constructor
-   * @param httpClient
-   * @param markdownService
-   * @param transientStorage
    */
   constructor(
     private httpClient: HttpClient,
     private markdownService: MarkdownService,
-    private transientStorage: TransientStorage,
+    private cacheService: CacheService,
+    private loggingService: LoggingService
   ) { }
 
   /**
    * Get a single scorecard for a provided repository.
-   * @param account
-   * @param repository
-   * @param forceReload
    */
   getScorecard(
     account: AccountModel,
     repository: RepositoryModel,
     forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
-    return this.fetchScorecard(account, repository, forceReload)
+    // Unless force reload is set, we will skip fetching scorecards for repositories that are known to not having one
+    if (repository.hasScorecard == false && !forceReload) {
+      this.loggingService.warn(`Skipped fetch of scorecard for repository ${repository.name}.`)
+      return of(undefined);
+    }
+
+    return this.cacheService.getByKey<ScorecardModel | undefined>(ScorecardService.CACHE_TABLE_NAME, repository.url)
       .pipe(
-        tap(scorecard => repository.scorecard = scorecard)
+        // Check if we have a cached item before requesting
+        switchMap(cached =>
+          cached && !forceReload
+            ? of(cached.value) : this.fetchScorecard(account, repository)),
+
+        // Set the scorecard
+        tap(scorecard =>
+          repository.scorecard = scorecard),
+
+        // Save the scorecard to the cache
+        switchMap(scorecard =>
+          this.cacheService.add<ScorecardModel | undefined>(
+            ScorecardService.CACHE_TABLE_NAME, scorecard, repository.url, ScorecardService.CACHE_TIMEOUT)),
+
+        // Return the scorecard
+        switchMap(scorecard => of(scorecard))
       );
   }
 
   /**
+   * Delete from cache.
+   */
+  deleteCached(
+    repository: RepositoryModel
+  ): Observable<void> {
+    return this.cacheService.deleteItem(ScorecardService.CACHE_TABLE_NAME, repository.url);
+  }
+
+  /**
    * Fetch information about the scorecard check from the OpenSSF GitHub markdown file.
-   * @param scorecardCheck
    */
   getCheckDetails(
     scorecardCheck: ScorecardCheck
@@ -90,9 +120,6 @@ export class ScorecardService {
 
   /**
    * Get a scorecard check by its name.
-   * @param checkName
-   * @param scorecard
-   * @throws CheckNotFoundError
    */
   getCheckByName(
     checkName: string,
@@ -111,7 +138,6 @@ export class ScorecardService {
 
   /**
    * Get the priority color of a result.
-   * @param resultPriority
    */
   getPriorityColor(
     resultPriority: ResultPriority
@@ -129,16 +155,43 @@ export class ScorecardService {
   }
 
   /**
+   * Calculate the average score for all the provided scorecards.
+   */
+  calculateAverageScore(
+    scorecards: (ScorecardModel | undefined)[]
+  ) {
+    let totalScore = 0;
+    let scoreCount = 0;
+
+    if (scorecards.length == 0) {
+      return 0;
+    }
+
+    for (const scorecard of scorecards) {
+      let score = 0;
+
+      if (scorecard && scorecard.score) {
+        score = scorecard.score;
+      }
+
+      totalScore += score;
+      scoreCount += 1;
+    }
+
+    if (scoreCount == 0) {
+      return 0;
+    }
+
+    return Number((totalScore / scoreCount).toFixed(1));
+  }
+
+  /**
    * Fetch a scorecard from the OpenSSF API.
-   * @param account
-   * @param repository
-   * @param forceReload
-   * @protected
+   * @private
    */
   private fetchScorecard(
     account: AccountModel,
     repository: RepositoryModel,
-    forceReload: boolean = false
   ): Observable<ScorecardModel | undefined> {
     let serviceProviderUrl = 'github.com';
 
@@ -147,17 +200,6 @@ export class ScorecardService {
     }
 
     const url = `https://api.securityscorecards.dev/projects/${serviceProviderUrl}/${account.tag}/${repository.name}`;
-    const storageKey = `${account.service}-${account.tag}-${repository.name}`.toLowerCase();
-
-    if (forceReload) {
-      this.transientStorage.remove(storageKey);
-    }
-
-    // Verify any existing storage/cache of the scorecard and return if it valid
-    if (this.transientStorage.has(storageKey)) {
-      const cached = this.transientStorage.get<ScorecardModel | undefined>(storageKey);
-      return cached ? of(cached) : throwError(() => new ScorecardNotFoundError());
-    }
 
     return this.httpClient.get(url, { responseType: 'json' })
       .pipe(
@@ -173,6 +215,7 @@ export class ScorecardService {
             dateGenerated: new Date(scorecardResult['date'])
           }
         }),
+
         // Sort the checks
         map(scorecard => {
           scorecard.checks.sort((a: ScorecardCheck, b: ScorecardCheck) => {
@@ -181,16 +224,8 @@ export class ScorecardService {
 
           return scorecard
         }),
-        // Store the scorecard to the storage service cache
-        tap(scorecard => {
-          this.transientStorage.set<ScorecardModel>(
-            storageKey, scorecard, ScorecardService.STORAGE_TIMEOUT_IN_DAYS);
-        }),
-        // Store even an invalid scorecard to avoid hitting the service too much
-        catchError(() => {
-          this.transientStorage.set<undefined>(
-            storageKey, undefined, ScorecardService.STORAGE_TIMEOUT_IN_DAYS);
 
+        catchError(() => {
           return of(undefined);
         })
       );
@@ -198,7 +233,6 @@ export class ScorecardService {
 
   /**
    * Get the weight of a priority.
-   * @param priority
    * @private
    */
   private static getPriorityWeight(
@@ -219,7 +253,7 @@ export class ScorecardService {
   /**
    * Determine the priority of the specific check. Unfortunately, the API does not return it, so we need to check it
    * manually.
-   * @param name
+   * @private
    */
   private static getPriority(
     name: string

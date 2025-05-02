@@ -1,20 +1,19 @@
 <div class="panel repositories">
-  @if (repositoryLoadState() == LoadingState.LOAD_SUCCESS) {
-    @if (selectedAccount(); as account) {
-      <div class="header">
-        <div>
-          <ossfd-input
-              [(value)]="searchString"
-              icon="search"
-              placeholder="type to filter repositories"></ossfd-input>
-        </div>
-        <div>
-          <ossfd-link-button
-              [icon]="getIcon('sort')"
-              [label]="getSortLabel()"
-              (click)="onToggleSortMode()"></ossfd-link-button>
-          <ossfd-multi-toggle-button
-              [items]="[{
+  @if (selectedAccount(); as account) {
+    <div class="header">
+      <div>
+        <ossfd-input
+            [(value)]="searchString"
+            icon="search"
+            placeholder="type to filter repositories"></ossfd-input>
+      </div>
+      <div>
+        <ossfd-link-button
+            [icon]="getIcon('sort')"
+            [label]="getSortLabel()"
+            (click)="onToggleSortMode()"></ossfd-link-button>
+        <ossfd-multi-toggle-button
+            [items]="[{
                 id: LayoutVisibility.HIDE_NO_SCORECARD_REPOS,
                 name: 'Hide Repositories Missing Scorecards',
                 icon: 'score',
@@ -27,13 +26,18 @@
                 active: hideArchivedRepos()
               }]"
             (itemChange)="onVisibleItemsChanged($event)"
-          ></ossfd-multi-toggle-button>
-          <ossfd-link-button
-              [icon]="getIcon('layout')"
-              (click)="onToggleLayout()"></ossfd-link-button>
-        </div>
+        ></ossfd-multi-toggle-button>
+        <ossfd-link-button
+            [icon]="getIcon('layout')"
+            (click)="onToggleLayout()"></ossfd-link-button>
       </div>
+    </div>
 
+    @if (!repositories().completed) {
+      <div class="container">
+        <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+      </div>
+    } @else {
       @if (getVisibleRepositories().length > 0) {
         <div class="container">
           <div
@@ -50,7 +54,7 @@
             <ossfd-link-button
                 class="view-more"
                 label="View More Repositories"
-                icon="next_plan"
+                icon="arrow-down"
                 (click)="onViewMore()"></ossfd-link-button>
           }
         </div>
@@ -63,7 +67,5 @@
         </div>
       }
     }
-  } @else {
-    <ossfd-loading></ossfd-loading>
   }
 </div>

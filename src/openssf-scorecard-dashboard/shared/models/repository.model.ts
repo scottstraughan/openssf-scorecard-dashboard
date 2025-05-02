@@ -28,5 +28,6 @@ export interface RepositoryModel {
   stars: number
   description: string
   archived: boolean
+  hasScorecard?: boolean
   scorecard?: ScorecardModel
 }

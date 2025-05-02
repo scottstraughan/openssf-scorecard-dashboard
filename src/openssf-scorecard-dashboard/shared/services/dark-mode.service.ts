@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { TransientStorage } from './transient-storage.service';
+import { KeyValueStore } from './storage/key-value.service';
 
 /**
  * This service make it easy to enable or disable dark mode.
@@ -30,21 +30,20 @@ export class DarkModeService {
   /**
    * Local storage key.
    */
-  static readonly STORAGE_KEY = 'ossfd-dark-mode-enabled';
+  private static readonly STORAGE_KEY = 'ossfd-dark-mode-enabled';
 
   /**
    * BehaviorSubject, used to track changes to the dark mode state.
    */
-  readonly darkModeEnabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private readonly darkModeEnabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   /**
-   * Constructor for DarkModeService.
-   * @param transientStorage
+   * Constructor.
    */
   constructor(
-    private transientStorage: TransientStorage
+    private keyValueStore: KeyValueStore
   ) {
-    const savedDarkMode = this.transientStorage.get<boolean>(DarkModeService.STORAGE_KEY);
+    const savedDarkMode = this.keyValueStore.get<boolean>(DarkModeService.STORAGE_KEY);
     const browserDarkMode = this.isBrowserDarkModeEnabled();
 
     if (savedDarkMode !== undefined) {
@@ -69,7 +68,7 @@ export class DarkModeService {
   toggleDarkModeEnabled(): void {
     const darkModeEnabled = !this.darkModeEnabled$.getValue();
 
-    this.transientStorage.set(DarkModeService.STORAGE_KEY, darkModeEnabled);
+    this.keyValueStore.set(DarkModeService.STORAGE_KEY, darkModeEnabled);
     this.darkModeEnabled$.next(darkModeEnabled);
   }
 

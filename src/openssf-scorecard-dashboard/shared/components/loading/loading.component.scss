@@ -1,20 +1,34 @@
 @use "../../../../mixins" as *;
 
 :host {
-  --ossfd-loading-max-height: 100px;
-  --ossfd-loading-max-width: 100px;
+  --ossfd-loading-size: 100px;
 
   @include center;
 
   height: 100%;
   width: 100%;
 
-  img {
-    animation: spin 1s linear infinite;
-    height: 100%;
-    max-height: var(--ossfd-loading-max-height);
-    max-width: var(--ossfd-loading-max-width);
-    width: 100%;
+  .indicator {
+    @include center;
+
+    height: var(--ossfd-loading-size);
+    position: relative;
+    width: var(--ossfd-loading-size);
+
+    img {
+      animation: spin 1s linear infinite;
+      height: 100%;
+      position: absolute;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .progress {
+      color: var(--text-color);
+      opacity: .7;
+      position: absolute;
+      z-index: 2;
+    }
   }
 }
 

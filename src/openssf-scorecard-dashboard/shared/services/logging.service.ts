@@ -16,19 +16,45 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
-@Component({
-  selector: 'ossfd-loading',
-  standalone: true,
-  templateUrl: './loading.component.html',
-  styleUrl: './loading.component.scss',
-  imports: [
-    NgOptimizedImage
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+@Injectable({
+  providedIn: 'root'
 })
-export class LoadingComponent {
-  readonly percentage = input<number>();
+export class LoggingService {
+  /**
+   * Enable or disable logging.
+   */
+  private enabled: boolean = environment.logging;
+
+  /**
+   * Log an info level message.
+   */
+  info(
+    ...data: any
+  ) {
+    if (!this.enabled) return ;
+    console.info(data);
+  }
+
+  /**
+   * Log an error level message.
+   */
+  error(
+    ...data: any
+  ) {
+    if (!this.enabled) return ;
+    console.error(data);
+  }
+
+  /**
+   * Log a warn level message.
+   */
+  warn(
+    ...data: any
+  ) {
+    if (!this.enabled) return ;
+    //console.warn(data);
+  }
 }

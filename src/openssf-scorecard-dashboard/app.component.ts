@@ -29,7 +29,7 @@ import {
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AccountModel } from './shared/models/account.model';
 import { DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { AccountService } from './shared/services/account.service';
+import { AccountService } from './shared/services/providers/account.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
 import { WatchAccountPopupComponent } from './popups/watch-account-popup/watch-account-popup.component';
@@ -67,11 +67,6 @@ export class AppComponent {
 
   /**
    * Constructor
-   * @param serviceStoreService
-   * @param popupService
-   * @param renderer
-   * @param document
-   * @param darkModeService
    */
   constructor(
     private serviceStoreService: AccountService,
