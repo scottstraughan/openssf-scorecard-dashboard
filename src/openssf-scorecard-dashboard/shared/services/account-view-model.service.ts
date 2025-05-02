@@ -27,7 +27,7 @@ import {
   map,
   Observable,
   Subject,
-  switchMap,
+  switchMap, take,
   takeUntil,
   tap
 } from 'rxjs';
@@ -177,7 +177,7 @@ export class AccountViewModelService {
   reloadRepositories(
     forceReload: boolean = false,
     emitEmpty: boolean = true
-  ) {
+  ): Observable<any> {
     return this.observeAccount()
       .pipe(
         // Emit a empty value
@@ -257,13 +257,18 @@ export class AccountViewModelService {
 
         // Remap each request into a reload observable
         map(repositoryRequests => repositoryRequests.map(scorecardRequest =>
-          this.reloadScorecard(scorecardRequest.repository, forceReload))),
+          this.reloadScorecard(scorecardRequest.repository, forceReload, false))),
 
         // Wait until all the requests have completed
         switchMap(observables => forkJoin(observables)),
 
+        // Notify we have loaded everything
+        tap(() =>
+          this.scorecardsRequests$.next(this.scorecardsRequests$.getValue())),
+
         // Stop when cancelled
-        takeUntil(this.cancelled$)
+        takeUntil(this.cancelled$),
+        take(1)
       );
   }
 
@@ -272,13 +277,16 @@ export class AccountViewModelService {
    */
   reloadScorecard(
     repository: RepositoryModel,
-    forceReload: boolean = true
+    forceReload: boolean = true,
+    emitProgress: boolean = true
   ): Observable<any> {
     const scorecardRequest = this.getScorecardRequest(repository);
 
     // Update the request loading state and notify observers
     scorecardRequest.loadState = LoadingState.LOADING;
-    this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
+
+    if (emitProgress)
+      this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
 
     return this.observeAccount()
       .pipe(
@@ -290,11 +298,14 @@ export class AccountViewModelService {
         tap(scorecard => {
           scorecardRequest.scorecard = scorecard;
           scorecardRequest.loadState = LoadingState.LOAD_SUCCESS;
-          this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
+
+          if (emitProgress)
+            this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
         }),
 
         // Listen to cancelled$ requests
-        takeUntil(this.cancelled$)
+        takeUntil(this.cancelled$),
+        take(1)
       )
   }
 }
