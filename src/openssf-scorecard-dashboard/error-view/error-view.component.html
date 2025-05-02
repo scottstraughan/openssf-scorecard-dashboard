@@ -1,0 +1,9 @@
+@if (error(); as error) {
+  <div class="panel error-message">
+    <div>
+      <ossfd-icon [icon]="getIconForError(error)"></ossfd-icon>
+      <h1 [innerHTML]="error.title"></h1>
+      <h2 [innerHTML]="error.message"></h2>
+    </div>
+  </div>
+}
