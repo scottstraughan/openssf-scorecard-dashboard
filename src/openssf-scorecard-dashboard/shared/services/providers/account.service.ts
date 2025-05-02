@@ -27,6 +27,7 @@ import { GitlabService } from '../api/gitlab.service';
 import { CacheService } from '../storage/cache.service';
 import { RepositoryService } from './repository.service';
 import { InitializableService } from './initializable-service';
+import { LoggingService } from '../logging.service';
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +52,8 @@ export class AccountService extends InitializableService {
     private githubAccountService: GithubService,
     private gitlabAccountService: GitlabService,
     private cacheService: CacheService,
-    private repositoryService: RepositoryService
+    private repositoryService: RepositoryService,
+    private loggingService: LoggingService
   ) {
     super();
 
@@ -201,7 +203,7 @@ export class AccountService extends InitializableService {
           Array.isArray(cached) ? of(cached) : of([])),
         tap(accounts => {
           if (notifyObservers) {
-            console.log('Notifying observers...');
+            this.loggingService.info('Notifying observers...');
             this.accounts$.next(accounts)
           }
         })
