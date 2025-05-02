@@ -78,7 +78,6 @@ input {
   @include center;
 
   height: 100%;
-  opacity: .4;
   text-align: center;
 
   ossfd-icon {
@@ -97,5 +96,6 @@ input {
 
   h2 {
     font-size: 1.1rem;
+    opacity: .6;
   }
 }
