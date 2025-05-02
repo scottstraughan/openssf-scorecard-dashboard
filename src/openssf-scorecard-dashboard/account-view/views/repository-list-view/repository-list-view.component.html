@@ -34,7 +34,9 @@
     </div>
 
     @if (!repositories().completed) {
-      <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+      <div class="container">
+        <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+      </div>
     } @else {
       @if (getVisibleRepositories().length > 0) {
         <div class="container">
