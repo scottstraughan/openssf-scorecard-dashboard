@@ -23,6 +23,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { take, tap } from 'rxjs';
 import { GenericError } from '../shared/errors/generic';
 import { Title } from '@angular/platform-browser';
+import { LoggingService } from '../shared/services/logging.service';
 
 @Component({
   selector: 'ossfd-error-view',
@@ -50,7 +51,8 @@ export class ErrorViewComponent implements OnInit {
     private errorService: ErrorService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private title: Title
+    private title: Title,
+    private loggingService: LoggingService,
   ) { }
 
   /**
@@ -69,6 +71,8 @@ export class ErrorViewComponent implements OnInit {
 
           this.error.set(error);
           this.title.setTitle(error.title);
+
+          this.loggingService.error(error);
 
           if (params['goTo'] && !error) {
             this.router.navigate([params['goTo']], {
