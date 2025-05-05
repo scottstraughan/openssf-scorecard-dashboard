@@ -37,6 +37,7 @@ export class GithubService extends BaseApiService {
 
     return this.getRequestInstance(apiUrl, apiToken)
       .pipe(
+        // Map result to account model
         map((accountResult: any) => {
           return {
             service: Service.GITHUB,
@@ -54,6 +55,8 @@ export class GithubService extends BaseApiService {
             apiToken: apiToken
           }
         }),
+
+        // Throw a decent error
         catchError(error =>
           throwError(() => this.throwDecentError(Service.GITHUB, error)))
       );
@@ -128,9 +131,8 @@ export class GithubService extends BaseApiService {
             observer.next(repositories)),
 
           // Capture any error that happens and then throw it
-          catchError(error => {
-            return throwError(() => error);
-          }),
+          catchError(error =>
+            throwError(() => error)),
 
           // Continue to next page or return finally state
           switchMap(loadState =>

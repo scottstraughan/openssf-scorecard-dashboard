@@ -39,9 +39,9 @@ import { ErrorService } from '../../services/error.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorPopupComponent {
-  readonly title: WritableSignal<string> = signal('');
-  readonly message: WritableSignal<string> = signal('');
-  readonly icon: WritableSignal<string> = signal('error');
+  protected readonly title: WritableSignal<string> = signal('');
+  protected readonly message: WritableSignal<string> = signal('');
+  protected readonly icon: WritableSignal<string> = signal('error');
 
   /**
    * Constructor

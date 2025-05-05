@@ -126,29 +126,38 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
     this.accountViewModelService.observeAccount()
       .pipe(
+        // Update the account when the account changes
         tap(account => {
           this.title.setTitle(`${account.name} - OpenSSF Scorecard Dashboard`);
 
           this.selectedAccount.set(account);
           this.accountLoadState.set(LoadingState.LOAD_SUCCESS);
         }),
+
+        // Catch any error
         catchError(error =>
           this.errorService.handleError(error)),
 
+        // Take until we cleanup
         takeUntil(this.cleanup)
       )
       .subscribe()
 
     this.activatedRoute.params
       .pipe(
-        tap(() => this.reset()),
+        // Reset the view
+        tap(() =>
+          this.reset()),
 
+        // Set the selected account based on router params
         switchMap(params =>
           this.accountViewModelService.setSelectedAccount(params['serviceTag'], params['accountTag'])),
 
+        // Catch any errors
         catchError(error =>
           this.errorService.handleError(error)),
 
+        // Take new router args until cleanup
         takeUntil(this.cleanup)
       )
       .subscribe();

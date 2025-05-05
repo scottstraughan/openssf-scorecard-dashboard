@@ -18,11 +18,11 @@
 
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, Subject, take, tap } from 'rxjs';
+import { Observable, Subject, take } from 'rxjs';
 import { AccountModel } from '../../models/account.model';
 import { RepositoryModel } from '../../models/repository.model';
 import { RateLimitError } from '../../errors/service';
-import { InvalidAccountError, InvalidApiTokenError } from '../../errors/account';
+import { AccountNotFoundError, InvalidApiTokenError } from '../../errors/account';
 import { Service } from '../../enums/service';
 import { LoggingService } from '../logging.service';
 
@@ -66,12 +66,7 @@ export abstract class BaseApiService {
     }
 
     return this.httpClient.get(url, { responseType: 'json', headers: headers, observe: observe })
-      .pipe(
-        tap(() => {
-          //throw new RateLimitError()
-        }),
-        take(1),
-      );
+      .pipe(take(1));
   }
 
   /**
@@ -88,7 +83,7 @@ export abstract class BaseApiService {
       return new RateLimitError(
         `You have been throttled by ${service}. Please wait 30 minutes or add a different API key to the account.`);
     } else if (error.status == 404) {
-      return new InvalidAccountError(
+      return new AccountNotFoundError(
         `No ${service} account with the provided name was found. Please recheck the account name.`);
     } else if (error.status == 401) {
       return new InvalidApiTokenError(
@@ -150,9 +145,8 @@ export class RepositoryCollection {
    * Get the current percentage of the repositories that we have loaded to what is available.
    */
   loadPercentage(): number {
-    if (this.totalRepositories == 0 || this.repositories.length == 0) {
+    if (this.totalRepositories == 0 || this.repositories.length == 0)
       return 0;
-    }
 
     return Math.round((this.repositories.length / this.totalRepositories) * 100);
   }
@@ -163,6 +157,7 @@ export class RepositoryCollection {
   static createFromRepositories(
     repositories: RepositoryModel[]
   ) {
-    return new RepositoryCollection(repositories.length, repositories, true, repositories.length);
+    return new RepositoryCollection(
+      repositories.length, repositories, true, repositories.length);
   }
 }

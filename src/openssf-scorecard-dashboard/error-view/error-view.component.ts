@@ -65,7 +65,9 @@ export class ErrorViewComponent implements OnInit {
           const error = this.errorService.getError();
 
           if (error == undefined) {
-            this.router.navigate(['./']).then();
+            this.router.navigate(['./'])
+              .then();
+
             return ;
           }
 

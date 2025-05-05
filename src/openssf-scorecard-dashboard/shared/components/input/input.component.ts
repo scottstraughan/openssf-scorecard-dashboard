@@ -32,19 +32,18 @@ import { IconComponent } from '../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InputComponent implements OnInit {
-  value = model<string>('');
-  placeholder = input<string>('');
-  icon = input<string | undefined>(undefined);
-  focus = input<boolean>(false);
+  readonly value = model<string>('');
+  readonly placeholder = input<string>('');
+  readonly icon = input<string | undefined>(undefined);
+  readonly focus = input<boolean>(false);
 
   @ViewChild('input') inputElement: ElementRef | undefined;
 
   ngOnInit(): void {
     if (this.focus()) {
       setTimeout(() => {
-        if (!this.inputElement) {
+        if (!this.inputElement)
           return;
-        }
 
         this.inputElement.nativeElement.focus();
       });

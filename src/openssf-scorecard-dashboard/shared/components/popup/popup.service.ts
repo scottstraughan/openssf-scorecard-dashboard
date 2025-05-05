@@ -42,15 +42,13 @@ export class PopupService {
   create<T>(component: T, data: any, immediatelyShow: boolean = false): PopupReference {
     this.rootContainerReference = this.applicationRef.components[0].injector.get(ViewContainerRef);
 
-    if (!this.rootContainerReference) {
-      throw new Error();
-    }
+    if (!this.rootContainerReference)
+      throw new Error('Could not find root container reference for popup injection.');
 
     const popupComponentComponentRef = this.rootContainerReference.createComponent(PopupComponent);
 
     const popupReference: PopupReference = new PopupReference(
-      popupComponentComponentRef,
-      data);
+      popupComponentComponentRef, data);
 
     const injector = Injector.create({
       providers: [{ provide: 'POPUP_DATA', useValue: popupReference }],
@@ -58,9 +56,8 @@ export class PopupService {
 
     popupComponentComponentRef.instance.attach(component, injector, popupReference);
 
-    if (immediatelyShow) {
+    if (immediatelyShow)
       popupComponentComponentRef.instance.show();
-    }
 
     return popupReference;
   }

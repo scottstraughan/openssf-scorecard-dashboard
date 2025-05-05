@@ -78,11 +78,15 @@ export class RepositoryService {
         // Cache the result
         switchMap(repositoryCollection =>
           repositoryCollection.completed
+            // If completed, add to cache
             ? this.indexedDbService.add<RepositoryModel[]>(
               RepositoryService.CACHE_TABLE_NAME,
               repositoryCollection.repositories, account.url, RepositoryService.CACHE_TIMEOUT)
               .pipe(map(() => repositoryCollection))
-            : of(repositoryCollection)),
+
+            // If not completed, return previous result
+            : of(repositoryCollection)
+        ),
 
         // Return the original result reference
         switchMap(() =>
@@ -104,9 +108,8 @@ export class RepositoryService {
       .pipe(
         map(repositories => {
           for (const repository of repositories.repositories) {
-            if (repository.name == name) {
+            if (repository.name == name)
               return repository;
-            }
           }
 
           throw new RepositoryNotFoundError();
@@ -126,13 +129,16 @@ export class RepositoryService {
           repositoryCollection.repositories.map(repository =>
             this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url)
               .pipe(
-                switchMap(() => this.scorecardService.deleteCached(repository))
+                // Switch to the delete cache observable
+                switchMap(() =>
+                  this.scorecardService.deleteCached(repository))
               )
           )
         ),
 
         // Wait for all the delete observables to complete
-        switchMap(deleteObservables => forkJoin(deleteObservables))
+        switchMap(deleteObservables =>
+          forkJoin(deleteObservables))
       )
   }
 
@@ -152,9 +158,8 @@ export class RepositoryService {
       observable = this.gitlabService.getRepositories(account, cancelled$);
     }
 
-    if (!observable) {
+    if (!observable)
       throw new ServiceNotSupportedError();
-    }
 
     return observable;
   }

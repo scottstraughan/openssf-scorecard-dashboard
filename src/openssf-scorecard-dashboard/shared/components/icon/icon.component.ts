@@ -41,8 +41,7 @@ export class IconComponent {
    * Constructor.
    */
   constructor() {
-    this.iconSrc = computed(() => {
-      return `./assets/icons/${this.icon()}.svg`;
-    });
+    this.iconSrc = computed(() =>
+      `./assets/icons/${this.icon()}.svg`);
   }
 }

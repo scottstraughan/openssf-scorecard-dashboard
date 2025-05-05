@@ -206,9 +206,8 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
     this.loading.set(LoadingState.LOAD_SUCCESS);
     this.scorecard.set(scorecard);
 
-    if (!scorecard) {
+    if (!scorecard)
       throw new ScorecardNotFoundError();
-    }
 
     if (selectedCheckName) {
       try {
@@ -227,16 +226,14 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
   private setSelectedCheck(
     check: ScorecardCheck | undefined
   ) {
-    if (!check) {
+    if (!check)
       return;
-    }
 
     const account = this.account;
     const repository = this.repository();
 
-    if (!account || !repository) {
+    if (!account || !repository)
       return ;
-    }
 
     const urlTree = this.router.createUrlTree([
       account.service,

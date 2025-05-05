@@ -79,10 +79,8 @@ export class AccountService extends InitializableService {
     apiToken?: string
   ): Observable<AccountModel> {
     // Check if the service is supported or not
-    if (!Object.values(Service).includes(service.toString())) {
-      return throwError(() =>
-        new ServiceNotSupportedError());
-    }
+    if (!Object.values(Service).includes(service.toString()))
+      return throwError(() => new ServiceNotSupportedError());
 
     const accountKey = AccountService.createAccountMapKey(service, accountName);
 
@@ -127,6 +125,7 @@ export class AccountService extends InitializableService {
     return serviceObservable
       .getAccount(accountName, apiToken)
       .pipe(
+        // Cache the account result, so we can referer to it later
         tap(account =>
           accountResult = account),
 
@@ -134,8 +133,13 @@ export class AccountService extends InitializableService {
         switchMap(account =>
           this.cacheService.add<AccountModel>(AccountService.CACHE_TABLE_NAME, account, accountKey)
             .pipe(
-              switchMap(() => this.reloadAccounts()),
-              switchMap(() => of(accountResult))
+              // Reload all the accounts
+              switchMap(() =>
+                this.reloadAccounts()),
+
+              // Return the account
+              switchMap(() =>
+                of(accountResult))
             )
         )
       );
@@ -183,8 +187,11 @@ export class AccountService extends InitializableService {
   private initialize(): Observable<any> {
     return this.reloadAccounts(false)
       .pipe(
+        // Notify any observers of updates to accounts
         tap(accounts =>
           this.accounts$.next(accounts)),
+
+        // Set that we are now initialized
         tap(() =>
           this.setInitialized(true)),
       )
@@ -199,8 +206,13 @@ export class AccountService extends InitializableService {
   ): Observable<AccountModel[]> {
     return this.cacheService.getAll<AccountModel>(AccountService.CACHE_TABLE_NAME)
       .pipe(
+        // If we have cache, return that or return an empty array
         switchMap(cached =>
-          Array.isArray(cached) ? of(cached) : of([])),
+          Array.isArray(cached)
+            ? of(cached)
+            : of([])),
+
+        // Notify any observers if enabled
         tap(accounts => {
           if (notifyObservers) {
             this.loggingService.info('Notifying observers...');

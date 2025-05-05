@@ -109,7 +109,8 @@ export class AccountViewModelService {
       .pipe(
         map(counter => counter == 0
           ? LoadingState.LOAD_SUCCESS
-          : LoadingState.LOADING)
+          : LoadingState.LOADING
+        )
       )
   }
 
@@ -199,7 +200,8 @@ export class AccountViewModelService {
             ? this.reloadScorecards(false)
               .pipe(
                 // We should now be fully complete
-                tap(() => completedSubject.next())
+                tap(() =>
+                  completedSubject.next())
               )
             : of([])),
 
@@ -214,7 +216,8 @@ export class AccountViewModelService {
    */
   getAverageAccountScore(): number {
     const scorecards = Array.from(this.scorecardsRequests$.getValue().values())
-      .map(scorecardRequest => scorecardRequest.scorecard);
+      .map(scorecardRequest =>
+        scorecardRequest.scorecard);
 
     return this.scorecardService.calculateAverageScore(scorecards);
   }
@@ -226,7 +229,8 @@ export class AccountViewModelService {
     const requests = Array.from(this.scorecardsRequests$.getValue().values());
 
     const withScorecardsCount = requests
-      .filter(scorecardRequest => scorecardRequest.scorecard == undefined).length;
+      .filter(scorecardRequest =>
+        scorecardRequest.scorecard == undefined).length;
 
     return requests.length - withScorecardsCount;
   }
@@ -317,9 +321,8 @@ export class AccountViewModelService {
     if (!Array.isArray(scorecardRequests))
       scorecardRequests = [scorecardRequests];
 
-    for (const scorecardRequest of scorecardRequests) {
+    for (const scorecardRequest of scorecardRequests)
       this.scorecardsRequests$.getValue().set(scorecardRequest.repository.url, scorecardRequest);
-    }
 
     const loadingCount = Array.from(this.scorecardsRequests$.getValue().values())
       .filter(scorecardRequest =>

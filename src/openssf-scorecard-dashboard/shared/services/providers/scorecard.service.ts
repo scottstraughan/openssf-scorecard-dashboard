@@ -61,7 +61,9 @@ export class ScorecardService {
         // Check if we have a cached item before requesting
         switchMap(cached =>
           cached && !forceReload
-            ? of(cached.value) : this.fetchScorecard(account, repository)),
+            ? of(cached.value)
+            : this.fetchScorecard(account, repository)
+        ),
 
         // Set the scorecard
         tap(scorecard =>
@@ -70,10 +72,12 @@ export class ScorecardService {
         // Save the scorecard to the cache
         switchMap(scorecard =>
           this.cacheService.add<ScorecardModel | undefined>(
-            ScorecardService.CACHE_TABLE_NAME, scorecard, repository.url, ScorecardService.CACHE_TIMEOUT)),
+            ScorecardService.CACHE_TABLE_NAME, scorecard, repository.url, ScorecardService.CACHE_TIMEOUT)
+        ),
 
         // Return the scorecard
-        switchMap(scorecard => of(scorecard))
+        switchMap(scorecard =>
+          of(scorecard))
       );
   }
 
@@ -95,7 +99,9 @@ export class ScorecardService {
     return this.httpClient.get(ScorecardService.CHECK_DETAILS_URL, { responseType: 'text' })
       .pipe(
         // Parse the markdown file from GitHub
-        map(result => this.markdownService.parse(result).toString()),
+        map(result =>
+          this.markdownService.parse(result).toString()),
+
         // Extract the relevant segment by searching for the specific H2 with id
         map(result => {
           const regex = /(<h2.*?>.*?<\/h2>)/gim;
@@ -110,10 +116,12 @@ export class ScorecardService {
 
           throw new UnableToParseCheckDetailsSegment('Unable to locate specific H2 in markdown.');
         }),
-        // Convert the result into a wrapped foarmt
-        map(result => <ScorecardCheckDetails> {
-          details: result,
-          check: scorecardCheck
+
+        // Convert the result into a wrapped format
+        map(result =>
+          <ScorecardCheckDetails> {
+            details: result,
+            check: scorecardCheck
         })
       )
   }
@@ -128,9 +136,8 @@ export class ScorecardService {
     checkName = checkName.toLowerCase();
 
     for (const check of scorecard.checks) {
-      if (check.name.toLowerCase() == checkName) {
+      if (check.name.toLowerCase() == checkName)
         return check;
-      }
     }
 
     throw new CheckNotFoundError();
@@ -170,17 +177,15 @@ export class ScorecardService {
     for (const scorecard of scorecards) {
       let score = 0;
 
-      if (scorecard && scorecard.score) {
+      if (scorecard && scorecard.score)
         score = scorecard.score;
-      }
 
       totalScore += score;
       scoreCount += 1;
     }
 
-    if (scoreCount == 0) {
+    if (scoreCount == 0)
       return 0;
-    }
 
     return Number((totalScore / scoreCount).toFixed(1));
   }
@@ -195,14 +200,14 @@ export class ScorecardService {
   ): Observable<ScorecardModel | undefined> {
     let serviceProviderUrl = 'github.com';
 
-    if (account.service == Service.GITLAB) {
+    if (account.service == Service.GITLAB)
       serviceProviderUrl = 'gitlab.com'
-    }
 
     const url = `https://api.securityscorecards.dev/projects/${serviceProviderUrl}/${account.tag}/${repository.name}`;
 
     return this.httpClient.get(url, { responseType: 'json' })
       .pipe(
+        // Remap the HTTP request into the correct model
         map((scorecardResult: any) => {
           return <ScorecardModel> {
             score: scorecardResult.score,
@@ -218,16 +223,15 @@ export class ScorecardService {
 
         // Sort the checks
         map(scorecard => {
-          scorecard.checks.sort((a: ScorecardCheck, b: ScorecardCheck) => {
-            return ScorecardService.getPriorityWeight(b.priority) - ScorecardService.getPriorityWeight(a.priority)
-          });
+          scorecard.checks.sort((a: ScorecardCheck, b: ScorecardCheck) =>
+            ScorecardService.getPriorityWeight(b.priority) - ScorecardService.getPriorityWeight(a.priority));
 
           return scorecard
         }),
 
-        catchError(() => {
-          return of(undefined);
-        })
+        // Return undefined if the scorecard was not found
+        catchError(() =>
+          of(undefined))
       );
   }
 
