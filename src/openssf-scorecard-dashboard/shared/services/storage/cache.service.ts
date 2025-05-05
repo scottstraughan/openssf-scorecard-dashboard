@@ -78,7 +78,7 @@ export class CacheService {
             return of(cached);
           }
 
-          return of(this.verifyExpired(storeName, cached));
+          return this.verifyExpired(storeName, cached);
         })
       )
   }
@@ -145,24 +145,22 @@ export class CacheService {
   verifyExpired<T>(
     storeName: string,
     cached: CacheItem<T>
-  ): CacheItem<T> | undefined {
+  ): Observable<CacheItem<T> | undefined > {
     // Ensure the current date is not past the expiry date, return cached if okay
     const currentDate: Date = new Date();
 
     if (cached.expires == undefined) {
-      return cached;
+      return of(cached);
     }
 
     if (currentDate > cached.expires) {
       this.loggingService.warn(`Cached item for store '${storeName}' has expired, deleting.`, cached);
 
-      this.deleteItem(storeName, cached.key)
+      return this.deleteItem(storeName, cached.key)
         .pipe(map(() => undefined));
-
-      return undefined;
     }
 
-    return cached;
+    return of(cached);
   }
 
   /**
