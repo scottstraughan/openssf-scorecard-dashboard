@@ -1,3 +1,21 @@
+/*---------------------------------------------------------------------------------------------
+ *
+ *  Copyright (C) Codeplay Software Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *--------------------------------------------------------------------------------------------*/
+
 import { Injectable } from '@angular/core';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
 import Dexie, { Version } from 'dexie';
@@ -65,18 +83,19 @@ export class CacheService {
   ): Observable<CacheItem<T> | undefined> {
     return this.getDexie()
       .pipe(
+        // Get any existing element from database
         switchMap(dexie =>
           dexie.table(storeName).get(key)),
 
+        // Ensure the cached item has not expired
         switchMap((cached: CacheItem<T>) => {
           // If there is no cached item, just return undefined
-          if (cached == undefined) {
+          if (cached == undefined)
             return of(undefined);
-          }
 
-          if (cached.expires == undefined) {
+          // If there is no expires set, it will last for ever
+          if (cached.expires == undefined)
             return of(cached);
-          }
 
           return this.verifyExpired(storeName, cached);
         })
@@ -117,9 +136,8 @@ export class CacheService {
     return this.getByKey<T>(storeName, key)
       .pipe(
         switchMap(existing => {
-          if (existing) {
+          if (existing)
             return of(existing.value);
-          }
 
           let expires = undefined;
 
@@ -130,9 +148,11 @@ export class CacheService {
 
           return this.getDexie()
             .pipe(
+              // Add to database
               switchMap(dexie =>
-                dexie.table(storeName).add({ expires: expires, value: item, key: key }, key)
-              ),
+                dexie.table(storeName).add({ expires: expires, value: item, key: key }, key)),
+
+              // Return the added item for easy chaining
               map(() => item)
             )
         })
@@ -149,9 +169,8 @@ export class CacheService {
     // Ensure the current date is not past the expiry date, return cached if okay
     const currentDate: Date = new Date();
 
-    if (cached.expires == undefined) {
+    if (cached.expires == undefined)
       return of(cached);
-    }
 
     if (currentDate > cached.expires) {
       this.loggingService.warn(`Cached item for store '${storeName}' has expired, deleting.`, cached);

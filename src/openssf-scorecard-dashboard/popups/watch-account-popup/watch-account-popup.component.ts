@@ -69,9 +69,8 @@ export class WatchAccountPopupComponent {
    */
   @HostListener('document:keydown.enter', ['$event'])
   onKeydownHandler() {
-    if (!this.isServiceFormsValid()) {
-      return;
-    }
+    if (!this.isServiceFormsValid())
+      return ;
 
     this.onAdd();
   }
@@ -87,9 +86,8 @@ export class WatchAccountPopupComponent {
    * Called when a user clicks to add a new account to inspect.
    */
   onAdd() {
-    if (!this.isServiceFormsValid()) {
+    if (!this.isServiceFormsValid())
       return ;
-    }
 
     this.loading.set(true);
 
@@ -97,15 +95,18 @@ export class WatchAccountPopupComponent {
 
     this.accountService.add(this.service(), this.accountName(), apiToken)
       .pipe(
-        tap((account) => {
+        tap(account => {
           this.popupReference.close();
           this.loading.set(false);
-          this.router.navigate([`/${account.service}/${account.tag}`], { replaceUrl: true }).then();
+          this.router.navigate([`/${account.service}/${account.tag}`], { replaceUrl: true })
+            .then();
         }),
         take(1),
-        catchError((error) => {
+        catchError(error => {
           if (error instanceof DuplicateAccountError) {
-            this.router.navigate([`/${this.service()}/${this.accountName()}`], { replaceUrl: true }).then();
+            this.router.navigate([`/${this.service()}/${this.accountName()}`], { replaceUrl: true })
+              .then();
+
             this.popupReference.close();
             return of();
           }

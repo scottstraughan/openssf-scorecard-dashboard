@@ -376,13 +376,13 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     let repositories: RepositoryModel[] = this.repositories()?.repositories.slice();
 
     if (this.hideNoScorecardRepos()) {
-      repositories = repositories.filter(
-        (repo) => repo.scorecard?.score !== undefined);
+      repositories = repositories.filter((repo) =>
+        repo.scorecard?.score !== undefined);
     }
 
     if (this.hideArchivedRepos()) {
-      repositories = repositories.filter(
-        (repo) => !repo.archived);
+      repositories = repositories.filter((repo) =>
+        !repo.archived);
     }
 
     const searchString = this.searchString();

@@ -88,9 +88,8 @@ export class PopupComponent implements AfterViewInit {
       .pipe(
         filter(event => (event instanceof NavigationStart))
       )
-      .subscribe(() => {
-        this.hide();
-    });
+      .subscribe(() =>
+        this.hide());
   }
 
   /**

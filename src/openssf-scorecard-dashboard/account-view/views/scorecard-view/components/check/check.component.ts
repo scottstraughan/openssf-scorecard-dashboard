@@ -51,9 +51,8 @@ export class CheckComponent {
     check: ScorecardCheck,
     showOnlyOnSelected: boolean = true
   ) {
-    if (showOnlyOnSelected || this.selected()) {
+    if (showOnlyOnSelected || this.selected())
       return this.scorecardService.getPriorityColor(check.priority);
-    }
 
     return '';
   }

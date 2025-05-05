@@ -29,7 +29,7 @@ export class KeyValueStore {
   /**
    * Storage key prefix.
    */
-  static readonly prefix: string = 'ossfd-ts';
+  private static readonly prefix: string = 'ossfd-ts';
 
   /**
    * Constructor
@@ -67,18 +67,15 @@ export class KeyValueStore {
   }
 
   /**
-   * Fetch an item from the storage service, verifying if the data has expired or not.
-   * @private
+   * Fetch an item from the storage service.
    */
   private fetch<T>(
     key: string
   ): T | undefined {
-    if (!this.storageService.has(key)) {
+    if (!this.storageService.has(key))
       return undefined;
-    }
 
-    const stored: T = this.storageService.get(key);
-    return <T> stored;
+    return <T> this.storageService.get(key);
   }
 
   /**
