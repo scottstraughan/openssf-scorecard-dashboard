@@ -25,9 +25,9 @@ import {
   filter,
   forkJoin,
   map,
-  Observable,
+  Observable, of,
   Subject,
-  switchMap,
+  switchMap, take,
   takeUntil,
   tap
 } from 'rxjs';
@@ -35,7 +35,6 @@ import { AccountModel } from '../models/account.model';
 import { ScorecardRequest } from '../models/scorecard-request.model';
 import { RepositoryModel } from '../models/repository.model';
 import { ScorecardNotFoundError } from '../errors/scorecard';
-import { ScorecardModel } from '../models/scorecard.model';
 import { LoadingState } from '../loading-state';
 import { RepositoryCollection } from './api/base-api-service';
 
@@ -47,22 +46,29 @@ export class AccountViewModelService {
    * Subject that stores the selected account.
    * @private
    */
-  private selectedAccount: BehaviorSubject<AccountModel | undefined>
+  private selectedAccount$: BehaviorSubject<AccountModel | undefined>
     = new BehaviorSubject<any>(undefined);
 
   /**
    * Subject that stores the selected account repositories.
    * @private
    */
-  private selectedAccountRepositories: BehaviorSubject<RepositoryCollection>
+  private selectedAccountRepositories$: BehaviorSubject<RepositoryCollection>
     = new BehaviorSubject<any>(new RepositoryCollection());
 
   /**
    * Subject that scores all selected account scorecards requests.
    * @private
    */
-  private scorecardsRequests$: BehaviorSubject<ScorecardRequest[]>
-    = new BehaviorSubject<any>([]);
+  private scorecardsRequests$: BehaviorSubject<Map<string, ScorecardRequest>>
+    = new BehaviorSubject<any>(new Map());
+
+  /**
+   * Subject to track the scorecard loads. This is separate from the main map to reduce latency within the UI.
+   * @private
+   */
+  private scorecardsRequestsLoadCounter$: BehaviorSubject<number>
+    = new BehaviorSubject<any>(0);
 
   /**
    * Used to cancel any requests, especially long ones.
@@ -83,7 +89,7 @@ export class AccountViewModelService {
    * Observe the selected account.
    */
   observeAccount(): Observable<AccountModel> {
-    return this.selectedAccount.asObservable()
+    return this.selectedAccount$.asObservable()
       .pipe(filter(account => account !== undefined));
   }
 
@@ -91,7 +97,7 @@ export class AccountViewModelService {
    * Observe all the repositories.
    */
   observeRepositories(): Observable<RepositoryCollection> {
-    return this.selectedAccountRepositories.asObservable();
+    return this.selectedAccountRepositories$.asObservable();
   }
 
   /**
@@ -99,17 +105,11 @@ export class AccountViewModelService {
    * scorecards are completed, the result will be LOAD_SUCCESS.
    */
   observeScorecardsLoading(): Observable<LoadingState> {
-    return this.scorecardsRequests$
+    return this.scorecardsRequestsLoadCounter$
       .pipe(
-        map(scorecardRequests => {
-          for (const request of scorecardRequests) {
-            if (request.loadState == LoadingState.LOADING) {
-              return LoadingState.LOADING;
-            }
-          }
-
-          return LoadingState.LOAD_SUCCESS;
-        })
+        map(counter => counter == 0
+          ? LoadingState.LOAD_SUCCESS
+          : LoadingState.LOADING)
       )
   }
 
@@ -121,12 +121,11 @@ export class AccountViewModelService {
   ): Observable<ScorecardRequest> {
     return this.scorecardsRequests$
       .pipe(
-        map(scorecardRequests => {
-          for (const scorecardRequest of scorecardRequests) {
-            if (scorecardRequest.repository.url == repository.url) {
-              return scorecardRequest;
-            }
-          }
+        map(() => {
+          const found = this.scorecardsRequests$.getValue().get(repository.url);
+
+          if (found)
+            return found;
 
           throw new ScorecardNotFoundError();
         })
@@ -153,7 +152,7 @@ export class AccountViewModelService {
         
         // Notify observe of the account change
         tap(account =>
-          this.selectedAccount.next(account)),
+          this.selectedAccount$.next(account)),
 
         // Update the repositories for the given account
         switchMap(() =>
@@ -177,27 +176,36 @@ export class AccountViewModelService {
   reloadRepositories(
     forceReload: boolean = false,
     emitEmpty: boolean = true
-  ) {
+  ): Observable<any> {
+    const completedSubject: Subject<void> = new Subject();
+
     return this.observeAccount()
       .pipe(
         // Emit a empty value
         tap(() =>
-          emitEmpty && this.selectedAccountRepositories.next(new RepositoryCollection())),
+          emitEmpty && this.selectedAccountRepositories$.next(new RepositoryCollection())),
 
         // Fetch all the repositories
         switchMap(account =>
           this.repositoryService.getRepositories(account, forceReload, this.cancelled$)
             .pipe(
               tap(repositoryCollection =>
-                this.selectedAccountRepositories.next(repositoryCollection))
+                this.selectedAccountRepositories$.next(repositoryCollection))
             )),
 
         // Reload the scorecards
-        switchMap(() =>
-          this.reloadScorecards(false)),
+        switchMap(repositoryCollection =>
+          repositoryCollection.completed
+            ? this.reloadScorecards(false)
+              .pipe(
+                // We should now be fully complete
+                tap(() => completedSubject.next())
+              )
+            : of([])),
 
-        // Listen to cancelled$ requests
-        takeUntil(this.cancelled$)
+        // Listen to cancellation or completion requests
+        takeUntil(this.cancelled$),
+        takeUntil(completedSubject)
       )
   }
 
@@ -205,7 +213,7 @@ export class AccountViewModelService {
    * Get the average scorecard result for the selected account.
    */
   getAverageAccountScore(): number {
-    const scorecards = this.scorecardsRequests$.getValue()
+    const scorecards = Array.from(this.scorecardsRequests$.getValue().values())
       .map(scorecardRequest => scorecardRequest.scorecard);
 
     return this.scorecardService.calculateAverageScore(scorecards);
@@ -215,70 +223,60 @@ export class AccountViewModelService {
    * Get the number of repositories that have scorecards.
    */
   getRepositoriesWithScorecardCount(): number {
-    const withScorecardsCount = this.scorecardsRequests$.getValue()
+    const requests = Array.from(this.scorecardsRequests$.getValue().values());
+
+    const withScorecardsCount = requests
       .filter(scorecardRequest => scorecardRequest.scorecard == undefined).length;
 
-    return this.scorecardsRequests$.getValue().length - withScorecardsCount;
-  }
-
-  /**
-   * Find a scorecard request based on the provided repository.
-   */
-  getScorecardRequest(
-    repository: RepositoryModel
-  ): ScorecardRequest {
-    const filtered = this.scorecardsRequests$.getValue().filter(request =>
-      request.repository.url == repository?.url);
-
-    if (filtered.length == 0) {
-      throw new ScorecardNotFoundError('Could not find the provided scorecard request.');
-    }
-
-    return filtered[0];
+    return requests.length - withScorecardsCount;
   }
 
   /**
    * Reload all the scorecards.
+   * @param forceReload if true, skip cache and instead get score from the scorecard API
    */
   reloadScorecards(
     forceReload: boolean = true
-  ): Observable<(ScorecardModel | undefined)[]> {
+  ): Observable<ScorecardRequest[]> {
     return this.observeRepositories()
       .pipe(
         // Convert into an array of requests
-        map(repositoryCollection => repositoryCollection.repositories.map(repository => <ScorecardRequest> {
-          repository: repository,
-          scorecard: undefined,
-          loadState: LoadingState.LOADING })),
-
-        // Update the requests subject
-        tap(repositoryRequests =>
-          this.scorecardsRequests$.next(repositoryRequests)),
-
-        // Remap each request into a reload observable
-        map(repositoryRequests => repositoryRequests.map(scorecardRequest =>
-          this.reloadScorecard(scorecardRequest.repository, forceReload))),
+        map(() =>
+          this.selectedAccountRepositories$.getValue().repositories.map(repository =>
+            this.reloadScorecard(repository, forceReload, false))),
 
         // Wait until all the requests have completed
-        switchMap(observables => forkJoin(observables)),
+        switchMap(observables =>
+          forkJoin(observables)),
+
+        tap(scorecardRequests =>
+          this.updateScorecardRequest(scorecardRequests, true)),
 
         // Stop when cancelled
-        takeUntil(this.cancelled$)
+        takeUntil(this.cancelled$),
+        take(1)
       );
   }
 
   /**
    * Reload a specific scorecard.
+   * @param repository the repository to reload
+   * @param forceReload if true, the cache for the scorecard will not be used and instead update
+   * @param updateSubjects if true, any observers to the scorecards or load counter will be notified of changes
    */
   reloadScorecard(
     repository: RepositoryModel,
-    forceReload: boolean = true
-  ): Observable<any> {
-    const scorecardRequest = this.getScorecardRequest(repository);
+    forceReload: boolean = true,
+    updateSubjects: boolean = true
+  ): Observable<ScorecardRequest> {
+    const scorecardRequest = <ScorecardRequest> {
+      repository: repository,
+      scorecard: undefined,
+      loadState: LoadingState.LOADING
+    };
 
     // Update the request loading state and notify observers
-    scorecardRequest.loadState = LoadingState.LOADING;
-    this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
+    this.updateScorecardRequest(scorecardRequest);
 
     return this.observeAccount()
       .pipe(
@@ -287,14 +285,48 @@ export class AccountViewModelService {
           this.scorecardService.getScorecard(account, repository, forceReload)),
 
         // Update the request
-        tap(scorecard => {
+        map(scorecard => {
           scorecardRequest.scorecard = scorecard;
           scorecardRequest.loadState = LoadingState.LOAD_SUCCESS;
-          this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
+          return scorecardRequest;
         }),
 
+        // Update the scorecard requests
+        tap(scorecardRequest =>
+          updateSubjects && this.updateScorecardRequest(scorecardRequest)),
+
         // Listen to cancelled$ requests
-        takeUntil(this.cancelled$)
+        takeUntil(this.cancelled$),
+        take(1)
       )
+  }
+
+  /**
+   * Update a scorecard request, also updating the loading counter.
+   * @param scorecardRequests array of ScorecardRequest to update
+   * @param clear clear the original requests or not
+   * @private
+   */
+  private updateScorecardRequest(
+    scorecardRequests: ScorecardRequest | ScorecardRequest[],
+    clear: boolean = false
+  ) {
+    if (clear)
+      this.scorecardsRequests$.getValue().clear();
+
+    if (!Array.isArray(scorecardRequests))
+      scorecardRequests = [scorecardRequests];
+
+    for (const scorecardRequest of scorecardRequests) {
+      this.scorecardsRequests$.getValue().set(scorecardRequest.repository.url, scorecardRequest);
+    }
+
+    const loadingCount = Array.from(this.scorecardsRequests$.getValue().values())
+      .filter(scorecardRequest =>
+        scorecardRequest.loadState == LoadingState.LOADING).length;
+
+    // Update subjects
+    this.scorecardsRequestsLoadCounter$.next(loadingCount);
+    this.scorecardsRequests$.next(this.scorecardsRequests$.getValue());
   }
 }

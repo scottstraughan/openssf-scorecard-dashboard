@@ -81,7 +81,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     private router: Router,
     private title: Title,
     private activatedRoute: ActivatedRoute,
-    private selectedAccountService: AccountViewModelService,
+    private accountViewModelService: AccountViewModelService,
     private accountService: AccountService,
     private errorService: ErrorService,
   ) {
@@ -102,7 +102,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   ngOnInit(): void {
-    this.selectedAccountService.observeRepositories()
+    this.accountViewModelService.observeRepositories()
       .pipe(
         tap(repositoryCollection =>
           this.totalRepositories.set(repositoryCollection.repositories.length)),
@@ -110,22 +110,21 @@ export class AccountViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.selectedAccountService.observeScorecardsLoading()
+    this.accountViewModelService.observeScorecardsLoading()
       .pipe(
         tap(loadState => {
           this.scorecardLoadState.set(loadState);
 
           if (loadState == LoadingState.LOAD_SUCCESS) {
-
-            this.averageScorecardScore.set(this.selectedAccountService.getAverageAccountScore());
-            this.totalRepositoriesWithScorecards.set(this.selectedAccountService.getRepositoriesWithScorecardCount());
+            this.averageScorecardScore.set(this.accountViewModelService.getAverageAccountScore());
+            this.totalRepositoriesWithScorecards.set(this.accountViewModelService.getRepositoriesWithScorecardCount());
           }
         }),
         takeUntil(this.cleanup)
       )
       .subscribe();
 
-    this.selectedAccountService.observeAccount()
+    this.accountViewModelService.observeAccount()
       .pipe(
         tap(account => {
           this.title.setTitle(`${account.name} - OpenSSF Scorecard Dashboard`);
@@ -145,7 +144,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
         tap(() => this.reset()),
 
         switchMap(params =>
-          this.selectedAccountService.setSelectedAccount(params['serviceTag'], params['accountTag'])),
+          this.accountViewModelService.setSelectedAccount(params['serviceTag'], params['accountTag'])),
 
         catchError(error =>
           this.errorService.handleError(error)),
@@ -166,8 +165,8 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   /**
    * Reload all the scorecard results.
    */
-  reloadScorecardResults() {
-    this.selectedAccountService.reloadScorecards(true)
+  onReloadScorecardResults() {
+    this.accountViewModelService.reloadScorecards(true)
       .pipe(take(1))
       .subscribe();
   }
@@ -205,7 +204,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   onReloadRepositories(
     account: AccountModel
   ) {
-    this.selectedAccountService.reloadRepositories(true, false)
+    this.accountViewModelService.reloadRepositories(true, false)
       .pipe(
         tap(() =>
           this.router.navigate(

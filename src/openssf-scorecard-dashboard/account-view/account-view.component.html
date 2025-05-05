@@ -8,7 +8,7 @@
             @if (scorecardLoadState() == LoadingState.LOAD_SUCCESS) {
               <ossfd-score-ring
                   [score]="averageScorecardScore()"
-                  (click)="reloadScorecardResults()"
+                  (click)="onReloadScorecardResults()"
                   title="Click to re-check all scorecard scores"></ossfd-score-ring>
             } @else {
               <ossfd-loading></ossfd-loading>

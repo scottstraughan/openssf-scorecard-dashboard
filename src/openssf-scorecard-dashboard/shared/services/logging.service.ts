@@ -55,6 +55,6 @@ export class LoggingService {
     ...data: any
   ) {
     if (!this.enabled) return ;
-    //console.warn(data);
+    console.warn(data);
   }
 }
