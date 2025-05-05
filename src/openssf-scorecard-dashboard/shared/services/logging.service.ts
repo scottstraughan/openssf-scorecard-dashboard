@@ -34,7 +34,9 @@ export class LoggingService {
   info(
     ...data: any
   ) {
-    if (!this.enabled) return ;
+    if (!this.enabled)
+      return ;
+
     console.info(data);
   }
 
@@ -44,7 +46,9 @@ export class LoggingService {
   error(
     ...data: any
   ) {
-    if (!this.enabled) return ;
+    if (!this.enabled)
+      return ;
+
     console.error(data);
   }
 
@@ -54,7 +58,9 @@ export class LoggingService {
   warn(
     ...data: any
   ) {
-    if (!this.enabled) return ;
+    if (!this.enabled)
+      return ;
+
     console.warn(data);
   }
 }

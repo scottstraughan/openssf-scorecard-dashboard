@@ -40,8 +40,7 @@ export class GitlabService extends BaseApiService {
           return this.getAccountViaMethod(Method.USERS, accountName, apiToken)
             .pipe(
               catchError(error =>
-                throwError(() =>
-                  this.throwDecentError(Service.GITLAB, error)))
+                throwError(() => this.throwDecentError(Service.GITLAB, error)))
             )
         })
       );
@@ -73,7 +72,10 @@ export class GitlabService extends BaseApiService {
       .pipe(
         // The user endpoint will return response in different format, modify it, so it matches group response
         map(response =>
-          method == Method.USERS ? GitlabService.transmogrifyUserResponse(response) : response),
+          method == Method.USERS
+            ? GitlabService.transmogrifyUserResponse(response)
+            : response ),
+
         // Convert the response into the account response
         map((accountResult: any) => {
           return <AccountModel> {
@@ -90,6 +92,7 @@ export class GitlabService extends BaseApiService {
             apiToken: apiToken
           }
         }),
+
         // Inject the repository account number
         switchMap(account =>
           this.injectTotalRepositoryCount(method, account, apiToken))
@@ -244,9 +247,8 @@ export class GitlabService extends BaseApiService {
     method: Method,
     accountName: string
   ) {
-    if (method == Method.USERS) {
+    if (method == Method.USERS)
       return `https://gitlab.com/api/v4/users?username=${accountName}`;
-    }
 
     return `${GitlabService.generateApiUrl(Method.GROUPS, accountName)}?with_projects=false`;
   }

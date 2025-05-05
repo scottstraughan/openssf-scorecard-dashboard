@@ -61,9 +61,8 @@ export class EmbedBadgePopupComponent {
 
     this.repoUrl.set(repository.url.replace('https://', ''));
 
-    this.badgeUrl = computed(() => {
-      return `https://api.scorecard.dev/projects/${this.repoUrl()}/badge`;
-    });
+    this.badgeUrl = computed(() =>
+      `https://api.scorecard.dev/projects/${this.repoUrl()}/badge`);
   }
 
   /**

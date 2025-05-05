@@ -98,18 +98,16 @@ export class ScoreRingComponent {
     }
 
     // Set a timer that is invalided if the user hovers-outs
-    this.timeout = setTimeout(() => {
-      this.hover.set(true);
-    }, this.hoverDelay);
+    this.timeout = setTimeout(() =>
+      this.hover.set(true), this.hoverDelay);
   }
 
   /**
    * Called when a user hovers-out the score ring with their mouse.
    */
   onMouseLeave() {
-    if (!this.allowReload()) {
+    if (!this.allowReload())
       return ;
-    }
 
     this.hover.set(false)
     clearTimeout(this.timeout);
@@ -122,9 +120,8 @@ export class ScoreRingComponent {
   static getColorVariableForScore(
     score?: number
   ): string {
-    if (!score) {
+    if (!score)
       return '';
-    }
 
     if (score >= 0 && score < 2.5) {
       return 'var(--color-shocking)';

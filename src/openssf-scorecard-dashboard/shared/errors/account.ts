@@ -21,7 +21,7 @@ import { GenericError } from './generic';
 /**
  * Error that is thrown when the backend has reported an invalid account.
  */
-export class InvalidAccountError extends GenericError {
+export class AccountNotFoundError extends GenericError {
   constructor(
     message?: string
   ) {

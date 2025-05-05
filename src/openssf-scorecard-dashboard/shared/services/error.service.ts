@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { PopupService } from '../components/popup/popup.service';
-import { DuplicateAccountError, InvalidAccountError } from '../errors/account';
+import { DuplicateAccountError, AccountNotFoundError } from '../errors/account';
 import { ScorecardNotFoundError } from '../errors/scorecard';
 import { RateLimitError } from '../errors/service';
 import { GenericError } from '../errors/generic';
@@ -61,9 +61,8 @@ export class ErrorService {
     this.error = error
 
     if (!fatal) {
-      setTimeout(() => {
-        this.popupService.create(ErrorPopupComponent, error, true);
-      });
+      setTimeout(() =>
+        this.popupService.create(ErrorPopupComponent, error, true));
     } else {
       this.router.navigate([`./error`], { queryParams: { goTo: this.router.url }})
         .then();
@@ -80,7 +79,7 @@ export class ErrorService {
   ): string {
     if (error instanceof RateLimitError) {
       return 'speed';
-    } else if (error instanceof InvalidAccountError) {
+    } else if (error instanceof AccountNotFoundError) {
       return 'followers';
     } else if (error instanceof DuplicateAccountError) {
       return 'followers';

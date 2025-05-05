@@ -41,9 +41,8 @@ export class MultiToggleButtonComponent {
    */
   @HostListener('document:click', ['$event'])
   documentClick() {
-    if (!this.optionsVisible()) {
+    if (!this.optionsVisible())
       return ;
-    }
 
     this.optionsVisible.set(false);
   }
