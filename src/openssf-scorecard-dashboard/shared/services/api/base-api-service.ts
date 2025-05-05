@@ -16,9 +16,9 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { map, Observable, Subject, take, tap } from 'rxjs';
+import { Observable, Subject, take, tap } from 'rxjs';
 import { AccountModel } from '../../models/account.model';
 import { RepositoryModel } from '../../models/repository.model';
 import { RateLimitError } from '../../errors/service';
