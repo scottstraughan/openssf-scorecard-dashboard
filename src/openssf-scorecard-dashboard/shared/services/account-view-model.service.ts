@@ -127,7 +127,6 @@ export class AccountViewModelService {
           if (found)
             return found;
 
-          alert();
           throw new ScorecardNotFoundError();
         })
       );
