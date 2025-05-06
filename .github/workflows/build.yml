@@ -31,6 +31,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build -- --base-href "$SITE_URL" --configuration production
+      - name: test
+        run: ls -l && ls -l ./dist/openssf-scorecard-dashboard/browser/
       - name: Copy index.html to 404.html
         run: cp ./dist/openssf-scorecard-dashboard/browser/index.html ./dist/openssf-scorecard-dashboard/browser/404.html
       - name: Upload to GitHub Artifacts
