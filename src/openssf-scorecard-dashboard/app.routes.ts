@@ -47,6 +47,10 @@ export const routes: Routes = [
     component: ErrorViewComponent
   },
   {
+    path: 'home',
+    component: HomeViewComponent
+  },
+  {
     path: '**',
     component: HomeViewComponent
   },

@@ -17,11 +17,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ChangeDetectionStrategy, Component, signal, Signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
 import { FollowAccountPopupComponent } from '../popups/follow-account-popup/follow-account-popup.component';
 import { PopupService } from '../shared/components/popup/popup.service';
+import { take, tap } from 'rxjs';
+import { AccountService } from '../shared/services/providers/account.service';
+import { AccountModel } from '../shared/models/account.model';
 
 @Component({
   selector: 'ossfd-home-view',
@@ -101,9 +104,28 @@ export class HomeViewComponent {
    */
   constructor(
     private popupService: PopupService,
+    private activatedRoute: ActivatedRoute,
+    private accountService: AccountService,
+    private router: Router,
     title: Title
   ) {
     title.setTitle('Who to Follow - OpenSSF Scorecard Dashboard');
+
+    activatedRoute.url
+      .pipe(
+        tap(urlSegments => {
+          if (urlSegments.length == 0) {
+            this.accountService.observeAccounts()
+              .pipe(
+                tap(accounts =>
+                  accounts.length > 0 && this.redirectToFirstAccount(accounts)),
+                take(1)
+              )
+              .subscribe();
+          }
+        })
+      )
+      .subscribe()
   }
 
   /**
@@ -111,6 +133,23 @@ export class HomeViewComponent {
    */
   onFollowAccount() {
     this.popupService.create(FollowAccountPopupComponent, null, true);
+  }
+
+  /**
+   * Redirect a user to the first account.
+   * @param accounts
+   * @private
+   */
+  private redirectToFirstAccount(
+    accounts: AccountModel[]
+  ) {
+    if (accounts.length > 0) {
+      const firstAccount = accounts[0];
+
+      this.router.navigate(
+        [`/${firstAccount.service}/${firstAccount.tag}`], { relativeTo: this.activatedRoute, replaceUrl: true })
+        .then();
+    }
   }
 }
 
