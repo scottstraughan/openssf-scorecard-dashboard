@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../../models/account.model';
-import { BehaviorSubject, Observable, of, switchMap, take, tap, throwError, } from 'rxjs';
+import { BehaviorSubject, filter, Observable, of, switchMap, take, tap, throwError, } from 'rxjs';
 import { GithubService } from '../api/github.service';
 import { MinimumAccountError } from '../../errors/account';
 import { Service } from '../../enums/service';
@@ -67,7 +67,11 @@ export class AccountService extends InitializableService {
    * Get the accounts observable.
    */
   observeAccounts(): Observable<AccountModel[]> {
-    return this.accounts$.asObservable();
+    return this.accounts$.asObservable()
+      .pipe(
+        filter(accounts =>
+          accounts.length > 0)
+      );
   }
 
   /**
