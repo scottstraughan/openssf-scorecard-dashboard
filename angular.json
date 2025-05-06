@@ -32,7 +32,15 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "server": "src/main.server.ts",
+            "prerender": {
+              "discoverRoutes": false,
+              "routesFile": "routes.txt"
+            },
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "production": {
@@ -53,6 +61,8 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
+              "ssr": false,
+              "prerender": false,
               "sourceMap": true,
               "fileReplacements": [
                 {
