@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { Injectable } from '@angular/core';
+import { afterNextRender, inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { KeyValueStore } from './storage/key-value.service';
 
@@ -43,16 +43,18 @@ export class DarkModeService {
   constructor(
     private keyValueStore: KeyValueStore
   ) {
-    const savedDarkMode = this.keyValueStore.get<boolean>(DarkModeService.STORAGE_KEY);
-    const browserDarkMode = this.isBrowserDarkModeEnabled();
+    afterNextRender(() => {
+      const savedDarkMode = this.keyValueStore.get<boolean>(DarkModeService.STORAGE_KEY);
+      const browserDarkMode = this.isBrowserDarkModeEnabled();
 
-    if (savedDarkMode !== undefined) {
-      this.darkModeEnabled$.next(savedDarkMode);
-    } else if (browserDarkMode !== undefined) {
-      this.darkModeEnabled$.next(browserDarkMode);
-    } else {
-      this.darkModeEnabled$.next(this.darkModeEnabled$.getValue());
-    }
+      if (savedDarkMode !== undefined) {
+        this.darkModeEnabled$.next(savedDarkMode);
+      } else if (browserDarkMode !== undefined) {
+        this.darkModeEnabled$.next(browserDarkMode);
+      } else {
+        this.darkModeEnabled$.next(this.darkModeEnabled$.getValue());
+      }
+    });
   }
 
   /**
