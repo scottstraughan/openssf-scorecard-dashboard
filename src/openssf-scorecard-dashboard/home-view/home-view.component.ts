@@ -16,7 +16,7 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, signal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, Signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
@@ -37,7 +37,7 @@ import { AccountModel } from '../shared/models/account.model';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeViewComponent {
+export class HomeViewComponent implements OnInit {
   /**
    * Example ideas.
    * @protected
@@ -110,8 +110,13 @@ export class HomeViewComponent {
     title: Title
   ) {
     title.setTitle('Who to Follow - OpenSSF Scorecard Dashboard');
+  }
 
-    activatedRoute.url
+  /**
+   * @inheritdoc
+   */
+  ngOnInit() {
+    this.activatedRoute.url
       .pipe(
         tap(urlSegments => {
           if (urlSegments.length == 0) {
