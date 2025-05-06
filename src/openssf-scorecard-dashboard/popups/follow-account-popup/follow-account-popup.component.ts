@@ -31,9 +31,9 @@ import { DuplicateAccountError } from '../../shared/errors/account';
 import { ErrorService } from '../../shared/services/error.service';
 
 @Component({
-  selector: 'ossfd-watch-account-popup',
+  selector: 'ossfd-follow-account-popup',
   standalone: true,
-  templateUrl: './watch-account-popup.component.html',
+  templateUrl: './follow-account-popup.component.html',
   imports: [
     InputComponent,
     LinkButtonComponent,
@@ -42,11 +42,11 @@ import { ErrorService } from '../../shared/services/error.service';
     NgOptimizedImage
   ],
   styleUrls: [
-    './watch-account-popup.component.scss'
+    './follow-account-popup.component.scss'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WatchAccountPopupComponent {
+export class FollowAccountPopupComponent {
   readonly Service = Service;
 
   readonly service: WritableSignal<Service> = signal(Service.GITHUB);

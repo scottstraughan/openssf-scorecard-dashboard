@@ -32,7 +32,7 @@ import { DOCUMENT, NgOptimizedImage } from '@angular/common';
 import { AccountService } from './shared/services/providers/account.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PopupService } from './shared/components/popup/popup.service';
-import { WatchAccountPopupComponent } from './popups/watch-account-popup/watch-account-popup.component';
+import { FollowAccountPopupComponent } from './popups/follow-account-popup/follow-account-popup.component';
 import { AboutPopupComponent } from './popups/about-popup/about-popup.component';
 import { DarkModeService } from './shared/services/dark-mode.service';
 import { tap } from 'rxjs';
@@ -95,7 +95,7 @@ export class AppComponent {
    * Called when a user presses the add service button.
    */
   onAddServiceAccount() {
-    this.popupService.create(WatchAccountPopupComponent, null, true);
+    this.popupService.create(FollowAccountPopupComponent, null, true);
   }
 
   /**
