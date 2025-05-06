@@ -1,3 +1,29 @@
 <div class="panel">
-  <ossfd-loading></ossfd-loading>
+  <header>
+    <div class="title">
+      <h1>Start Following</h1>
+      <h2>You are not following anyone yet. Follow as many people as you like on GitHub or GitLab.</h2>
+    </div>
+    <div>
+      <ossfd-link-button
+          class="follow"
+          icon="add"
+          label="Follow Account"
+          (click)="onFollowAccount()"></ossfd-link-button>
+    </div>
+  </header>
+
+  <div class="ideas">
+    @for (idea of ideas(); track idea.name) {
+      <a class="idea" [routerLink]="idea.url">
+        <div class="left">
+          <div class="avatar" [style.background-image]="'url(' + idea.avatar + ')'"></div>
+        </div>
+        <div class="right">
+          <h1>{{ idea.name }}</h1>
+          <p>{{ idea.description }}</p>
+        </div>
+      </a>
+    }
+  </div>
 </div>

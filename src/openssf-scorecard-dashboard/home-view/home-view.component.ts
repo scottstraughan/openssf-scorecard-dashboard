@@ -16,13 +16,12 @@
  *
  *--------------------------------------------------------------------------------------------*/
 
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { AccountService } from '../shared/services/providers/account.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingComponent } from '../shared/components/loading/loading.component';
-import { Subscription } from 'rxjs';
-import { AccountModel } from '../shared/models/account.model';
-import { environment } from '../../environments/environment';
+import { ChangeDetectionStrategy, Component, signal, Signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { LinkButtonComponent } from '../shared/components/link-button/link-button.component';
+import { FollowAccountPopupComponent } from '../popups/follow-account-popup/follow-account-popup.component';
+import { PopupService } from '../shared/components/popup/popup.service';
 
 @Component({
   selector: 'ossfd-home-view',
@@ -30,65 +29,97 @@ import { environment } from '../../environments/environment';
   templateUrl: 'home-view.component.html',
   styleUrls: ['./home-view.component.scss'],
   imports: [
-    LoadingComponent
+    RouterLink,
+    LinkButtonComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeViewComponent implements OnInit, OnDestroy {
+export class HomeViewComponent {
   /**
-   * Holds a reference to the account subscription to ensure we can close it.
+   * Example ideas.
+   * @protected
    */
-  private accountSubscription$ : Subscription | undefined;
+  protected ideas: Signal<Idea[]> = signal([
+    {
+      name: 'Angular',
+      description: 'Angular is a TypeScript-based free and open-source single-page web application framework.',
+      url: '/github/angular',
+      avatar: 'https://avatars.githubusercontent.com/u/139426?s=200&v=4',
+    },
+    {
+      name: 'Codeplay® Software',
+      description: 'Codeplay is internationally recognized for expertise in Heterogeneous Systems.',
+      url: '/github/codeplaysoftware',
+      avatar: 'https://avatars.githubusercontent.com/u/7440916?s=200&v=4',
+    },
+    {
+      name: 'Intel®',
+      description: 'Speed up AI development using Intel®-optimized software &amp; hardware.',
+      url: '/github/intel',
+      avatar: 'https://avatars.githubusercontent.com/u/17888862?s=200&v=4',
+    },
+    {
+      name: 'JetBrains®',
+      description: 'At JetBrains we create, contribute, and support Open Source projects.',
+      url: '/github/jetbrains',
+      avatar: 'https://avatars.githubusercontent.com/u/878437?s=200&v=4',
+    },
+    {
+      name: 'Ladybird',
+      description: 'Ladybird is an open-source web browser developed by the Ladybird Browser Initiative.',
+      url: '/github/LadybirdBrowser',
+      avatar: 'https://avatars.githubusercontent.com/u/134672918?s=200&v=4',
+    },
+    {
+      name: 'Microsoft®',
+      description: 'Open source projects and samples from Microsoft Corporation.',
+      url: '/github/microsoft',
+      avatar: 'https://avatars.githubusercontent.com/u/6154722?s=200&v=4',
+    },
+    {
+      name: 'Scott Straughan',
+      description: 'Full stack software engineer. Love working with Angular, Android and AWS.',
+      url: '/github/scottstraughan',
+      avatar: 'https://avatars.githubusercontent.com/u/42965777?v=4',
+    },
+    {
+      name: 'Signal',
+      description: 'Say "hello" to a different messaging experience.',
+      url: '/github/signalapp',
+      avatar: 'https://avatars.githubusercontent.com/u/702459?s=200&v=4',
+    },
+    {
+      name: 'UXL Foundation',
+      description: 'UXL promotes open source & standards for accelerated computing.',
+      url: '/github/uxlfoundation',
+      avatar: 'https://avatars.githubusercontent.com/u/144704571?v=4',
+    },
+  ])
 
   /**
    * Constructor.
    */
   constructor(
-    private serviceStoreService: AccountService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) { }
-
-  /**
-   * @inheritDoc
-   */
-  ngOnInit() {
-    this.accountSubscription$ = this.serviceStoreService.observeAccounts()
-      .subscribe(accounts => {
-        if (accounts.length == 0) {
-          this.router.navigate(
-            [`/${environment.defaultAccount}`], { relativeTo: this.activatedRoute, replaceUrl: true })
-            .then();
-
-          return ;
-        }
-
-        return this.redirectToFirstAccount(accounts);
-      });
-  }
-
-  /**
-   * @inheritDoc
-   */
-  ngOnDestroy(): void {
-    this.accountSubscription$?.unsubscribe();
-  }
-
-  /**
-   * Redirect a user to the first account.
-   * @private
-   */
-  private redirectToFirstAccount(
-    accounts: AccountModel[]
+    private popupService: PopupService,
+    title: Title
   ) {
-    this.accountSubscription$?.unsubscribe();
-
-    if (accounts.length > 0) {
-      const firstAccount = accounts[0];
-
-      this.router.navigate(
-        [`/${firstAccount.service}/${firstAccount.tag}`], { relativeTo: this.activatedRoute, replaceUrl: true })
-        .then();
-    }
+    title.setTitle('Who to Follow - OpenSSF Scorecard Dashboard');
   }
+
+  /**
+   * Called when a user presses the follow button.
+   */
+  onFollowAccount() {
+    this.popupService.create(FollowAccountPopupComponent, null, true);
+  }
+}
+
+/**
+ * Idea model.
+ */
+interface Idea {
+  name: string
+  description: string
+  url: string
+  avatar: string
 }
