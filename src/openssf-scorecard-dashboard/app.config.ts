@@ -36,7 +36,8 @@ export const appConfig = {
     provideMarkdown({
       sanitize: SecurityContext.NONE,
       markedExtensions: [gfmHeadingId()],
-    }), provideClientHydration(withEventReplay())
+    }),
+    provideClientHydration(withEventReplay())
   ],
   defaultEncapsulation: ViewEncapsulation.ShadowDom,
   defaultChangeDetection: ChangeDetectionStrategy.OnPush
