@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../../models/account.model';
-import { Observable, of, ReplaySubject, switchMap, take, tap, throwError, } from 'rxjs';
+import { BehaviorSubject, Observable, of, switchMap, take, tap, throwError, } from 'rxjs';
 import { GithubService } from '../api/github.service';
 import { MinimumAccountError } from '../../errors/account';
 import { Service } from '../../enums/service';
@@ -43,7 +43,7 @@ export class AccountService extends InitializableService {
    * Accounts observable.
    * @private
    */
-  private accounts$: ReplaySubject<AccountModel[]> = new ReplaySubject<AccountModel[]>();
+  private accounts$: BehaviorSubject<AccountModel[]> = new BehaviorSubject<AccountModel[]>([]);
 
   /**
    * Constructor
