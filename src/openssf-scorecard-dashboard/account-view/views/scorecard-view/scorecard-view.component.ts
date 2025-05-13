@@ -116,7 +116,8 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
           this.errorService.handleError(error, true)),
 
         // Take until cleanup
-        takeUntil(this.cleanup)
+        takeUntil(this.cleanup),
+        take(1)
       )
       .subscribe();
   }

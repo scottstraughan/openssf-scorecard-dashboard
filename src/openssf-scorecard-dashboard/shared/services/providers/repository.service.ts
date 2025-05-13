@@ -69,24 +69,25 @@ export class RepositoryService {
           cached != undefined && !forceReload
             ? of(RepositoryCollection.createFromRepositories(cached.value))
             : this.getRepositoryServiceProvider(account, cancelled$)
+              .pipe(
+                // Cache the result
+                switchMap(repositoryCollection =>
+                  repositoryCollection.completed
+                    // If completed, add to cache
+                    ? this.indexedDbService.add<RepositoryModel[]>(
+                      RepositoryService.CACHE_TABLE_NAME,
+                      repositoryCollection.repositories, account.url, RepositoryService.CACHE_TIMEOUT)
+                      .pipe(map(() => repositoryCollection))
+
+                    // If not completed, return previous result
+                    : of(repositoryCollection)
+                )
+              )
         ),
 
         // Create backup of result reference
         tap(result =>
           observableResult = result),
-
-        // Cache the result
-        switchMap(repositoryCollection =>
-          repositoryCollection.completed
-            // If completed, add to cache
-            ? this.indexedDbService.add<RepositoryModel[]>(
-              RepositoryService.CACHE_TABLE_NAME,
-              repositoryCollection.repositories, account.url, RepositoryService.CACHE_TIMEOUT)
-              .pipe(map(() => repositoryCollection))
-
-            // If not completed, return previous result
-            : of(repositoryCollection)
-        ),
 
         // Return the original result reference
         switchMap(() =>
@@ -102,7 +103,8 @@ export class RepositoryService {
    */
   observeRepository(
     account: AccountModel,
-    name: string
+    name: string,
+    cancelled$: Subject<void> = new Subject<void>()
   ): Observable<RepositoryModel> {
     return this.getRepositories(account)
       .pipe(
@@ -113,7 +115,8 @@ export class RepositoryService {
           }
 
           throw new RepositoryNotFoundError();
-        })
+        }),
+        takeUntil(cancelled$)
       )
   }
 
