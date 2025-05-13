@@ -133,29 +133,21 @@ export class CacheService {
     key: any,
     timeoutInDays?: number
   ): Observable<T> {
-    return this.getByKey<T>(storeName, key)
+    let expires = undefined;
+
+    if (timeoutInDays) {
+      expires = new Date();
+      expires.setDate(expires.getDate() + timeoutInDays);
+    }
+
+    return this.getDexie()
       .pipe(
-        switchMap(existing => {
-          if (existing)
-            return of(existing.value);
+        // Add to database
+        switchMap(dexie =>
+          dexie.table(storeName).put({ expires: expires, value: item, key: key }, key)),
 
-          let expires = undefined;
-
-          if (timeoutInDays) {
-            expires = new Date();
-            expires.setDate(expires.getDate() + timeoutInDays);
-          }
-
-          return this.getDexie()
-            .pipe(
-              // Add to database
-              switchMap(dexie =>
-                dexie.table(storeName).add({ expires: expires, value: item, key: key }, key)),
-
-              // Return the added item for easy chaining
-              map(() => item)
-            )
-        })
+        // Return the added item for easy chaining
+        map(() => item)
       )
   }
 
