@@ -40,6 +40,12 @@
       }
     }
 
+    &.list {
+      .notice {
+        display: none;
+      }
+    }
+
     .overview {
       cursor: pointer;
       display: flex;
@@ -177,6 +183,10 @@
           border-left: var(--ossfd-repository-widget-border);
         }
       }
+    }
+
+    &.locked {
+      opacity: .6;
     }
   }
 }

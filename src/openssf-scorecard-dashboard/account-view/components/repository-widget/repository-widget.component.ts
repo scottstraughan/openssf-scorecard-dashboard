@@ -121,4 +121,19 @@ export class RepositoryWidgetComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe();
   }
+
+  /**
+   * Get a useful title when hovering the widget.
+   */
+  getTitle(
+    repository: RepositoryModel
+  ): string {
+    let title = `Click to view ${repository.name}`;
+
+    if (repository.archived) {
+      title += ' (archived)';
+    }
+
+    return title;
+  }
 }

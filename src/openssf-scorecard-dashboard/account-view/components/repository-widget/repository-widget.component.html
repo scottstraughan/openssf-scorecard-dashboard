@@ -1,5 +1,9 @@
 @if (repository(); as repository) {
-  <div class="container" [class.list]="layout() == LayoutView.LIST">
+  <div class="container"
+       [class.list]="layout() == LayoutView.LIST"
+       [class.locked]="repository.archived"
+       [title]="getTitle(repository)">
+
     <div class="overview" (click)="onClick()">
       @if (repository.archived) {
         <div class="notice">
@@ -15,7 +19,7 @@
       <div class="stats">
         <div>
           <ossfd-icon class="stat-icon" icon="calendar"></ossfd-icon>
-          <h1 [innerHTML]="repository.lastUpdated | date: 'mediumDate'"></h1>
+          <h1 [innerHTML]="repository.lastUpdated | date: 'shortDate'"></h1>
         </div>
         <div>
           <ossfd-icon class="stat-icon" icon="star"></ossfd-icon>
