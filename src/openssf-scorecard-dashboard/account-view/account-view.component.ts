@@ -72,7 +72,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * This is used to clean up when ngOnDestroy is called, or we wish to reset state.
    * @private
    */
-  private cleanup = new Subject<void>();
+  private onDestroy = new Subject<void>();
 
   /**
    * Constructor.
@@ -106,7 +106,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
       .pipe(
         tap(repositoryCollection =>
           this.totalRepositories.set(repositoryCollection.repositories.length)),
-        takeUntil(this.cleanup)
+        takeUntil(this.onDestroy)
       )
       .subscribe();
 
@@ -120,7 +120,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
             this.totalRepositoriesWithScorecards.set(this.accountViewModelService.getRepositoriesWithScorecardCount());
           }
         }),
-        takeUntil(this.cleanup)
+        takeUntil(this.onDestroy)
       )
       .subscribe();
 
@@ -138,8 +138,8 @@ export class AccountViewComponent implements OnInit, OnDestroy {
         catchError(error =>
           this.errorService.handleError(error)),
 
-        // Take until we cleanup
-        takeUntil(this.cleanup)
+        // Take until we clean
+        takeUntil(this.onDestroy)
       )
       .subscribe()
 
@@ -157,8 +157,8 @@ export class AccountViewComponent implements OnInit, OnDestroy {
         catchError(error =>
           this.errorService.handleError(error)),
 
-        // Take new router args until cleanup
-        takeUntil(this.cleanup)
+        // Take new route changes until destroy
+        takeUntil(this.onDestroy)
       )
       .subscribe();
   }
@@ -167,8 +167,8 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   ngOnDestroy() {
-    this.cleanup.next();
-    this.cleanup.complete();
+    this.onDestroy.next();
+    this.onDestroy.complete();
   }
 
   /**
@@ -231,7 +231,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
    * @private
    */
   private reset() {
-    this.cleanup.complete();
+    this.onDestroy.complete();
 
     this.selectedAccount.set(undefined);
     this.accountLoadState.set(LoadingState.LOADING);
