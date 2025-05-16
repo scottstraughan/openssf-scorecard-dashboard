@@ -33,7 +33,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/loading-state';
-import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, of, Subject, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
 import { KeyValueStore } from '../../../shared/services/storage/key-value.service';
@@ -155,23 +155,33 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.activatedRoute.queryParams.subscribe(params => {
-      if (Object.keys(params).length == 0) {
-        this.navigateWithQueryParams({
-          'layout': this.getStorageValue('layout'),
-          'sort': this.getStorageValue('sort'),
-          'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
-          'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
-        });
-      }
+    this.activatedRoute.queryParams
+      .pipe(
+        tap(params => {
+          if (Object.keys(params).length == 0) {
+            this.navigateWithQueryParams({
+              'layout': this.getStorageValue('layout'),
+              'sort': this.getStorageValue('sort'),
+              'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
+              'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
+            });
+          }
 
-      this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
-      this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
-      this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
-      this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
+          this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
+          this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
+          this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
+          this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
 
-      this.changeDetectorRef.detectChanges();
-    });
+          this.changeDetectorRef.detectChanges();
+        }),
+
+        // We can close after first param check as we handle state changes without using the router
+        take(1),
+
+        // Close on cleanup
+        takeUntil(this.cleanup)
+      )
+      .subscribe();
   }
 
   /**
