@@ -33,11 +33,7 @@
       </div>
     </div>
 
-    @if (!repositories().completed) {
-      <div class="container">
-        <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
-      </div>
-    } @else if (repositories().completed && getVisibleRepositories().length > 0) {
+    @if (repositories().completed && getVisibleRepositories().length > 0) {
       <div class="container">
         <div
             [class.list]="layoutView() == LayoutView.LIST"
@@ -64,6 +60,14 @@
           <h1>No Repositories Available</h1>
         </div>
       </div>
+    } @else {
+      <div class="container">
+        <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+      </div>
     }
+  } @else {
+    <div class="container">
+      <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+    </div>
   }
 </div>
