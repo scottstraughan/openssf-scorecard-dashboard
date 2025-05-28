@@ -127,22 +127,18 @@ export class RepositoryService {
   deleteCached(
     account: AccountModel
   ): Observable<any> {
-    return this.getRepositories(account)
+    return this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url)
       .pipe(
-        map(repositoryCollection =>
-          repositoryCollection.getRepositoriesAsArray().map(repository =>
-            this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url)
-              .pipe(
-                // Switch to the delete cache observable
-                switchMap(() =>
-                  this.scorecardService.deleteCached(repository))
-              )
-          )
-        ),
+        // Get all the repos
+        switchMap(() =>
+          this.getRepositories(account)),
 
-        // Wait for all the delete observables to complete
-        switchMap(deleteObservables =>
-          forkJoin(deleteObservables))
+        // Delete the scorecard for each repo
+        switchMap(repositories =>
+          repositories.getRepositoriesAsArray().length > 0
+            ? forkJoin(repositories.getRepositoriesAsArray().map(repository =>
+              this.scorecardService.deleteCached(repository)))
+            : of([])),
       )
   }
 
