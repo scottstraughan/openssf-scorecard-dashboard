@@ -175,7 +175,12 @@ export class AccountViewModelService {
 
     // Close any previous observables
     this.cancelled$.next();
-    
+
+    // Reset
+    this.scorecardsRequestsLoadCounter$.next(0);
+    this.averageScore$.next(0);
+    this.selectedAccountRepositories$.next(new RepositoryCollection());
+
     return this.accountService.getAccount(service, accountTag)
       .pipe(
         // Store the account for local reuse
