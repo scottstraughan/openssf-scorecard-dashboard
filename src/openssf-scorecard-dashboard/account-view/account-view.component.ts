@@ -39,6 +39,7 @@ import { AccountService } from '../shared/services/providers/account.service';
 import { ErrorService } from '../shared/services/error.service';
 import { IconComponent } from '../shared/components/icon/icon.component';
 import { Service } from '../shared/enums/service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'ossfd-account-view',
@@ -65,7 +66,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
   readonly scorecardLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly totalRepositories: WritableSignal<number> = signal(0);
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
-  readonly averageScorecardScore: WritableSignal<number> = signal(0);
+  readonly averageScorecardScore: Signal<number>;
   readonly selectedAccountServiceName: Signal<string> = signal('');
 
   /**
@@ -95,7 +96,10 @@ export class AccountViewComponent implements OnInit, OnDestroy {
         default:
           return ''
       }
-    })
+    });
+
+    this.averageScorecardScore = toSignal(
+      this.accountViewModelService.observeAverageScore(), { initialValue: 0 })
   }
 
   /**
@@ -105,7 +109,7 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     this.accountViewModelService.observeRepositories()
       .pipe(
         tap(repositoryCollection =>
-          this.totalRepositories.set(repositoryCollection.repositories.length)),
+          this.totalRepositories.set(repositoryCollection.getRepositoriesAsArray().length)),
         takeUntil(this.onDestroy)
       )
       .subscribe();
@@ -116,7 +120,6 @@ export class AccountViewComponent implements OnInit, OnDestroy {
           this.scorecardLoadState.set(loadState);
 
           if (loadState == LoadingState.LOAD_SUCCESS) {
-            this.averageScorecardScore.set(this.accountViewModelService.getAverageAccountScore());
             this.totalRepositoriesWithScorecards.set(this.accountViewModelService.getRepositoriesWithScorecardCount());
           }
         }),
@@ -237,6 +240,5 @@ export class AccountViewComponent implements OnInit, OnDestroy {
     this.accountLoadState.set(LoadingState.LOADING);
     this.scorecardLoadState.set(LoadingState.LOADING);
     this.totalRepositoriesWithScorecards.set(0);
-    this.averageScorecardScore.set(0);
   }
 }

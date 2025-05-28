@@ -121,34 +121,48 @@ export abstract class BaseApiService {
  * current progress.
  */
 export class RepositoryCollection {
+  public repositoriesMap: Map<string, RepositoryModel> = new Map();
+
   /**
    * Constructor.
    */
   constructor(
     public totalRepositories: number = 0,
-    public repositories: RepositoryModel[] = [],
+    repositories: RepositoryModel[] = [],
     public completed: boolean = false,
     public loadedRepositoryCount: number = 0
-  ) { }
+  ) {
+    this.addRepositories(repositories);
+  }
 
   /**
-   * Add more repositories to the repository array.
+   * Add more repositories to the repository map.
    */
   addRepositories(
     repositories: RepositoryModel[]
   ) {
-    this.repositories = this.repositories.concat(repositories);
-    this.loadedRepositoryCount = this.repositories.length;
+    for (const repository of repositories) {
+      this.repositoriesMap.set(repository.name, repository);
+    }
+
+    this.loadedRepositoryCount = this.repositoriesMap.size;
+  }
+
+  /**
+   * Get all the repositories as an array.
+   */
+  getRepositoriesAsArray(): RepositoryModel[] {
+    return Array.from(this.repositoriesMap.values());
   }
 
   /**
    * Get the current percentage of the repositories that we have loaded to what is available.
    */
   loadPercentage(): number {
-    if (this.totalRepositories == 0 || this.repositories.length == 0)
+    if (this.totalRepositories == 0 || this.repositoriesMap.size == 0)
       return 0;
 
-    return Math.round((this.repositories.length / this.totalRepositories) * 100);
+    return Math.round((this.repositoriesMap.size / this.totalRepositories) * 100);
   }
 
   /**

@@ -71,10 +71,23 @@ export class AccountViewModelService {
     = new BehaviorSubject<any>(0);
 
   /**
+   * Subject to track average score changes.
+   * @private
+   */
+  private averageScore$: BehaviorSubject<number>
+    = new BehaviorSubject<number>(0);
+
+  /**
    * Used to cancel any requests, especially long ones.
    * @private
    */
   private cancelled$ = new Subject<void>();
+
+  /**
+   * If true, repositories without scorecards will not be included in the average count.
+   * @private
+   */
+  private averageScoreHideMissingScorecards: boolean = false;
 
   /**
    * Constructor.
@@ -131,6 +144,24 @@ export class AccountViewModelService {
           throw new ScorecardNotFoundError();
         })
       );
+  }
+
+  /**
+   * Observe the average score.
+   */
+  observeAverageScore(): Observable<number> {
+    return this.averageScore$;
+  }
+
+  /**
+   * Set to ignore repositories that don't have scorecards from the average score.
+   * @param ignoreMissing
+   */
+  setIgnoreReposWithMissingScorecards(
+    ignoreMissing: boolean = false
+  ) {
+    this.averageScoreHideMissingScorecards = ignoreMissing;
+    this.averageScore$.next(this.getAverageAccountScore());
   }
 
   /**
@@ -197,7 +228,7 @@ export class AccountViewModelService {
         // Reload the scorecards
         switchMap(repositoryCollection =>
           repositoryCollection.completed
-            ? this.reloadScorecards(false)
+            ? this.reloadScorecards(forceReload)
               .pipe(
                 // We should now be fully complete
                 tap(() =>
@@ -219,7 +250,8 @@ export class AccountViewModelService {
       .map(scorecardRequest =>
         scorecardRequest.scorecard);
 
-    return this.scorecardService.calculateAverageScore(scorecards);
+    return this.scorecardService.calculateAverageScore(
+      scorecards, this.averageScoreHideMissingScorecards);
   }
 
   /**
@@ -246,15 +278,23 @@ export class AccountViewModelService {
       .pipe(
         // Convert into an array of requests
         map(() =>
-          this.selectedAccountRepositories$.getValue().repositories.map(repository =>
+          this.selectedAccountRepositories$.getValue().getRepositoriesAsArray().map(repository =>
             this.reloadScorecard(repository, forceReload, false))),
 
         // Wait until all the requests have completed
         switchMap(observables =>
           forkJoin(observables)),
 
+        // Update the completed repositories
+        tap(() =>
+          this.selectedAccountRepositories$.next(this.selectedAccountRepositories$.getValue())),
+
         tap(scorecardRequests =>
           this.updateScorecardRequest(scorecardRequests, true)),
+
+        // Recalculate the average score
+        tap(() =>
+          this.averageScore$.next(this.getAverageAccountScore())),
 
         // Stop when cancelled
         takeUntil(this.cancelled$),

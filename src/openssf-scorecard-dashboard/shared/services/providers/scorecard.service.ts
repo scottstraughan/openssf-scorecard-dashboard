@@ -165,7 +165,8 @@ export class ScorecardService {
    * Calculate the average score for all the provided scorecards.
    */
   calculateAverageScore(
-    scorecards: (ScorecardModel | undefined)[]
+    scorecards: (ScorecardModel | undefined)[],
+    ignoreMissing: boolean = true
   ) {
     let totalScore = 0;
     let scoreCount = 0;
@@ -177,11 +178,17 @@ export class ScorecardService {
     for (const scorecard of scorecards) {
       let score = 0;
 
-      if (scorecard && scorecard.score)
+      if (scorecard && scorecard.score) {
         score = scorecard.score;
 
+        if (ignoreMissing)
+          scoreCount += 1;
+      }
+
       totalScore += score;
-      scoreCount += 1;
+
+      if (!ignoreMissing)
+        scoreCount += 1;
     }
 
     if (scoreCount == 0)

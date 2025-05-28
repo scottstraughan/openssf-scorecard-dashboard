@@ -33,19 +33,19 @@
       </div>
     </div>
 
-    @if (repositories().completed && getVisibleRepositories().length > 0) {
+    @if (repositoryCollection().completed && visibleRepositories().length > 0) {
       <div class="container">
         <div
             [class.list]="layoutView() == LayoutView.LIST"
             [class.grid]="layoutView() == LayoutView.GRID">
-          @for (repository of getVisibleRepositories(); track repository.url) {
+          @for (repository of visibleRepositories(); track repository.url) {
             <ossfd-repository-widget
                 [layout]="layoutView()"
                 [account]="account"
                 [repository]="repository"></ossfd-repository-widget>
           }
         </div>
-        @if (getVisibleRepositories().length < filteredRepositoriesCount) {
+        @if (visibleRepositories().length < filteredRepositoriesCount) {
           <ossfd-link-button
               class="view-more"
               label="View More Repositories"
@@ -53,7 +53,7 @@
               (click)="onViewMore()"></ossfd-link-button>
         }
       </div>
-    } @else if (repositories().completed && getVisibleRepositories().length == 0) {
+    } @else if (repositoryCollection().completed && visibleRepositories().length == 0) {
       <div class="error-message">
         <div>
           <ossfd-icon icon="info"></ossfd-icon>
