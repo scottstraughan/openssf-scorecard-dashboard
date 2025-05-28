@@ -63,9 +63,10 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
   readonly accountLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
-  readonly scorecardLoadState: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   readonly totalRepositories: WritableSignal<number> = signal(0);
   readonly totalRepositoriesWithScorecards: WritableSignal<number> = signal(0);
+
+  readonly scorecardLoadState: Signal<LoadingState>;
   readonly averageScorecardScore: Signal<number>;
   readonly selectedAccountServiceName: Signal<string> = signal('');
 
@@ -100,6 +101,14 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
     this.averageScorecardScore = toSignal(
       this.accountViewModelService.observeAverageScore(), { initialValue: 0 })
+
+    this.scorecardLoadState = toSignal(
+      this.accountViewModelService.observeScorecardsLoading()
+        .pipe(
+          tap(() =>
+            this.totalRepositoriesWithScorecards.set(this.accountViewModelService.getRepositoriesWithScorecardCount()))
+        ), { initialValue: LoadingState.LOADING }
+    );
   }
 
   /**
@@ -110,19 +119,6 @@ export class AccountViewComponent implements OnInit, OnDestroy {
       .pipe(
         tap(repositoryCollection =>
           this.totalRepositories.set(repositoryCollection.getRepositoriesAsArray().length)),
-        takeUntil(this.onDestroy)
-      )
-      .subscribe();
-
-    this.accountViewModelService.observeScorecardsLoading()
-      .pipe(
-        tap(loadState => {
-          this.scorecardLoadState.set(loadState);
-
-          if (loadState == LoadingState.LOAD_SUCCESS) {
-            this.totalRepositoriesWithScorecards.set(this.accountViewModelService.getRepositoriesWithScorecardCount());
-          }
-        }),
         takeUntil(this.onDestroy)
       )
       .subscribe();
@@ -238,7 +234,6 @@ export class AccountViewComponent implements OnInit, OnDestroy {
 
     this.selectedAccount.set(undefined);
     this.accountLoadState.set(LoadingState.LOADING);
-    this.scorecardLoadState.set(LoadingState.LOADING);
     this.totalRepositoriesWithScorecards.set(0);
   }
 }
