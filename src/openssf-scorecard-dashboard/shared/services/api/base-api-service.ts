@@ -152,6 +152,10 @@ export class RepositoryCollection {
    * Get all the repositories as an array.
    */
   getRepositoriesAsArray(): RepositoryModel[] {
+    if (this.repositoriesMap.size == 0) {
+      return [];
+    }
+
     return Array.from(this.repositoriesMap.values());
   }
 

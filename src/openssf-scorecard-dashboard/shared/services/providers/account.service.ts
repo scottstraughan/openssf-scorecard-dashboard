@@ -168,13 +168,13 @@ export class AccountService extends InitializableService {
                   throw new MinimumAccountError();
               }),
 
-              // Delete the account
-              switchMap(() =>
-                this.cacheService.deleteItem(AccountService.CACHE_TABLE_NAME, accountKey)),
-
               // Delete any account repositories
               switchMap(() =>
                 this.repositoryService.deleteCached(account)),
+
+              // Delete the account
+              switchMap(() =>
+                this.cacheService.deleteItem(AccountService.CACHE_TABLE_NAME, accountKey)),
 
               // Reload the cache
               switchMap(() =>
