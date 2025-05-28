@@ -60,7 +60,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
   protected readonly ScoreRingComponent = ScoreRingComponent;
 
   protected account: AccountModel | undefined;
-  protected cleanup = new Subject<void>();
+  protected onDestroy = new Subject<void>();
 
   protected readonly loading: WritableSignal<LoadingState> = signal(LoadingState.LOADING);
   protected readonly repository: WritableSignal<RepositoryModel | undefined> = signal(undefined);
@@ -115,9 +115,11 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
         catchError(error =>
           this.errorService.handleError(error, true)),
 
-        // Take until cleanup
-        takeUntil(this.cleanup),
-        take(1)
+        // Take the first item and close
+        take(1),
+
+        // Take new route changes until destroy
+        takeUntil(this.onDestroy)
       )
       .subscribe();
   }
@@ -126,7 +128,7 @@ export class ScorecardViewComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   ngOnDestroy(): void {
-    this.cleanup.complete();
+    this.onDestroy.complete();
   }
 
   /**

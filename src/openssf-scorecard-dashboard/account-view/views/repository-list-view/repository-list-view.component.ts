@@ -19,10 +19,10 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, computed,
   effect,
   OnDestroy,
-  OnInit,
+  OnInit, Signal,
   signal,
   WritableSignal
 } from '@angular/core';
@@ -33,7 +33,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/loading-state';
-import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, map, of, Subject, take, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
 import { KeyValueStore } from '../../../shared/services/storage/key-value.service';
@@ -44,6 +44,7 @@ import {
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { RepositoryCollection } from '../../../shared/services/api/base-api-service';
 import { ErrorService } from '../../../shared/services/error.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'ossfd-repository-list-view',
@@ -70,8 +71,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   readonly LayoutVisibility = LayoutVisibility;
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
-  readonly repositories: WritableSignal<RepositoryCollection> = signal(new RepositoryCollection());
+  readonly repositoryCollection: WritableSignal<RepositoryCollection> = signal(new RepositoryCollection());
   readonly loadingPercentage: WritableSignal<number> = signal(0);
+
+  readonly allRepositories: Signal<RepositoryModel[]>;
+  readonly visibleRepositories: Signal<RepositoryModel[]>;
+  readonly filteredRepositories: Signal<RepositoryModel[]>;
 
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
   readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
@@ -102,6 +107,76 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       this.setStorageValue('hide-nsr', this.hideNoScorecardRepos());
       this.setStorageValue('hide-ar', this.hideArchivedRepos());
     });
+
+    this.allRepositories = toSignal(
+      this.selectedAccountService.observeRepositories()
+        .pipe(
+          // Extract the repository collection
+          tap(repositoryCollection =>
+            this.repositoryCollection.set(repositoryCollection)),
+
+          // Extract the load progress
+          tap(repositoryCollection =>
+            this.loadingPercentage.set(repositoryCollection.loadPercentage())),
+
+          // Extract the repository array
+          map(repositoryCollection =>
+            repositoryCollection.getRepositoriesAsArray()),
+
+          // Handle any errors
+          catchError(error => {
+            this.errorService.handleError(error);
+            return of(error);
+          }),
+        ),
+      { initialValue: [] })
+
+    this.visibleRepositories = computed(() => {
+      let repositories: RepositoryModel[] = this.filteredRepositories();
+
+      repositories.sort((a, b) => {
+        const aScore = a.scorecard?.score !== undefined ? a.scorecard.score : 0;
+        const bScore = b.scorecard?.score !== undefined ? b.scorecard.score : 0;
+
+        if (this.layoutSortMode() == LayoutSortMode.NAME_ASC) {
+          return a.name.localeCompare(b.name)
+        } else if (this.layoutSortMode() == LayoutSortMode.NAME_DESC) {
+          return b.name.localeCompare(a.name)
+        } else if (this.layoutSortMode() == LayoutSortMode.SCORE_ASC) {
+          return aScore > bScore ? 1 : -1;
+        } else if (this.layoutSortMode() == LayoutSortMode.SCORE_DESC) {
+          return bScore > aScore ? 1 : -1;
+        }
+
+        return 0;
+      });
+
+      this.filteredRepositoriesCount = repositories.length;
+      return repositories.slice(0, this.layoutVisibleResults());
+    })
+
+    this.filteredRepositories = computed(() => {
+      let repositories: RepositoryModel[] = this.allRepositories();
+
+      if (this.hideNoScorecardRepos()) {
+        repositories = repositories.filter((repo) =>
+          repo.scorecard?.score !== undefined);
+      }
+
+      if (this.hideArchivedRepos()) {
+        repositories = repositories.filter((repo) =>
+          !repo.archived);
+      }
+
+      const searchString = this.searchString();
+
+      if (searchString.length > 0) {
+        repositories = repositories.filter((repo) =>
+          JSON.stringify(repo).toLowerCase().includes(searchString));
+      }
+
+      return repositories;
+    });
   }
 
   /**
@@ -123,27 +198,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.selectedAccountService.observeRepositories()
-      .pipe(
-        // Update repositories signal
-        tap(repositories =>
-          this.repositories.set(repositories)),
-
-        // Update progress signal
-        tap(repositoryLoadState =>
-          this.loadingPercentage.set(repositoryLoadState.loadPercentage())),
-
-        // Handle any errors
-        catchError(error => {
-          this.errorService.handleError(error);
-          return of(error);
-        }),
-
-        // Close on cleanup
-        takeUntil(this.cleanup),
-      )
-      .subscribe();
-
     this.selectedAccountService.observeScorecardsLoading()
       .pipe(
         // Detect any new changes on LOAD_SUCCESS
@@ -155,23 +209,35 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
-    this.activatedRoute.queryParams.subscribe(params => {
-      if (Object.keys(params).length == 0) {
-        this.navigateWithQueryParams({
-          'layout': this.getStorageValue('layout'),
-          'sort': this.getStorageValue('sort'),
-          'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
-          'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
-        });
-      }
+    this.activatedRoute.queryParams
+      .pipe(
+        tap(params => {
+          if (Object.keys(params).length == 0) {
+            this.navigateWithQueryParams({
+              'layout': this.getStorageValue('layout'),
+              'sort': this.getStorageValue('sort'),
+              'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
+              'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
+            });
+          }
 
-      this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
-      this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
-      this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
-      this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
+          this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
+          this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
+          this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
+          this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
 
-      this.changeDetectorRef.detectChanges();
-    });
+          this.ignoreMissingRepos(this.hideNoScorecardRepos());
+
+          this.changeDetectorRef.detectChanges();
+        }),
+
+        // We can close after first param check as we handle state changes without using the router
+        take(1),
+
+        // Close on cleanup
+        takeUntil(this.cleanup)
+      )
+      .subscribe();
   }
 
   /**
@@ -197,33 +263,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     }
 
     return value;
-  }
-
-  /**
-   * Get a list of repositories after the results have had the sort filters applied.
-   */
-  getVisibleRepositories(): RepositoryModel[] {
-    let repositories: RepositoryModel[] = this.getFilteredRepositories();
-
-    repositories.sort((a, b) => {
-      const aScore = a.scorecard?.score !== undefined ? a.scorecard.score : 0;
-      const bScore = b.scorecard?.score !== undefined ? b.scorecard.score : 0;
-
-      if (this.layoutSortMode() == LayoutSortMode.NAME_ASC) {
-        return a.name.localeCompare(b.name)
-      } else if (this.layoutSortMode() == LayoutSortMode.NAME_DESC) {
-        return b.name.localeCompare(a.name)
-      } else if (this.layoutSortMode() == LayoutSortMode.SCORE_ASC) {
-        return aScore > bScore ? 1 : -1;
-      } else if (this.layoutSortMode() == LayoutSortMode.SCORE_DESC) {
-        return bScore > aScore ? 1 : -1;
-      }
-
-      return 0;
-    });
-
-    this.filteredRepositoriesCount = repositories.length;
-    return repositories.slice(0, this.layoutVisibleResults());
   }
 
   /**
@@ -299,6 +338,8 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
       this.navigateWithQueryParams({
         'hide-nsr': changedItem.active ? true : undefined
       });
+
+      this.ignoreMissingRepos(changedItem.active);
     } else if (changedItem.id == LayoutVisibility.HIDE_ARCHIVED_REPOS) {
       this.hideArchivedRepos.set(changedItem.active);
 
@@ -332,6 +373,12 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     }
 
     return 'mood';
+  }
+
+  private ignoreMissingRepos(
+    ignore: boolean = false
+  ) {
+    this.selectedAccountService.setIgnoreReposWithMissingScorecards(ignore);
   }
 
   /**
@@ -370,32 +417,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get a list of repositories after the results have been filtered.
-   */
-  private getFilteredRepositories(): RepositoryModel[] {
-    let repositories: RepositoryModel[] = this.repositories()?.repositories.slice();
-
-    if (this.hideNoScorecardRepos()) {
-      repositories = repositories.filter((repo) =>
-        repo.scorecard?.score !== undefined);
-    }
-
-    if (this.hideArchivedRepos()) {
-      repositories = repositories.filter((repo) =>
-        !repo.archived);
-    }
-
-    const searchString = this.searchString();
-
-    if (searchString.length > 0) {
-      repositories = repositories.filter((repo) =>
-        JSON.stringify(repo).toLowerCase().includes(searchString));
-    }
-
-    return repositories;
-  }
-
-  /**
    * Updates the query params, merging values and ensuring the page doesn't reload.
    * @private
    */
@@ -415,9 +436,8 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    * @private
    */
   private reset() {
-    this.loadingPercentage.set(0);
     this.selectedAccount.set(undefined);
-    this.repositories.set(new RepositoryCollection());
+    this.repositoryCollection.set(new RepositoryCollection());
   }
 }
 

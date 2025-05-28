@@ -76,7 +76,7 @@ export class RepositoryService {
                     // If completed, add to cache
                     ? this.indexedDbService.add<RepositoryModel[]>(
                       RepositoryService.CACHE_TABLE_NAME,
-                      repositoryCollection.repositories, account.url, RepositoryService.CACHE_TIMEOUT)
+                      repositoryCollection.getRepositoriesAsArray(), account.url, RepositoryService.CACHE_TIMEOUT)
                       .pipe(map(() => repositoryCollection))
 
                     // If not completed, return previous result
@@ -109,9 +109,10 @@ export class RepositoryService {
     return this.getRepositories(account)
       .pipe(
         map(repositories => {
-          for (const repository of repositories.repositories) {
-            if (repository.name == name)
-              return repository;
+          const found = repositories.repositoriesMap.get(name)
+
+          if (found) {
+            return found;
           }
 
           throw new RepositoryNotFoundError();
@@ -129,7 +130,7 @@ export class RepositoryService {
     return this.getRepositories(account)
       .pipe(
         map(repositoryCollection =>
-          repositoryCollection.repositories.map(repository =>
+          repositoryCollection.getRepositoriesAsArray().map(repository =>
             this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url)
               .pipe(
                 // Switch to the delete cache observable

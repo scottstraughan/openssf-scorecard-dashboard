@@ -33,39 +33,41 @@
       </div>
     </div>
 
-    @if (!repositories().completed) {
+    @if (repositoryCollection().completed && visibleRepositories().length > 0) {
+      <div class="container">
+        <div
+            [class.list]="layoutView() == LayoutView.LIST"
+            [class.grid]="layoutView() == LayoutView.GRID">
+          @for (repository of visibleRepositories(); track repository.url) {
+            <ossfd-repository-widget
+                [layout]="layoutView()"
+                [account]="account"
+                [repository]="repository"></ossfd-repository-widget>
+          }
+        </div>
+        @if (visibleRepositories().length < filteredRepositoriesCount) {
+          <ossfd-link-button
+              class="view-more"
+              label="View More Repositories"
+              icon="arrow-down"
+              (click)="onViewMore()"></ossfd-link-button>
+        }
+      </div>
+    } @else if (repositoryCollection().completed && visibleRepositories().length == 0) {
+      <div class="error-message">
+        <div>
+          <ossfd-icon icon="info"></ossfd-icon>
+          <h1>No Repositories Available</h1>
+        </div>
+      </div>
+    } @else {
       <div class="container">
         <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
       </div>
-    } @else {
-      @if (getVisibleRepositories().length > 0) {
-        <div class="container">
-          <div
-              [class.list]="layoutView() == LayoutView.LIST"
-              [class.grid]="layoutView() == LayoutView.GRID">
-            @for (repository of getVisibleRepositories(); track repository.url) {
-              <ossfd-repository-widget
-                  [layout]="layoutView()"
-                  [account]="account"
-                  [repository]="repository"></ossfd-repository-widget>
-            }
-          </div>
-          @if (getVisibleRepositories().length < filteredRepositoriesCount) {
-            <ossfd-link-button
-                class="view-more"
-                label="View More Repositories"
-                icon="arrow-down"
-                (click)="onViewMore()"></ossfd-link-button>
-          }
-        </div>
-      } @else {
-        <div class="error-message">
-          <div>
-            <ossfd-icon icon="info"></ossfd-icon>
-            <h1>No Repositories Available</h1>
-          </div>
-        </div>
-      }
     }
+  } @else {
+    <div class="container">
+      <ossfd-loading [percentage]="loadingPercentage()"></ossfd-loading>
+    </div>
   }
 </div>
