@@ -73,6 +73,22 @@ export class CacheService {
   }
 
   /**
+   * Bulk delete from database.
+   */
+  bulkDelete(
+    tableName: string,
+    keys: string[],
+  ) {
+    return this.getDexie()
+      .pipe(
+        switchMap(dexie =>
+          dexie.table(tableName).bulkDelete(keys)),
+        tap(() =>
+          this.loggingService.warn(`Deleting '${keys.length}' items from '${tableName}' cache.`))
+      )
+  }
+
+  /**
    * Returns entry by id.
    * @param storeName The name of the store to query
    * @param key The entry key
