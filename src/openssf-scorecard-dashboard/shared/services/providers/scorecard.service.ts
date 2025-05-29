@@ -179,26 +179,18 @@ export class ScorecardService {
       return 0;
     }
 
+    // If we are ignoring missing scorecards, filter them out
+    if (ignoreMissing)
+      scorecards = scorecards.filter(scorecard =>
+        scorecard !== undefined);
+
     for (const scorecard of scorecards) {
-      let score = 0;
-
-      if (scorecard && scorecard.score) {
-        score = scorecard.score;
-
-        if (ignoreMissing)
-          scoreCount += 1;
-      }
-
-      totalScore += score;
-
-      if (!ignoreMissing)
-        scoreCount += 1;
+      totalScore += scorecard && scorecard.score ? scorecard.score : 0;
+      scoreCount += 1;
     }
 
-    if (scoreCount == 0)
-      return 0;
-
-    return Number((totalScore / scoreCount).toFixed(1));
+    return scoreCount == 0
+      ? 0 : Number((totalScore / scoreCount).toFixed(1));
   }
 
   /**
