@@ -32,8 +32,7 @@
             (click)="onToggleLayout()"></ossfd-link-button>
       </div>
     </div>
-
-    @if (repositoryCollection().completed && visibleRepositories().length > 0) {
+    @if (loadingPercentage() == 100 && allRepositories().length > 0) {
       <div class="container">
         <div
             [class.list]="layoutView() == LayoutView.LIST"
@@ -53,7 +52,7 @@
               (click)="onViewMore()"></ossfd-link-button>
         }
       </div>
-    } @else if (repositoryCollection().completed && visibleRepositories().length == 0) {
+    } @else if (loadingPercentage() == 100 && allRepositories().length == 0) {
       <div class="error-message">
         <div>
           <ossfd-icon icon="info"></ossfd-icon>

@@ -42,7 +42,6 @@ import {
   ToggleButtonItem
 } from '../../../shared/components/multi-toggle-button/multi-toggle-button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
-import { RepositoryCollection } from '../../../shared/services/api/base-api-service';
 import { ErrorService } from '../../../shared/services/error.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -71,20 +70,17 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
   readonly LayoutVisibility = LayoutVisibility;
 
   readonly selectedAccount: WritableSignal<AccountModel | undefined> = signal(undefined);
-  readonly repositoryCollection: WritableSignal<RepositoryCollection> = signal(new RepositoryCollection());
   readonly loadingPercentage: WritableSignal<number> = signal(0);
-
-  readonly allRepositories: Signal<RepositoryModel[]>;
-  readonly visibleRepositories: Signal<RepositoryModel[]>;
-  readonly filteredRepositories: Signal<RepositoryModel[]>;
-
   readonly layoutView: WritableSignal<LayoutView> = signal(LayoutView.GRID);
   readonly layoutSortMode: WritableSignal<LayoutSortMode> = signal(LayoutSortMode.NAME_ASC);
   readonly layoutVisibleResults: WritableSignal<number> = signal(RepositoryListViewComponent.RESULTS_PER_PAGE);
   readonly searchString: WritableSignal<string> = signal('');
-
   readonly hideNoScorecardRepos: WritableSignal<boolean> = signal(false);
   readonly hideArchivedRepos: WritableSignal<boolean> = signal(false);
+
+  readonly allRepositories: Signal<RepositoryModel[]>;
+  readonly visibleRepositories: Signal<RepositoryModel[]>;
+  readonly filteredRepositories: Signal<RepositoryModel[]>;
 
   public filteredRepositoriesCount: number = 0;
   private cleanup = new Subject<void>();
@@ -111,10 +107,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.allRepositories = toSignal(
       this.selectedAccountService.observeRepositories()
         .pipe(
-          // Extract the repository collection
-          tap(repositoryCollection =>
-            this.repositoryCollection.set(repositoryCollection)),
-
           // Extract the load progress
           tap(repositoryCollection =>
             this.loadingPercentage.set(repositoryCollection.loadPercentage())),
@@ -212,23 +204,26 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams
       .pipe(
         tap(params => {
+          const layout = this.getParamValue(params, 'layout') || this.getStorageValue('layout') || this.layoutView();
+          const sort = this.getParamValue(params, 'sort') || this.getStorageValue('sort') || this.layoutSortMode();
+          const hideNsr = this.getParamValue(params, 'hide-nsr') || this.getStorageValue('hide-nsr') || this.hideNoScorecardRepos();
+          const hideAr = this.getParamValue(params, 'hide-ar') || this.getStorageValue('hide-ar') || this.hideArchivedRepos();
+
           if (Object.keys(params).length == 0) {
             this.navigateWithQueryParams({
-              'layout': this.getStorageValue('layout'),
-              'sort': this.getStorageValue('sort'),
-              'hide-nsr': this.getStorageValue('hide-nsr') === true || undefined,
-              'hide-ar': this.getStorageValue('hide-ar') === true || undefined,
+              'layout': layout,
+              'sort': sort,
+              'hide-nsr': hideNsr === true || undefined,
+              'hide-ar': hideAr === true || undefined,
             });
           }
 
-          this.layoutView.set(this.getParamValue(params, 'layout') || this.layoutView());
-          this.layoutSortMode.set(this.getParamValue(params, 'sort') || this.layoutSortMode());
-          this.hideNoScorecardRepos.set(this.getParamValue(params, 'hide-nsr') || this.hideNoScorecardRepos());
-          this.hideArchivedRepos.set(this.getParamValue(params, 'hide-ar') || this.hideArchivedRepos());
+          this.layoutView.set(layout);
+          this.layoutSortMode.set(sort);
+          this.hideNoScorecardRepos.set(hideNsr);
+          this.hideArchivedRepos.set(hideAr);
 
           this.ignoreMissingRepos(this.hideNoScorecardRepos());
-
-          this.changeDetectorRef.detectChanges();
         }),
 
         // We can close after first param check as we handle state changes without using the router
@@ -437,7 +432,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
    */
   private reset() {
     this.selectedAccount.set(undefined);
-    this.repositoryCollection.set(new RepositoryCollection());
   }
 }
 
