@@ -175,9 +175,8 @@ export class ScorecardService {
     let totalScore = 0;
     let scoreCount = 0;
 
-    if (scorecards.length == 0) {
+    if (scorecards.length == 0)
       return 0;
-    }
 
     // If we are ignoring missing scorecards, filter them out
     if (ignoreMissing)
