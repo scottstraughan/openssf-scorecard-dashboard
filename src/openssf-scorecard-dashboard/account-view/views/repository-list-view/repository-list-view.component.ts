@@ -209,6 +209,13 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
           const hideNsr = this.getParamValue(params, 'hide-nsr') || this.getStorageValue('hide-nsr') || this.hideNoScorecardRepos();
           const hideAr = this.getParamValue(params, 'hide-ar') || this.getStorageValue('hide-ar') || this.hideArchivedRepos();
 
+          this.layoutView.set(layout);
+          this.layoutSortMode.set(sort);
+          this.hideNoScorecardRepos.set(hideNsr);
+          this.hideArchivedRepos.set(hideAr);
+
+          this.ignoreMissingRepos(this.hideNoScorecardRepos());
+
           if (Object.keys(params).length == 0) {
             this.navigateWithQueryParams({
               'layout': layout,
@@ -217,17 +224,10 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
               'hide-ar': hideAr === true || undefined,
             });
           }
-
-          this.layoutView.set(layout);
-          this.layoutSortMode.set(sort);
-          this.hideNoScorecardRepos.set(hideNsr);
-          this.hideArchivedRepos.set(hideAr);
-
-          this.ignoreMissingRepos(this.hideNoScorecardRepos());
         }),
 
         // We can close after first param check as we handle state changes without using the router
-        take(1),
+       //take(1),
 
         // Close on cleanup
         takeUntil(this.cleanup)
