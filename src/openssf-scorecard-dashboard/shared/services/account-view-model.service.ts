@@ -176,10 +176,8 @@ export class AccountViewModelService {
     // Close any previous observables
     this.cancelled$.next();
 
-    // Reset
-    this.scorecardsRequestsLoadCounter$.next(1);
-    this.averageScore$.next(0);
-    this.selectedAccountRepositories$.next(new RepositoryCollection());
+    // Reset the state
+    this.reset();
 
     return this.accountService.getAccount(service, accountTag)
       .pipe(
@@ -348,6 +346,18 @@ export class AccountViewModelService {
         takeUntil(this.cancelled$),
         take(1)
       )
+  }
+
+  /**
+   * Reset the account view model state so it's ready to accept a new account without any lingering data from a
+   * previous account.
+   * @private
+   */
+  private reset() {
+    // Reset
+    this.scorecardsRequestsLoadCounter$.next(1);
+    this.averageScore$.next(0);
+    this.selectedAccountRepositories$.next(new RepositoryCollection());
   }
 
   /**
