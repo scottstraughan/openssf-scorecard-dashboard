@@ -172,7 +172,7 @@ export class AccountService extends InitializableService {
               switchMap(() =>
                 this.repositoryService.deleteCached(account)),
 
-              // Delete the account
+              // Delete the account from cache
               switchMap(() =>
                 this.cacheService.deleteItem(AccountService.CACHE_TABLE_NAME, accountKey)),
 

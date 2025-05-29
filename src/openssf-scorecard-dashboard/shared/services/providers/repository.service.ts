@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { AccountModel } from '../../models/account.model';
-import { forkJoin, map, Observable, of, Subject, switchMap, takeUntil, tap, } from 'rxjs';
+import { map, Observable, of, Subject, switchMap, takeUntil, tap, } from 'rxjs';
 import { GithubService } from '../api/github.service';
 import { Service } from '../../enums/service';
 import { RepositoryCollection } from '../api/base-api-service';
@@ -127,18 +127,15 @@ export class RepositoryService {
   deleteCached(
     account: AccountModel
   ): Observable<any> {
-    return this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url)
+    return this.getRepositories(account)
       .pipe(
-        // Get all the repos
-        switchMap(() =>
-          this.getRepositories(account)),
-
         // Delete the scorecard for each repo
-        switchMap(repositories =>
-          repositories.getRepositoriesAsArray().length > 0
-            ? forkJoin(repositories.getRepositoriesAsArray().map(repository =>
-              this.scorecardService.deleteCached(repository)))
-            : of([])),
+        switchMap(repositoryCollection =>
+          this.scorecardService.deleteCached(repositoryCollection)),
+
+        // Delete the repository cache
+        switchMap(() =>
+          this.indexedDbService.deleteItem(RepositoryService.CACHE_TABLE_NAME, account.url))
       )
   }
 

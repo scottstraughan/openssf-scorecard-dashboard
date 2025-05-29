@@ -12,6 +12,7 @@ import { CheckNotFoundError, UnableToParseCheckDetailsSegment } from '../../erro
 import { Service } from '../../enums/service';
 import { CacheService } from '../storage/cache.service';
 import { LoggingService } from '../logging.service';
+import { RepositoryCollection } from '../api/base-api-service';
 
 @Injectable({
   providedIn: 'root'
@@ -82,12 +83,15 @@ export class ScorecardService {
   }
 
   /**
-   * Delete from cache.
+   * Delete from all the repository scorecards from the cache.
    */
   deleteCached(
-    repository: RepositoryModel
+    repositoryCollection: RepositoryCollection
   ): Observable<void> {
-    return this.cacheService.deleteItem(ScorecardService.CACHE_TABLE_NAME, repository.url);
+    const repositoryKeys: string[] = repositoryCollection.getRepositoriesAsArray().map(repository =>
+      repository.url)
+
+    return this.cacheService.bulkDelete(ScorecardService.CACHE_TABLE_NAME, repositoryKeys);
   }
 
   /**

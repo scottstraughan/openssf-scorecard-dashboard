@@ -67,8 +67,8 @@ export class AccountViewModelService {
    * Subject to track the scorecard loads. This is separate from the main map to reduce latency within the UI.
    * @private
    */
-  private scorecardsRequestsLoadCounter$: BehaviorSubject<number>
-    = new BehaviorSubject<any>(0);
+  private scorecardsRequestsLoadCounter$: BehaviorSubject<number | undefined>
+    = new BehaviorSubject<any>(undefined);
 
   /**
    * Subject to track average score changes.
@@ -120,9 +120,9 @@ export class AccountViewModelService {
   observeScorecardsLoading(): Observable<LoadingState> {
     return this.scorecardsRequestsLoadCounter$
       .pipe(
-        map(counter => counter == 0
-          ? LoadingState.LOAD_SUCCESS
-          : LoadingState.LOADING
+        map(counter => counter == undefined || counter > 0
+          ? LoadingState.LOADING
+          : LoadingState.LOAD_SUCCESS
         )
       )
   }
@@ -177,7 +177,7 @@ export class AccountViewModelService {
     this.cancelled$.next();
 
     // Reset
-    this.scorecardsRequestsLoadCounter$.next(0);
+    this.scorecardsRequestsLoadCounter$.next(1);
     this.averageScore$.next(0);
     this.selectedAccountRepositories$.next(new RepositoryCollection());
 
