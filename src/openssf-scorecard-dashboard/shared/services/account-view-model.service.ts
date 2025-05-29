@@ -354,7 +354,6 @@ export class AccountViewModelService {
    * @private
    */
   private reset() {
-    // Reset
     this.scorecardsRequestsLoadCounter$.next(1);
     this.averageScore$.next(0);
     this.selectedAccountRepositories$.next(new RepositoryCollection());
