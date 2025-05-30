@@ -20,7 +20,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, computed,
-  effect,
   OnDestroy,
   OnInit, Signal,
   signal,
@@ -33,7 +32,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AccountModel } from '../../../shared/models/account.model';
 import { RepositoryModel } from '../../../shared/models/repository.model';
 import { LoadingState } from '../../../shared/loading-state';
-import { catchError, map, of, Subject, take, takeUntil, tap } from 'rxjs';
+import { catchError, map, of, Subject, takeUntil, tap } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AccountViewModelService } from '../../../shared/services/account-view-model.service';
 import { KeyValueStore } from '../../../shared/services/storage/key-value.service';
@@ -96,14 +95,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     private transientStorage: KeyValueStore,
     private errorService: ErrorService
   ) {
-    effect(() => {
-      // Save changes to the ui settings to the storage
-      this.setStorageValue('layout', this.layoutView());
-      this.setStorageValue('sort', this.layoutSortMode());
-      this.setStorageValue('hide-nsr', this.hideNoScorecardRepos());
-      this.setStorageValue('hide-ar', this.hideArchivedRepos());
-    });
-
     this.allRepositories = toSignal(
       this.selectedAccountService.observeRepositories()
         .pipe(
@@ -204,10 +195,10 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams
       .pipe(
         tap(params => {
-          const layout = this.getParamValue(params, 'layout') || this.getStorageValue('layout') || this.layoutView();
-          const sort = this.getParamValue(params, 'sort') || this.getStorageValue('sort') || this.layoutSortMode();
-          const hideNsr = this.getParamValue(params, 'hide-nsr') || this.getStorageValue('hide-nsr') || this.hideNoScorecardRepos();
-          const hideAr = this.getParamValue(params, 'hide-ar') || this.getStorageValue('hide-ar') || this.hideArchivedRepos();
+          const layout = this.getSyncedLayoutValue(params, 'layout', this.layoutView());
+          const sort = this.getSyncedLayoutValue(params, 'sort', this.layoutSortMode());
+          const hideNsr = this.getSyncedLayoutValue(params, 'hide-nsr', this.hideNoScorecardRepos());
+          const hideAr = this.getSyncedLayoutValue(params, 'hide-ar', this.hideArchivedRepos());
 
           this.layoutView.set(layout);
           this.layoutSortMode.set(sort);
@@ -225,9 +216,6 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
             });
           }
         }),
-
-        // We can close after first param check as we handle state changes without using the router
-       //take(1),
 
         // Close on cleanup
         takeUntil(this.cleanup)
@@ -258,6 +246,33 @@ export class RepositoryListViewComponent implements OnInit, OnDestroy {
     }
 
     return value;
+  }
+
+  /**
+   * Get a value to use for layout. Params is preferred with storage second. Fallback is the final option.
+   */
+  getSyncedLayoutValue(
+    params: Params,
+    key: string,
+    fallback: any
+  ) {
+    let preferredValue = undefined;
+    const paramValue = this.getParamValue(params, key);
+    const storageValue = this.getStorageValue(key);
+
+    if (Object.keys(params).length == 0 && storageValue) {
+      preferredValue = storageValue;
+    } else if (Object.keys(params).length > 0) {
+      preferredValue = paramValue;
+    }
+
+    if (preferredValue == undefined) {
+      preferredValue = fallback;
+    }
+
+    // Out of sync, update stored value
+    this.setStorageValue(key, preferredValue);
+    return preferredValue;
   }
 
   /**
