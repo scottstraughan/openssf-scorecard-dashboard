@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { PopupReference } from '../../shared/components/popup/popup.service';
 import { LinkButtonComponent } from '../../shared/components/link-button/link-button.component';
 import { FormsModule } from '@angular/forms';
-import { IconComponent } from '../../shared/components/icon/icon.component';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'ossfd-about-popup',
@@ -29,7 +29,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
   imports: [
     LinkButtonComponent,
     FormsModule,
-    IconComponent
+    NgOptimizedImage
   ],
   styleUrls: [
     '../../shared/popups/error-popup/error-popup.component.scss',
